@@ -9,7 +9,7 @@ import {
   donations,
   streamGoals,
   streamSessions,
-  users,
+  user,
 } from '@core/database/schema';
 import { logger } from '@core/logger/logger';
 import { desc, eq, sql } from 'drizzle-orm';
@@ -124,7 +124,7 @@ export class StreamsService {
   }> {
     const stream = await this.getOrCreateActiveStream();
 
-    // 1. Upsert into Better Auth 'user' and 'account' tables & award +5 loyalty PTS
+    // 1. Upsert into unified 'user' & 'account' tables and award +5 loyalty PTS
     const { pointsService } = await import('@modules/points/points.service');
     const gamifiedProfile = await pointsService.upsertUserFromYouTubeChat({
       username: dto.username,
@@ -135,79 +135,14 @@ export class StreamsService {
       isSponsor: dto.isSponsor,
     });
 
-    // 2. Upsert User in database based on youtubeChannelId or username (Legacy users table)
-    let user: UserTable | undefined;
+    const userRecord = gamifiedProfile.user;
 
-    if (dto.youtubeChannelId) {
-      user = await db.query.users.findFirst({
-        where: eq(users.youtubeChannelId, dto.youtubeChannelId),
-      });
-    }
-
-    if (!user) {
-      // Check by name if no channel ID exists
-      user = await db.query.users.findFirst({
-        where: eq(users.name, dto.username),
-      });
-    }
-
-    const determinedRole = dto.isOwner
-      ? 'admin'
-      : dto.isModerator
-        ? 'moderator'
-        : dto.isSponsor
-          ? 'member'
-          : 'viewer';
-
-    if (!user) {
-      // Create new user discovered from live chat in legacy users table
-      const [createdUser] = await db
-        .insert(users)
-        .values({
-          name: dto.username,
-          youtubeChannelId: dto.youtubeChannelId || null,
-          youtubeHandle: gamifiedProfile.user.youtubeHandle || `@${dto.username.toLowerCase().replace(/\s+/g, '')}`,
-          avatarUrl: dto.userAvatarUrl || null,
-          role: determinedRole,
-          totalMessagesSent: '1',
-          firstSeenAt: new Date(),
-          lastSeenAt: new Date(),
-        })
-        .returning();
-
-      user = createdUser;
-      logger.info('👤 [StreamsService] Discovered new user from YouTube chat', {
-        userId: user.id,
-        authUserId: gamifiedProfile.user.id,
-        username: user.name,
-        role: user.role,
-        tier: gamifiedProfile.user.tier,
-        points: gamifiedProfile.user.points,
-      });
-    } else {
-      // Update existing user stats
-      const [updatedUser] = await db
-        .update(users)
-        .set({
-          name: dto.username,
-          avatarUrl: dto.userAvatarUrl || user.avatarUrl,
-          role: user.role === 'admin' ? 'admin' : determinedRole,
-          totalMessagesSent: sql`${users.totalMessagesSent} + 1`,
-          lastSeenAt: new Date(),
-          updatedAt: new Date(),
-        })
-        .where(eq(users.id, user.id))
-        .returning();
-
-      user = updatedUser;
-    }
-
-    // 2. Insert chat message linked to this stream session
+    // 2. Insert chat message linked to this stream session & user
     const [insertedMsg] = await db
       .insert(chatMessages)
       .values({
         streamId: stream.id,
-        userId: user.id,
+        userId: userRecord.id,
         username: dto.username,
         youtubeChannelId: dto.youtubeChannelId || null,
         youtubeMessageId: dto.youtubeMessageId || null,
@@ -233,7 +168,7 @@ export class StreamsService {
 
     return {
       message: insertedMsg,
-      user,
+      user: userRecord,
       stream: updatedStream,
     };
   }
@@ -295,8 +230,8 @@ export class StreamsService {
    * List all known users / chatters across all streams
    */
   async getAllChatters(): Promise<UserTable[]> {
-    return await db.query.users.findMany({
-      orderBy: [desc(users.lastSeenAt)],
+    return await db.query.user.findMany({
+      orderBy: [desc(user.createdAt)],
     });
   }
 

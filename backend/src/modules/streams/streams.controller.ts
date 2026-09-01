@@ -119,7 +119,7 @@ streamsController.post(
       streamId: result.stream.id,
       user: result.user.name,
       userId: result.user.id,
-      avatarUrl: result.user.avatarUrl,
+      avatarUrl: result.user.image,
       role: result.user.role,
       message: result.message.message,
       isOwner: result.message.isOwner,

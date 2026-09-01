@@ -186,7 +186,7 @@ export class StreamerbotService extends EventEmitter {
           user: result.user.name,
           userId: result.user.id,
           youtubeHandle: user.customUrl || result.user.youtubeHandle || null,
-          avatarUrl: result.user.avatarUrl || user.profileImageUrl || user.avatarUrl || null,
+          avatarUrl: result.user.image || user.profileImageUrl || user.avatarUrl || null,
           role: result.user.role,
           tier: userProfile?.tier || 'bronze',
           points: userProfile?.points || 5,

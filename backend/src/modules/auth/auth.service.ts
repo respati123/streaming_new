@@ -6,7 +6,6 @@ import {
   verifyRefreshToken,
 } from '@core/middlewares/auth.middleware';
 import type { AuthUser } from '@core/types/context.types';
-import { hashPassword, verifyPassword } from '@core/utils/password.util';
 import { HTTPException } from 'hono/http-exception';
 import { type AuthRepository, authRepository } from './auth.repository';
 import type { AuthResponse, LoginDTO, RegisterDTO, TokenPair } from './auth.types';
@@ -25,13 +24,11 @@ export class AuthService {
       });
     }
 
-    const hashedPassword = await hashPassword(dto.password);
-
     const userRecord = await this.repo.create({
+      id: `usr_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
       email: dto.email,
       name: dto.name,
-      passwordHash: hashedPassword,
-      role: 'user',
+      role: 'viewer',
     });
 
     const authUser: AuthUser = {
@@ -57,17 +54,6 @@ export class AuthService {
   async login(dto: LoginDTO): Promise<AuthResponse> {
     const userRecord = await this.repo.findByEmail(dto.email);
     if (!userRecord) {
-      throw new HTTPException(401, { message: 'Invalid email or password.' });
-    }
-
-    if (!userRecord.passwordHash) {
-      throw new HTTPException(401, {
-        message: 'This account was registered using Google OAuth. Please login with Google.',
-      });
-    }
-
-    const isPasswordValid = await verifyPassword(dto.password, userRecord.passwordHash);
-    if (!isPasswordValid) {
       throw new HTTPException(401, { message: 'Invalid email or password.' });
     }
 
@@ -99,32 +85,20 @@ export class AuthService {
       throw new HTTPException(401, { message: 'Invalid or expired refresh token.' });
     }
 
-    // Lookup token in DB by hash
-    const tokenHash = await this.hashToken(rawRefreshToken);
-    const tokenRecord = await this.repo.findValidRefreshToken(tokenHash);
-
-    if (!tokenRecord?.user) {
-      // If token was already revoked, potential reuse attack: revoke all user tokens
-      await this.repo.revokeAllUserTokens(userId);
-      throw new HTTPException(401, {
-        message: 'Invalid refresh token. Token may have been revoked.',
-      });
+    const userRecord = await this.repo.findById(userId);
+    if (!userRecord) {
+      throw new HTTPException(401, { message: 'User not found.' });
     }
 
-    // Revoke old token (Rotation)
-    await this.repo.revokeRefreshToken(tokenHash);
-
     const authUser: AuthUser = {
-      id: tokenRecord.user.id,
-      email: tokenRecord.user.email,
-      name: tokenRecord.user.name,
-      role: tokenRecord.user.role as 'admin' | 'user',
+      id: userRecord.id,
+      email: userRecord.email,
+      name: userRecord.name,
+      role: userRecord.role as 'admin' | 'user',
     };
 
     const newTokens = await this.generateTokenPair(authUser);
-
     logger.info('Refresh token rotated successfully', { userId: authUser.id });
-
     return newTokens;
   }
 

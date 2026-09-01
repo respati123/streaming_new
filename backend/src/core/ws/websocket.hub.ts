@@ -154,7 +154,7 @@ class WebSocketHub {
             user: result.user.name,
             userId: result.user.id,
             youtubeHandle: chatPayload.youtubeHandle || null,
-            avatarUrl: result.user.avatarUrl,
+            avatarUrl: result.user.image,
             role: result.user.role,
             tier: pointsInfo?.tier || 'bronze',
             points: pointsInfo?.totalPoints,

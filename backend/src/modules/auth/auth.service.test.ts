@@ -1,39 +1,34 @@
 import { describe, expect, it } from 'bun:test';
 import type { UserTable } from '@core/database/schema';
-import { hashPassword } from '@core/utils/password.util';
 import type { AuthRepository } from './auth.repository';
 import { AuthService } from './auth.service';
 
 describe('AuthService Unit Tests', () => {
   it('should register a new user and return user and token pair', async () => {
     const mockUsers: UserTable[] = [];
-    const mockTokens: Array<{ userId: string; tokenHash: string; expiresAt: Date }> = [];
 
     const mockRepo: Partial<AuthRepository> = {
       findByEmail: async (email) => mockUsers.find((u) => u.email === email),
       create: async (data) => {
         const user: UserTable = {
-          id: 'user-id-123',
-          email: data.email || null,
+          id: data.id || 'user-id-123',
+          email: data.email || 'test@example.com',
+          emailVerified: false,
           name: data.name,
-          passwordHash: data.passwordHash || null,
+          image: null,
           role: data.role || 'viewer',
-          avatarUrl: null,
-          googleId: null,
           youtubeChannelId: null,
           youtubeHandle: null,
-          youtubeTitle: null,
-          totalMessagesSent: '0',
-          firstSeenAt: new Date(),
-          lastSeenAt: new Date(),
+          youtubeChannelTitle: null,
+          points: 0,
+          tier: 'bronze',
+          totalChatCount: 0,
+          totalDonationAmount: 0,
           createdAt: new Date(),
           updatedAt: new Date(),
         };
         mockUsers.push(user);
         return user;
-      },
-      saveRefreshToken: async (userId, tokenHash, expiresAt) => {
-        mockTokens.push({ userId, tokenHash, expiresAt });
       },
     };
 
@@ -49,32 +44,29 @@ describe('AuthService Unit Tests', () => {
     expect(result.user.name).toBe('Test User');
     expect(result.tokens.accessToken).toBeDefined();
     expect(result.tokens.refreshToken).toBeDefined();
-    expect(mockTokens.length).toBe(1);
   });
 
-  it('should authenticate user with valid password and issue tokens', async () => {
-    const hashedPassword = await hashPassword('SecretPassword123');
+  it('should authenticate user and issue tokens', async () => {
     const existingUser: UserTable = {
       id: 'usr-999',
       email: 'john@example.com',
+      emailVerified: true,
       name: 'John Doe',
-      passwordHash: hashedPassword,
+      image: null,
       role: 'admin',
-      avatarUrl: null,
-      googleId: null,
       youtubeChannelId: null,
       youtubeHandle: null,
-      youtubeTitle: null,
-      totalMessagesSent: '0',
-      firstSeenAt: new Date(),
-      lastSeenAt: new Date(),
+      youtubeChannelTitle: null,
+      points: 100,
+      tier: 'silver',
+      totalChatCount: 5,
+      totalDonationAmount: 50000,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
 
     const mockRepo: Partial<AuthRepository> = {
       findByEmail: async (email) => (email === existingUser.email ? existingUser : undefined),
-      saveRefreshToken: async () => {},
     };
 
     const service = new AuthService(mockRepo as AuthRepository);

@@ -149,48 +149,6 @@ export const accountRelations = relations(account, ({ one }) => ({
 }));
 
 /**
- * Users Table Schema (Supporting both Standard Auth & Google / YouTube OAuth)
- */
-export const users = pgTable(
-  'users',
-  {
-    id: uuid('id').primaryKey().defaultRandom(),
-    email: varchar('email', { length: 255 }).unique(), // Nullable for chat-only discovered users
-    name: varchar('name', { length: 255 }).notNull(),
-    passwordHash: varchar('password_hash', { length: 255 }), // Nullable for OAuth-only or chat users
-    role: varchar('role', { length: 50 }).notNull().default('viewer'), // 'admin' | 'moderator' | 'member' | 'viewer'
-    avatarUrl: text('avatar_url'),
-    googleId: varchar('google_id', { length: 255 }).unique(),
-    youtubeChannelId: varchar('youtube_channel_id', { length: 255 }).unique(),
-    youtubeHandle: varchar('youtube_handle', { length: 255 }), // e.g. "@respati_stream"
-    youtubeTitle: varchar('youtube_title', { length: 255 }), // e.g. "Respati Gaming"
-    totalMessagesSent: numeric('total_messages_sent').notNull().default('0'),
-    firstSeenAt: timestamp('first_seen_at', { withTimezone: true }).notNull().defaultNow(),
-    lastSeenAt: timestamp('last_seen_at', { withTimezone: true }).notNull().defaultNow(),
-    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
-  },
-  (table) => [
-    index('idx_users_youtube_channel_id').on(table.youtubeChannelId),
-    index('idx_users_role').on(table.role),
-  ]
-);
-
-/**
- * Refresh Tokens Table Schema
- */
-export const refreshTokens = pgTable('refresh_tokens', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  userId: uuid('user_id')
-    .notNull()
-    .references(() => users.id, { onDelete: 'cascade' }),
-  tokenHash: varchar('token_hash', { length: 255 }).notNull(),
-  expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
-  isRevoked: boolean('is_revoked').notNull().default(false),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-});
-
-/**
  * Stream Sessions Table (Each Live Stream has its own unique record)
  */
 export const streamSessions = pgTable(
@@ -223,7 +181,7 @@ export const chatMessages = pgTable(
     streamId: uuid('stream_id')
       .notNull()
       .references(() => streamSessions.id, { onDelete: 'cascade' }),
-    userId: uuid('user_id').references(() => users.id, { onDelete: 'set null' }),
+    userId: text('user_id').references(() => user.id, { onDelete: 'set null' }),
     youtubeMessageId: varchar('youtube_message_id', { length: 255 }),
     username: varchar('username', { length: 255 }).notNull(), // The user's displayed name on YouTube/Google
     youtubeChannelId: varchar('youtube_channel_id', { length: 255 }),
@@ -280,7 +238,7 @@ export const donations = pgTable(
   'donations',
   {
     id: uuid('id').primaryKey().defaultRandom(),
-    userId: uuid('user_id').references(() => users.id, { onDelete: 'set null' }),
+    userId: text('user_id').references(() => user.id, { onDelete: 'set null' }),
     streamId: uuid('stream_id').references(() => streamSessions.id, { onDelete: 'set null' }),
     donorName: varchar('donor_name', { length: 255 }).notNull(),
     donorEmail: varchar('donor_email', { length: 255 }),
@@ -322,17 +280,10 @@ export const streamerbotActions = pgTable('streamerbot_actions', {
 /**
  * Drizzle Relations
  */
-export const usersRelations = relations(users, ({ many }) => ({
-  refreshTokens: many(refreshTokens),
+export const userStreamRelations = relations(user, ({ many }) => ({
   donations: many(donations),
   chatMessages: many(chatMessages),
-}));
-
-export const refreshTokensRelations = relations(refreshTokens, ({ one }) => ({
-  user: one(users, {
-    fields: [refreshTokens.userId],
-    references: [users.id],
-  }),
+  pointTransactions: many(pointTransactions),
 }));
 
 export const streamSessionsRelations = relations(streamSessions, ({ many }) => ({
@@ -345,16 +296,16 @@ export const chatMessagesRelations = relations(chatMessages, ({ one }) => ({
     fields: [chatMessages.streamId],
     references: [streamSessions.id],
   }),
-  user: one(users, {
+  user: one(user, {
     fields: [chatMessages.userId],
-    references: [users.id],
+    references: [user.id],
   }),
 }));
 
 export const donationsRelations = relations(donations, ({ one }) => ({
-  user: one(users, {
+  user: one(user, {
     fields: [donations.userId],
-    references: [users.id],
+    references: [user.id],
   }),
   streamSession: one(streamSessions, {
     fields: [donations.streamId],
@@ -365,10 +316,8 @@ export const donationsRelations = relations(donations, ({ one }) => ({
 /**
  * Inferred Types
  */
-export type UserTable = typeof users.$inferSelect;
-export type NewUserTable = typeof users.$inferInsert;
-export type RefreshTokenTable = typeof refreshTokens.$inferSelect;
-export type NewRefreshTokenTable = typeof refreshTokens.$inferInsert;
+export type UserTable = typeof user.$inferSelect;
+export type NewUserTable = typeof user.$inferInsert;
 export type StreamSessionTable = typeof streamSessions.$inferSelect;
 export type NewStreamSessionTable = typeof streamSessions.$inferInsert;
 export type ChatMessageTable = typeof chatMessages.$inferSelect;

@@ -1,32 +1,31 @@
 import { logger } from '@core/logger/logger';
-import { hashPassword } from '@core/utils/password.util';
 import { eq } from 'drizzle-orm';
 import { db, queryClient } from './index';
-import { donations, streamGoals, streamSettings, streamerbotActions, users } from './schema';
+import { donations, streamGoals, streamSettings, streamerbotActions, user } from './schema';
 
 async function seed() {
   logger.info('Starting streaming database seeding...');
 
   try {
     // 1. Seed Admin User
-    const existingAdmin = await db.query.users.findFirst({
-      where: eq(users.email, 'admin@respati.stream'),
+    const existingAdmin = await db.query.user.findFirst({
+      where: eq(user.email, 'tyorespati@gmail.com'),
     });
 
     if (!existingAdmin) {
-      const hashedPassword = await hashPassword('admin12345');
-
-      await db.insert(users).values({
-        email: 'admin@respati.stream',
+      await db.insert(user).values({
+        id: 'usr_streamer_admin',
+        email: 'tyorespati@gmail.com',
         name: 'Respati Streamer',
-        passwordHash: hashedPassword,
         role: 'admin',
         youtubeHandle: '@respati_stream',
-        youtubeTitle: 'Respati Live',
-        avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120',
+        youtubeChannelTitle: 'Respati Live',
+        image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120',
+        tier: 'diamond',
+        points: 10000,
       });
 
-      logger.info('✅ Admin user created: admin@respati.stream (password: admin12345)');
+      logger.info('✅ Admin user created in unified user table: tyorespati@gmail.com');
     } else {
       logger.info('ℹ️ Demo admin user already exists, skipping.');
     }
