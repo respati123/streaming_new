@@ -23,6 +23,7 @@ export const auth = betterAuth({
     'http://127.0.0.1:3000',
     'http://127.0.0.1:5173',
     env.FRONTEND_URL,
+    env.BETTER_AUTH_URL,
   ],
   plugins: [
     dash(),
