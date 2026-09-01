@@ -30,17 +30,24 @@ export default function UserPortalPage() {
   const [selectedTemplate, setSelectedTemplate] = useState<'electric-lightning' | 'fire-glass'>('electric-lightning');
   const [donationSentNotice, setDonationSentNotice] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [loginError, setLoginError] = useState<string | null>(null);
 
   // Handle Google OAuth Sign In
   const handleGoogleLogin = async () => {
     try {
       setIsSubmitting(true);
-      await signIn.social({
+      setLoginError(null);
+      const res = await signIn.social({
         provider: 'google',
         callbackURL: window.location.origin + '/user',
       });
-    } catch (error) {
+      if (res?.error) {
+        setLoginError(res.error.message || 'Gagal memulai autentikasi Google');
+        setIsSubmitting(false);
+      }
+    } catch (error: any) {
       console.error('Google Sign In failed:', error);
+      setLoginError(error?.message || 'Gagal menghubungi server Better Auth');
       setIsSubmitting(false);
     }
   };
@@ -179,6 +186,13 @@ export default function UserPortalPage() {
                 <RiGoogleFill className="text-xl text-red-500 group-hover:scale-110 transition-transform" />
                 <span>{isSubmitting ? 'Menghubungkan ke Google...' : 'Masuk dengan Google'}</span>
               </button>
+
+              {loginError && (
+                <div className="mt-4 p-3 rounded-xl bg-red-950/60 border border-red-500/40 text-red-300 text-xs font-semibold text-left flex items-start gap-2">
+                  <RiInformationLine className="text-base text-red-400 shrink-0 mt-0.5" />
+                  <span>{loginError}</span>
+                </div>
+              )}
 
               <div className="mt-6 flex items-center justify-center gap-2 text-xs text-zinc-500 font-mono">
                 <RiShieldCheckFill className="text-emerald-400" />
