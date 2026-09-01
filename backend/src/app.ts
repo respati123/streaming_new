@@ -42,7 +42,7 @@ export function createApp() {
   );
 
   // ─── BETTER AUTH (Google OAuth & Audience Social Auth) ───────────────────
-  app.on(['POST', 'GET'], '/api/auth/**', (c) => auth.handler(c.req.raw));
+  app.all('/api/auth/*', (c) => auth.handler(c.req.raw));
 
   app.onError(errorHandler);
   app.notFound((c) => {
