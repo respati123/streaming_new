@@ -160,11 +160,10 @@ export class StreamsService {
           : 'viewer';
 
     if (!user) {
-      // Create new user discovered from live chat
+      // Create new user discovered from live chat in legacy users table
       const [createdUser] = await db
         .insert(users)
         .values({
-          id: gamifiedProfile.user.id,
           name: dto.username,
           youtubeChannelId: dto.youtubeChannelId || null,
           youtubeHandle: gamifiedProfile.user.youtubeHandle || `@${dto.username.toLowerCase().replace(/\s+/g, '')}`,
@@ -179,6 +178,7 @@ export class StreamsService {
       user = createdUser;
       logger.info('👤 [StreamsService] Discovered new user from YouTube chat', {
         userId: user.id,
+        authUserId: gamifiedProfile.user.id,
         username: user.name,
         role: user.role,
         tier: gamifiedProfile.user.tier,
