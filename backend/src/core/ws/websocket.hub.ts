@@ -128,6 +128,7 @@ class WebSocketHub {
 
         case 'chat:send': {
           const { streamsService } = await import('@modules/streams/streams.service');
+          const { pointsService } = await import('@modules/points/points.service');
           const chatPayload = parsed.data;
           const result = await streamsService.ingestChatMessage({
             message: chatPayload.message,
@@ -140,18 +141,28 @@ class WebSocketHub {
             isVerified: chatPayload.isVerified || false,
           });
 
+          // Award loyalty points for chatting (+5 PTS)
+          let pointsInfo = null;
+          if (chatPayload.userId) {
+            pointsInfo = await pointsService.awardChatPoints(chatPayload.userId, result.message.id);
+          }
+
           // Broadcast new chat to all clients
           this.broadcast('chat:message', {
             id: result.message.id,
             streamId: result.stream.id,
             user: result.user.name,
             userId: result.user.id,
+            youtubeHandle: chatPayload.youtubeHandle || null,
             avatarUrl: result.user.avatarUrl,
             role: result.user.role,
+            tier: pointsInfo?.tier || 'bronze',
+            points: pointsInfo?.totalPoints,
             message: result.message.message,
             isOwner: result.message.isOwner,
             isModerator: result.message.isModerator,
             isSponsor: result.message.isSponsor,
+            isVerified: result.message.isVerified,
             timestamp: result.message.publishedAt,
           });
           break;
@@ -169,8 +180,16 @@ class WebSocketHub {
           break;
         }
 
+        case 'alert:trigger':
         case 'alert:test': {
+          const { pointsService } = await import('@modules/points/points.service');
           const alertData = parsed.data;
+
+          // Award loyalty points for donation (+1 PTS per Rp 100)
+          if (alertData.userId && alertData.amount) {
+            await pointsService.awardDonationPoints(alertData.userId, Number(alertData.amount), alertData.id);
+          }
+
           await streamerbotService.triggerDonationAlert(alertData);
           this.broadcast('donation:alert', alertData);
           break;

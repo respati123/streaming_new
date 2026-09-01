@@ -26,12 +26,14 @@ import { FireFlameFrame } from '../components/FireFlameFrame';
 interface ChatOverlayMsg {
   id: string;
   username: string;
+  youtubeHandle?: string | null;
   message: string;
   avatarUrl?: string | null;
   isOwner?: boolean;
   isModerator?: boolean;
   isSponsor?: boolean;
   isVerified?: boolean;
+  tier?: string;
   timestamp: string;
 }
 
@@ -143,12 +145,14 @@ export default function OverlayPage() {
       const newMsg: ChatOverlayMsg = {
         id: payload.id || Date.now().toString(),
         username: payload.user || payload.username || 'Anonymous',
+        youtubeHandle: payload.youtubeHandle || null,
         message: payload.message || '',
         avatarUrl: payload.avatarUrl || payload.userAvatarUrl || null,
         isOwner: payload.isOwner || payload.role === 'streamer' || payload.role === 'owner',
         isModerator: payload.isModerator || payload.role === 'moderator',
         isSponsor: payload.isSponsor || payload.role === 'member' || payload.role === 'sponsor',
         isVerified: payload.isVerified || false,
+        tier: payload.tier || 'bronze',
         timestamp: payload.timestamp || payload.publishedAt || new Date().toISOString(),
       };
 
@@ -472,6 +476,17 @@ export default function OverlayPage() {
                           {msg.isSponsor && (
                             <span className="px-1 py-0.2 rounded text-[8px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-mono flex items-center gap-0.5">
                               <RiStarFill className="text-[9px]" /> MEMBER
+                            </span>
+                          )}
+                          {msg.tier && msg.tier !== 'bronze' && !msg.isOwner && (
+                            <span className={`px-1 py-0.2 rounded text-[8px] font-bold uppercase font-mono flex items-center gap-0.5 ${
+                              msg.tier === 'diamond'
+                                ? 'bg-cyan-500/30 text-cyan-200 border border-cyan-400/80 shadow-[0_0_8px_rgba(0,212,255,0.4)]'
+                                : msg.tier === 'gold'
+                                ? 'bg-amber-500/30 text-amber-200 border border-amber-400/80'
+                                : 'bg-zinc-400/30 text-zinc-200 border border-zinc-400/80'
+                            }`}>
+                              <RiSparklingFill className="text-[8px]" /> {msg.tier}
                             </span>
                           )}
                           {msg.isVerified && !msg.isOwner && (

@@ -1,6 +1,7 @@
 import { relations } from 'drizzle-orm';
 import {
   boolean,
+  integer,
   numeric,
   pgTable,
   text,
@@ -19,11 +20,32 @@ export const user = pgTable('user', {
   emailVerified: boolean('email_verified').default(false).notNull(),
   image: text('image'),
   role: text('role').default('viewer').notNull(),
+  // YouTube Data Tracking
+  youtubeChannelId: text('youtube_channel_id'),
+  youtubeHandle: text('youtube_handle'), // e.g. "@tyorespati"
+  youtubeChannelTitle: text('youtube_channel_title'), // e.g. "Tyo Respati Official"
+  // Gamification & Loyalty Point System
+  points: integer('points').default(0).notNull(),
+  tier: text('tier').default('bronze').notNull(), // 'bronze' | 'silver' | 'gold' | 'diamond'
+  totalChatCount: integer('total_chat_count').default(0).notNull(),
+  totalDonationAmount: integer('total_donation_amount').default(0).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at')
     .defaultNow()
     .$onUpdate(() => new Date())
     .notNull(),
+});
+
+export const pointTransactions = pgTable('point_transactions', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  userId: text('user_id')
+    .notNull()
+    .references(() => user.id, { onDelete: 'cascade' }),
+  amount: integer('amount').notNull(),
+  type: text('type').notNull(), // 'CHAT_REWARD' | 'DONATION_REWARD' | 'DAILY_BONUS' | 'REDEEM'
+  description: text('description'),
+  metadata: text('metadata'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
 export const session = pgTable('session', {

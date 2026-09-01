@@ -16,6 +16,7 @@ import {
   RiSparklingFill,
   RiUser3Fill,
   RiVipCrownFill,
+  RiYoutubeFill,
 } from 'react-icons/ri';
 import { Link } from 'react-router-dom';
 
@@ -72,12 +73,15 @@ export default function UserPortalPage() {
     e.preventDefault();
     if (!chatInput.trim()) return;
 
-    const username = session?.user?.name || 'Google Viewer';
-    const avatarUrl = session?.user?.image || null;
+    const userObj = session?.user as any;
+    const displayName = userObj?.youtubeHandle || userObj?.name || 'Google Viewer';
+    const avatarUrl = userObj?.image || null;
 
     overlaySocket.send('chat:send', {
+      userId: userObj?.id,
       message: chatInput.trim(),
-      username: username,
+      username: displayName,
+      youtubeHandle: userObj?.youtubeHandle,
       userAvatarUrl: avatarUrl,
       isOwner: false,
       isModerator: false,
@@ -95,10 +99,12 @@ export default function UserPortalPage() {
     e.preventDefault();
     if (donorAmount <= 0) return;
 
-    const donorName = session?.user?.name || 'Google Supporter';
+    const userObj = session?.user as any;
+    const donorName = userObj?.youtubeHandle || userObj?.name || 'Google Supporter';
 
     overlaySocket.send('alert:trigger', {
       id: `don_${Date.now()}`,
+      userId: userObj?.id,
       donorName: donorName,
       amount: donorAmount,
       currency: 'Rp',
@@ -230,19 +236,38 @@ export default function UserPortalPage() {
                 <div>
                   <div className="flex items-center gap-2.5 flex-wrap">
                     <h1 className="text-2xl font-black text-white tracking-tight">
-                      {session.user.name}
+                      {(session.user as any)?.youtubeChannelTitle || session.user.name}
                     </h1>
+                    {(session.user as any)?.youtubeHandle && (
+                      <span className="px-2.5 py-0.5 rounded-full bg-red-600/20 text-red-300 border border-red-500/40 text-xs font-mono font-bold flex items-center gap-1 shadow-xs">
+                        <RiYoutubeFill className="text-red-500" />
+                        <span>{(session.user as any)?.youtubeHandle}</span>
+                      </span>
+                    )}
                     <span className="px-2.5 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-400/30 text-xs font-mono font-bold flex items-center gap-1">
                       <RiGoogleFill className="text-red-400" />
                       <span>Google Verified</span>
                     </span>
                     <span className="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/30 text-xs font-mono font-bold flex items-center gap-1">
                       <RiVipCrownFill className="text-amber-400" />
-                      <span>Sponsor Member</span>
+                      <span className="uppercase font-mono">Tier: {(session.user as any)?.tier || 'Bronze'}</span>
                     </span>
                   </div>
+
                   <p className="text-sm text-zinc-400 font-mono mt-1">{session.user.email}</p>
-                  <p className="text-xs text-zinc-500 mt-1">ID Pengguna: <span className="font-mono text-zinc-400">{session.user.id}</span></p>
+
+                  <div className="flex items-center gap-4 mt-2 text-xs font-mono">
+                    <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-zinc-800/80 border border-zinc-700/80 text-amber-300 font-bold">
+                      <RiSparklingFill className="text-amber-400" />
+                      <span>{Number((session.user as any)?.points || 0).toLocaleString('id-ID')} Loyalty PTS</span>
+                    </div>
+                    <span className="text-zinc-500">
+                      Chats: <strong className="text-zinc-300">{(session.user as any)?.totalChatCount || 0}</strong>
+                    </span>
+                    <span className="text-zinc-500">
+                      Total Sawer: <strong className="text-emerald-400">Rp {Number((session.user as any)?.totalDonationAmount || 0).toLocaleString('id-ID')}</strong>
+                    </span>
+                  </div>
                 </div>
               </div>
 
