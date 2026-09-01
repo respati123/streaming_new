@@ -1,0 +1,16 @@
+{
+  "name": "enterprise-fullstack-boilerplate",
+  "version": "1.0.0",
+  "description": "Enterprise Monorepo Boilerplate with Bun, React 18 (MVVM), Hono v4 (Clean Architecture), Drizzle ORM, and Biome",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "prepare": "git config core.hooksPath .githooks",
+    "lint": "bun run --cwd frontend lint && bun run --cwd backend lint",
+    "lint:fix": "bun run --cwd frontend lint:fix && bun run --cwd backend lint:fix",
+    "format": "bun run --cwd frontend format && bun run --cwd backend format",
+    "build": "bun run --cwd frontend build && bun run --cwd backend build",
+    "test": "bun run --cwd backend test && bun run --cwd frontend test",
+    "test:e2e": "bun run --cwd frontend test:e2e"
+  }
+}

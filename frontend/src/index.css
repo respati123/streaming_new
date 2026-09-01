@@ -1,0 +1,197 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  *, ::before, ::after {
+    font-family: 'Poppins', sans-serif;
+  }
+
+  html,
+  body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #fafafa;
+    color: #18181b;
+    -webkit-font-smoothing: antialiased;
+    letter-spacing: -0.01em;
+  }
+
+  button,
+  input,
+  optgroup,
+  select,
+  textarea {
+    font-family: 'Poppins', sans-serif;
+  }
+
+  code,
+  pre,
+  kbd,
+  samp,
+  .font-mono,
+  .font-mono * {
+    font-family: 'Poppins', sans-serif !important;
+  }
+}
+
+/* Studio Broadcast Card & Button Micro-Affordances */
+.studio-card {
+  background-color: #ffffff;
+  border: 1px solid #e4e4e7;
+  border-radius: 12px;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.04), 0 1px 1px 0 rgba(0, 0, 0, 0.02);
+}
+
+.studio-panel-inset {
+  background-color: #fafafa;
+  border: 1px solid #e4e4e7;
+  border-radius: 8px;
+}
+
+.studio-btn {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  border-radius: 8px;
+  transition: transform 0.1s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.studio-btn:active:not(:disabled) {
+  transform: scale(0.98) translateY(0.5px);
+}
+
+.studio-deck-btn {
+  background: #ffffff;
+  border: 1px solid #e4e4e7;
+  border-bottom: 2px solid #d4d4d8;
+  border-radius: 10px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  transition: all 0.1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.studio-deck-btn:hover:not(:disabled) {
+  border-color: #a1a1aa;
+  background-color: #fafafa;
+  box-shadow: 0 3px 8px -1px rgba(0, 0, 0, 0.05);
+}
+
+.studio-deck-btn:active:not(:disabled) {
+  transform: translateY(1.5px);
+  border-bottom-width: 1px;
+  box-shadow: none;
+}
+
+/* Liquid Glass Refraction */
+.studio-glass {
+  background: rgba(24, 24, 27, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.12), 0 20px 40px -15px rgba(0, 0, 0, 0.3);
+}
+
+.studio-glass-light {
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(228, 228, 231, 0.8);
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.8), 0 20px 40px -15px rgba(0, 0, 0, 0.05);
+}
+
+/* ─── INFERNO FLAME GLASSMORPHISM DONATION TEMPLATE ────────────────────────── */
+.fire-glass-card {
+  background: rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1.5px solid rgba(255, 255, 255, 0.35);
+  box-shadow: 
+    inset 0 1.5px 2px 0 rgba(255, 255, 255, 0.6),
+    inset 0 -1.5px 2px 0 rgba(255, 255, 255, 0.15),
+    0 25px 60px -12px rgba(0, 0, 0, 0.7),
+    0 0 45px rgba(255, 100, 0, 0.35);
+}
+
+.fire-flame-wrapper {
+  position: relative;
+}
+
+.fire-flame-halo {
+  position: absolute;
+  inset: -18px;
+  border-radius: 36px;
+  background: radial-gradient(circle, rgba(255, 140, 0, 0.8) 0%, rgba(255, 60, 0, 0.6) 40%, rgba(220, 20, 60, 0.3) 70%, transparent 85%);
+  filter: blur(16px);
+  animation: fireGlowPulse 2.5s ease-in-out infinite alternate;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.fire-flame-border-anim {
+  position: absolute;
+  inset: -8px;
+  border-radius: 32px;
+  border: 3px solid transparent;
+  background: linear-gradient(45deg, #ff4500, #ff8c00, #ffd700, #ff4500) border-box;
+  -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: destination-out;
+  mask-composite: exclude;
+  animation: flameBorderRotate 3s linear infinite;
+  filter: drop-shadow(0 0 12px rgba(255, 100, 0, 0.9));
+  z-index: 1;
+  pointer-events: none;
+}
+
+.golden-3d-text {
+  background: linear-gradient(180deg, #fff7d6 0%, #ffd066 35%, #e68a00 70%, #994d00 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 3px 2px rgba(0, 0, 0, 0.8)) drop-shadow(0 0 16px rgba(255, 170, 0, 0.75));
+}
+
+@keyframes fireGlowPulse {
+  0% {
+    opacity: 0.75;
+    transform: scale(0.98);
+    filter: blur(14px);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.03);
+    filter: blur(20px);
+  }
+  100% {
+    opacity: 0.85;
+    transform: scale(1);
+    filter: blur(16px);
+  }
+}
+
+@keyframes flameBorderRotate {
+  0% {
+    filter: drop-shadow(0 0 12px rgba(255, 69, 0, 0.9)) drop-shadow(0 0 24px rgba(255, 140, 0, 0.6));
+  }
+  50% {
+    filter: drop-shadow(0 0 18px rgba(255, 215, 0, 1)) drop-shadow(0 0 35px rgba(255, 69, 0, 0.8));
+  }
+  100% {
+    filter: drop-shadow(0 0 12px rgba(255, 69, 0, 0.9)) drop-shadow(0 0 24px rgba(255, 140, 0, 0.6));
+  }
+}
+
+
+/* Sleek Minimal Scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #d4d4d8;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #a1a1aa;
+}

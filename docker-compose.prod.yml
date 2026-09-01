@@ -1,0 +1,86 @@
+# ==============================================================================
+# Production Docker Compose Setup
+# Production-ready, hardened multi-stage container builds.
+# Usage:
+#   docker compose -f docker-compose.prod.yml up -d --build
+# ==============================================================================
+
+services:
+  # ----------------------------------------------------------------------------
+  # 1. Production PostgreSQL Database
+  # ----------------------------------------------------------------------------
+  postgres:
+    image: postgres:16-alpine
+    container_name: boilerplate-prod-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set strong POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: ${POSTGRES_DB:-boilerplate_db}
+    volumes:
+      - prod_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-boilerplate_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - boilerplate-prod-net
+
+  # ----------------------------------------------------------------------------
+  # 2. Production Hono Backend API (Bun Multi-Stage Runner)
+  # ----------------------------------------------------------------------------
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: boilerplate-prod-backend
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PORT: 4000
+      NODE_ENV: production
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-boilerplate_db}
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:?Set strong JWT_ACCESS_SECRET in .env}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:?Set strong JWT_REFRESH_SECRET in .env}
+      JWT_ACCESS_EXPIRES_IN: ${JWT_ACCESS_EXPIRES_IN:-15m}
+      JWT_REFRESH_EXPIRES_IN: ${JWT_REFRESH_EXPIRES_IN:-7d}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost,http://localhost:80}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    ports:
+      - "${BACKEND_PORT:-4000}:4000"
+    networks:
+      - boilerplate-prod-net
+
+  # ----------------------------------------------------------------------------
+  # 3. Production React Frontend (Nginx Alpine + Gzip + Security Headers)
+  # ----------------------------------------------------------------------------
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:4000/api/v1}
+    container_name: boilerplate-prod-frontend
+    restart: always
+    depends_on:
+      - backend
+    ports:
+      - "${FRONTEND_PROD_PORT:-80}:80"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost/healthz"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+    networks:
+      - boilerplate-prod-net
+
+volumes:
+  prod_postgres_data:
+    driver: local
+
+networks:
+  boilerplate-prod-net:
+    driver: bridge

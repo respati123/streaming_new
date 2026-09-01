@@ -1,0 +1,1089 @@
+{
+  "version": "2.17",
+  "children": [
+    {
+      "type": "frame",
+      "id": "W9b9s2",
+      "x": 0,
+      "y": 0,
+      "name": "OBS 1080p Stream Overlay Canvas",
+      "clip": true,
+      "width": 1920,
+      "height": 1080,
+      "fill": "#0B0F17",
+      "children": [
+        {
+          "type": "frame",
+          "id": "Lf2HN",
+          "name": "01_TopBar_EventTicker",
+          "width": 1824,
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "lVyYa",
+              "name": "Brand_Live_Pill",
+              "fill": "#161b26eb",
+              "cornerRadius": 999,
+              "stroke": "#ffffff1f",
+              "gap": 12,
+              "padding": [
+                8,
+                16
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "a2Fhv",
+                  "name": "Red_Live_Dot",
+                  "width": 8,
+                  "height": 8,
+                  "fill": "#EF4444",
+                  "cornerRadius": 999
+                },
+                {
+                  "type": "text",
+                  "id": "Lo8pY",
+                  "name": "Channel_Name",
+                  "fill": "#F8FAFC",
+                  "content": "STREAMHUB // LIVE",
+                  "fontFamily": "Inter",
+                  "fontSize": 12,
+                  "fontWeight": "700",
+                  "letterSpacing": 0.5
+                },
+                {
+                  "type": "text",
+                  "id": "EXtjN",
+                  "name": "Category_Tag",
+                  "fill": "#94A3B8",
+                  "content": "• Just Chatting & Games",
+                  "fontFamily": "Inter",
+                  "fontSize": 12,
+                  "fontWeight": "500"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "YBUEQ",
+              "name": "Event_Tickers_Group",
+              "gap": 12,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "WGaFn",
+                  "name": "Follower_Card",
+                  "fill": "#0f172ae0",
+                  "cornerRadius": 10,
+                  "stroke": "#38bdf840",
+                  "gap": 8,
+                  "padding": [
+                    8,
+                    14
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "LuV3l",
+                      "name": "Follower_Icon",
+                      "fill": "#38BDF8",
+                      "content": "★",
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "gZWIw",
+                      "name": "Follower_Label",
+                      "fill": "#64748B",
+                      "content": "LATEST FOLLOWER:",
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "OT2sM",
+                      "name": "Follower_User",
+                      "fill": "#F1F5F9",
+                      "content": "ryankusuma",
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "owxkU",
+                  "name": "Donation_Card",
+                  "fill": "#0f172ae0",
+                  "cornerRadius": 10,
+                  "stroke": "#34d3994d",
+                  "gap": 8,
+                  "padding": [
+                    8,
+                    14
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "GOnko",
+                      "name": "Donor_Icon",
+                      "fill": "#34D399",
+                      "content": "💎",
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "H5KZY",
+                      "name": "Donor_Label",
+                      "fill": "#34D399",
+                      "content": "TOP DONOR:",
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "nFwQu",
+                      "name": "Donor_User_Amount",
+                      "fill": "#F1F5F9",
+                      "content": "andi_99 (Rp 100.000)",
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "600"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "MpuOT",
+              "name": "Sub_Goal_Card",
+              "fill": "#0f172ae0",
+              "cornerRadius": 10,
+              "stroke": "#ffffff1a",
+              "layout": "vertical",
+              "gap": 6,
+              "padding": [
+                8,
+                16
+              ],
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "uwATh",
+                  "name": "Goal_Header_Row",
+                  "width": 180,
+                  "justifyContent": "space_between",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "koIBC",
+                      "name": "Goal_Title",
+                      "fill": "#94A3B8",
+                      "content": "Sub Goal",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "ykdIv",
+                      "name": "Goal_Progress_Num",
+                      "fill": "#38BDF8",
+                      "content": "85 / 100",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "700"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "Af2vJ",
+                  "name": "Goal_Track_BG",
+                  "width": 180,
+                  "height": 6,
+                  "fill": "#ffffff1a",
+                  "cornerRadius": 999,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "g90drr",
+                      "name": "Goal_Bar_Fill",
+                      "width": 153,
+                      "height": 6,
+                      "fill": "#38BDF8",
+                      "cornerRadius": 999
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "jBXF4",
+          "name": "02_DonationAlert_ActiveToast",
+          "width": 480,
+          "fill": "#0f172af5",
+          "cornerRadius": 14,
+          "stroke": "#10B981",
+          "layout": "vertical",
+          "gap": 12,
+          "padding": [
+            16,
+            20
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "fF8qf",
+              "name": "Alert_Header_Row",
+              "width": 440,
+              "justifyContent": "space_between",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "Uo1tV",
+                  "name": "Alert_Badge_Pill",
+                  "fill": "#10b98126",
+                  "cornerRadius": 999,
+                  "stroke": "#10b98166",
+                  "padding": [
+                    4,
+                    10
+                  ],
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "j5c6H",
+                      "name": "Alert_Badge_Label",
+                      "fill": "#34D399",
+                      "content": "🎉 NEW DONATION RECEIVED",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "700",
+                      "letterSpacing": 0.5
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "cNk2q",
+                  "name": "Alert_Amount_Text",
+                  "fill": "#34D399",
+                  "content": "Rp 50.000",
+                  "fontFamily": "Inter",
+                  "fontSize": 16,
+                  "fontWeight": "800"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "t2PXV",
+              "name": "Alert_Body_Row",
+              "gap": 12,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "ojE4w",
+                  "name": "Donor_Avatar_Circle",
+                  "width": 40,
+                  "height": 40,
+                  "fill": "#059669",
+                  "cornerRadius": 999,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "IAVRU",
+                      "name": "Donor_Avatar_Letter",
+                      "fill": "#FFFFFF",
+                      "content": "B",
+                      "fontFamily": "Inter",
+                      "fontSize": 16,
+                      "fontWeight": "700"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "TCN5S",
+                  "name": "Donor_Text_Group",
+                  "layout": "vertical",
+                  "gap": 2,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "RDO6q",
+                      "name": "Donor_Username",
+                      "fill": "#F1F5F9",
+                      "content": "Budi_Santoso",
+                      "fontFamily": "Inter",
+                      "fontSize": 13,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "p4kPaK",
+                      "name": "Donor_Custom_Message",
+                      "fill": "#94A3B8",
+                      "content": "\"Semangat streamingnya bang! Tetap konsisten gass 🔥\"",
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "hrIcJ",
+          "name": "05_Gameplay_TransparentArea_Guide",
+          "width": 960,
+          "height": 320,
+          "cornerRadius": 16,
+          "stroke": "#ffffff14",
+          "justifyContent": "center",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "wgIMG",
+              "name": "Transparent_Area_Label",
+              "fill": "#94a3b866",
+              "content": "🎮 MAIN SCREEN / GAMEPLAY AREA (100% TRANSPARENT)",
+              "fontFamily": "Inter",
+              "fontSize": 13,
+              "fontWeight": "600",
+              "letterSpacing": 1
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "NqdrJ",
+          "name": "03_LiveChat_OverlayBox",
+          "width": 380,
+          "height": 502,
+          "fill": "#0b0f17d9",
+          "cornerRadius": 16,
+          "stroke": "#ffffff1a",
+          "layout": "vertical",
+          "gap": 10,
+          "padding": 16,
+          "children": [
+            {
+              "type": "frame",
+              "id": "DXamY",
+              "name": "Chat_Header_Bar",
+              "width": 348,
+              "justifyContent": "space_between",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "J0Hv8",
+                  "name": "Chat_Title_Label",
+                  "fill": "#64748B",
+                  "content": "STREAM CHAT",
+                  "fontFamily": "Inter",
+                  "fontSize": 11,
+                  "fontWeight": "700",
+                  "letterSpacing": 0.8
+                },
+                {
+                  "type": "text",
+                  "id": "mGWM7",
+                  "name": "Chat_Sync_Indicator",
+                  "fill": "#22C55E",
+                  "content": "• Live Sync",
+                  "fontFamily": "Inter",
+                  "fontSize": 10,
+                  "fontWeight": "600"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "Y4tpTD",
+              "name": "Chat_Row_1_VIP",
+              "width": 348,
+              "fill": "#ffffff0a",
+              "cornerRadius": 8,
+              "layout": "vertical",
+              "gap": 4,
+              "padding": [
+                8,
+                12
+              ],
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "q3ZbF",
+                  "name": "Sender_Header_VIP",
+                  "gap": 6,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "gnW90",
+                      "name": "VIP_Badge",
+                      "fill": "#6366F1",
+                      "cornerRadius": 4,
+                      "padding": [
+                        2,
+                        6
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "p3XuOb",
+                          "name": "VIP_Text",
+                          "fill": "#FFFFFF",
+                          "content": "VIP",
+                          "fontFamily": "Inter",
+                          "fontSize": 9,
+                          "fontWeight": "700"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "LcrWq",
+                      "name": "Sender_Username_VIP",
+                      "fill": "#A5B4FC",
+                      "content": "kevin_gaming",
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "NzPLe",
+                      "name": "Timestamp_VIP",
+                      "fill": "#475569",
+                      "content": "11:02",
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "ECRQ3",
+                  "name": "Message_Content_VIP",
+                  "fill": "#E2E8F0",
+                  "content": "Gila tadi clutch-nya rapi banget bang! GGWP 👏",
+                  "fontFamily": "Inter",
+                  "fontSize": 12,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "o3YyqY",
+              "name": "Chat_Row_2_Sub",
+              "width": 348,
+              "fill": "#ffffff0a",
+              "cornerRadius": 8,
+              "layout": "vertical",
+              "gap": 4,
+              "padding": [
+                8,
+                12
+              ],
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "Xb90C",
+                  "name": "Sender_Header_Sub",
+                  "gap": 6,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "dnvwf",
+                      "name": "Sub_Badge",
+                      "fill": "#EC4899",
+                      "cornerRadius": 4,
+                      "padding": [
+                        2,
+                        6
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "FL3pP",
+                          "name": "Sub_Text",
+                          "fill": "#FFFFFF",
+                          "content": "SUB 6M",
+                          "fontFamily": "Inter",
+                          "fontSize": 9,
+                          "fontWeight": "700"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "wnyIO",
+                      "name": "Sender_Username_Sub",
+                      "fill": "#F472B6",
+                      "content": "clarissa_m",
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "Tk8F9",
+                      "name": "Timestamp_Sub",
+                      "fill": "#475569",
+                      "content": "11:03",
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "gaySE",
+                  "name": "Message_Content_Sub",
+                  "fill": "#E2E8F0",
+                  "content": "Next match main ranked lagi ga nih?",
+                  "fontFamily": "Inter",
+                  "fontSize": 12,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "KX6wS",
+              "name": "Chat_Row_3_Mod",
+              "width": 348,
+              "fill": "#22c55e0f",
+              "cornerRadius": 8,
+              "stroke": "#22c55e40",
+              "layout": "vertical",
+              "gap": 4,
+              "padding": [
+                8,
+                12
+              ],
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "fm7zv",
+                  "name": "Sender_Header_Mod",
+                  "gap": 6,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "zAj1W",
+                      "name": "Mod_Badge",
+                      "fill": "#16A34A",
+                      "cornerRadius": 4,
+                      "padding": [
+                        2,
+                        6
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "ZuCZI",
+                          "name": "Mod_Text",
+                          "fill": "#FFFFFF",
+                          "content": "MOD",
+                          "fontFamily": "Inter",
+                          "fontSize": 9,
+                          "fontWeight": "700"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "c43LR",
+                      "name": "Sender_Username_Mod",
+                      "fill": "#4ADE80",
+                      "content": "mod_guardian",
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "P5Udt",
+                      "name": "Timestamp_Mod",
+                      "fill": "#475569",
+                      "content": "11:04",
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "MtD73",
+                  "name": "Message_Content_Mod",
+                  "fill": "#E2E8F0",
+                  "content": "Reminder jangan spam link di chat ya guys! Taati rules.",
+                  "fontFamily": "Inter",
+                  "fontSize": 12,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "Sb3bp",
+              "name": "Chat_Row_4_Viewer",
+              "width": 348,
+              "fill": "#ffffff0a",
+              "cornerRadius": 8,
+              "layout": "vertical",
+              "gap": 4,
+              "padding": [
+                8,
+                12
+              ],
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "D4tII",
+                  "name": "Sender_Header_Viewer",
+                  "gap": 6,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "C6RMz",
+                      "name": "Sender_Username_Viewer",
+                      "fill": "#93C5FD",
+                      "content": "doni_setiawan",
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "JdIcI",
+                      "name": "Timestamp_Viewer",
+                      "fill": "#475569",
+                      "content": "11:05",
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "lUvap",
+                  "name": "Message_Content_Viewer",
+                  "fill": "#E2E8F0",
+                  "content": "Halo bang salam dari Bandung 👋",
+                  "fontFamily": "Inter",
+                  "fontSize": 12,
+                  "fontWeight": "normal"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "wxtLw",
+          "name": "04_Webcam_Frame_16x9",
+          "width": 432,
+          "height": 302,
+          "layout": "vertical",
+          "children": [
+            {
+              "type": "frame",
+              "id": "o68vSU",
+              "name": "Webcam_16x9_Viewport",
+              "width": 432,
+              "height": 250,
+              "fill": "#38bdf80d",
+              "cornerRadius": 12,
+              "stroke": "#38BDF8",
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "v8h9p",
+                  "name": "Cam_Placeholder_Label",
+                  "fill": "#38BDF8",
+                  "content": "WEBCAM VIEWPORT (16:9 TRANSPARENT)",
+                  "fontFamily": "Inter",
+                  "fontSize": 11,
+                  "fontWeight": "700",
+                  "letterSpacing": 0.5
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "bthry",
+              "name": "Webcam_Streamer_Footer_Bar",
+              "width": 432,
+              "fill": "#0f172af2",
+              "cornerRadius": 8,
+              "stroke": "#ffffff1a",
+              "padding": [
+                8,
+                14
+              ],
+              "justifyContent": "space_between",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "D1wdg8",
+                  "name": "Streamer_Handle_Row",
+                  "gap": 8,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "Tcb2x",
+                      "name": "Mic_Icon",
+                      "fill": "#FFFFFF",
+                      "content": "🎙️",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "vU8PJ",
+                      "name": "Streamer_Handle_Text",
+                      "fill": "#F8FAFC",
+                      "content": "@respati_stream",
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "G01lGQ",
+                  "name": "Social_Links_Group",
+                  "gap": 10,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "U1nVNq",
+                      "name": "Social_YT",
+                      "fill": "#94A3B8",
+                      "content": "YT: respati",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "500"
+                    },
+                    {
+                      "type": "text",
+                      "id": "kc0bU",
+                      "name": "Social_TT",
+                      "fill": "#94A3B8",
+                      "content": "TT: @respati",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "500"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "themes": {
+    "Mode": [
+      "Dark",
+      "Light"
+    ]
+  },
+  "variables": {
+    "--background": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#0b0d13"
+        },
+        {
+          "value": "#f8fafc",
+          "theme": {
+            "Mode": "Light"
+          }
+        }
+      ]
+    },
+    "--card": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#131722"
+        },
+        {
+          "value": "#ffffff",
+          "theme": {
+            "Mode": "Light"
+          }
+        }
+      ]
+    },
+    "--card-header": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#181d2a"
+        },
+        {
+          "value": "#f1f5f9",
+          "theme": {
+            "Mode": "Light"
+          }
+        }
+      ]
+    },
+    "--card-border": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#232936"
+        },
+        {
+          "value": "#e2e8f0",
+          "theme": {
+            "Mode": "Light"
+          }
+        }
+      ]
+    },
+    "--primary": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#6366f1"
+        },
+        {
+          "value": "#4f46e5",
+          "theme": {
+            "Mode": "Light"
+          }
+        }
+      ]
+    },
+    "--accent-red": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#ef4444"
+        },
+        {
+          "value": "#dc2626",
+          "theme": {
+            "Mode": "Light"
+          }
+        }
+      ]
+    },
+    "--accent-green": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#22c55e"
+        },
+        {
+          "value": "#16a34a",
+          "theme": {
+            "Mode": "Light"
+          }
+        }
+      ]
+    },
+    "--accent-yellow": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#eab308"
+        },
+        {
+          "value": "#ca8a04",
+          "theme": {
+            "Mode": "Light"
+          }
+        }
+      ]
+    },
+    "--text-primary": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#f8fafc"
+        },
+        {
+          "value": "#0f172a",
+          "theme": {
+            "Mode": "Light"
+          }
+        }
+      ]
+    },
+    "--text-muted": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#94a3b8"
+        },
+        {
+          "value": "#64748b",
+          "theme": {
+            "Mode": "Light"
+          }
+        }
+      ]
+    },
+    "canvas": {
+      "type": "color",
+      "value": "#0B0F14"
+    },
+    "surface": {
+      "type": "color",
+      "value": "#141A22"
+    },
+    "surface-raised": {
+      "type": "color",
+      "value": "#1B2430"
+    },
+    "line": {
+      "type": "color",
+      "value": "#2A3542"
+    },
+    "text-primary": {
+      "type": "color",
+      "value": "#F5F7FA"
+    },
+    "text-secondary": {
+      "type": "color",
+      "value": "#9AA7B5"
+    },
+    "muted": {
+      "type": "color",
+      "value": "#697686"
+    },
+    "live": {
+      "type": "color",
+      "value": "#FF4D5A"
+    },
+    "donate": {
+      "type": "color",
+      "value": "#FFB547"
+    },
+    "donate-soft": {
+      "type": "color",
+      "value": "#3A2B17"
+    },
+    "accent": {
+      "type": "color",
+      "value": "#7C8CFF"
+    },
+    "font-ui": {
+      "type": "string",
+      "value": "Inter"
+    },
+    "font-mono": {
+      "type": "string",
+      "value": "IBM Plex Mono"
+    },
+    "radius": {
+      "type": "number",
+      "value": 12
+    },
+    "ovl-bg": {
+      "type": "color",
+      "value": "#0B1018"
+    },
+    "ovl-stage": {
+      "type": "color",
+      "value": "#173447"
+    },
+    "ovl-panel": {
+      "type": "color",
+      "value": "#111A25"
+    },
+    "ovl-panel-soft": {
+      "type": "color",
+      "value": "#1B2633"
+    },
+    "ovl-line": {
+      "type": "color",
+      "value": "#3A4A59"
+    },
+    "ovl-text": {
+      "type": "color",
+      "value": "#F7FAFC"
+    },
+    "ovl-muted": {
+      "type": "color",
+      "value": "#A7B3BF"
+    },
+    "ovl-orange": {
+      "type": "color",
+      "value": "#FF9D22"
+    },
+    "ovl-orange-soft": {
+      "type": "color",
+      "value": "#533313"
+    },
+    "ovl-cyan": {
+      "type": "color",
+      "value": "#63D6E8"
+    },
+    "ovl-live": {
+      "type": "color",
+      "value": "#FF5263"
+    },
+    "ovl-font": {
+      "type": "string",
+      "value": "Inter"
+    },
+    "ovl-mono": {
+      "type": "string",
+      "value": "IBM Plex Mono"
+    }
+  },
+  "fileToken": "d49848d2-203f-4536-8229-d7ddd3d93a4b"
+}

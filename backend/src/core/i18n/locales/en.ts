@@ -1,0 +1,37 @@
+export const en = {
+  errors: {
+    internalServerError: 'An unexpected internal server error occurred',
+    validationFailed: 'Validation Failed',
+    unauthorized: 'Authentication required. Please provide a valid Bearer token.',
+    forbidden: 'You do not have permission to access this resource.',
+    notFound: 'The requested resource could not be found.',
+    routeNotFound: 'Route not found: {{method}} {{path}}',
+    rateLimitExceeded: 'Too many requests. Please slow down and try again later.',
+    authRateLimitExceeded: 'Too many authentication attempts. Please try again after 1 minute.',
+    invalidCredentials: 'Email or password does not match our records.',
+    tokenExpired: 'Your access token has expired. Please refresh your session.',
+    tokenInvalid: 'The provided token is invalid or corrupt.',
+    tokenRevoked: 'Your session has been terminated or revoked.',
+    duplicateEmail: 'An account with this email address already exists.',
+    userNotFound: 'User account not found.',
+    productNotFound: 'Product with the specified ID does not exist.',
+    badRequest: 'Invalid request payload or parameters.',
+    databaseUnavailable: 'Database service unavailable',
+  },
+  success: {
+    healthCheck: 'All services operational',
+    registrationSuccessful: 'Registration successful. Account created.',
+    loginSuccessful: 'Login successful.',
+    tokensRefreshed: 'Tokens refreshed successfully.',
+    loggedOut: 'Logged out successfully.',
+    userProfileRetrieved: 'User profile retrieved.',
+    productsRetrieved: 'Products retrieved successfully',
+    productStatisticsRetrieved: 'Product statistics retrieved',
+    productDetailsRetrieved: 'Product details retrieved',
+    productCreated: 'Product created successfully',
+    productUpdated: 'Product updated successfully',
+    productDeleted: 'Product deleted successfully',
+  },
+} as const;
+
+export type TranslationSchema = typeof en;

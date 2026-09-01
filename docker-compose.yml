@@ -1,0 +1,94 @@
+# ==============================================================================
+# Development Docker Compose Setup
+# Supports live code reloading (HMR) for both Frontend and Backend.
+# Usage:
+#   docker compose up --build
+# ==============================================================================
+
+services:
+  # ----------------------------------------------------------------------------
+  # 1. PostgreSQL Database
+  # ----------------------------------------------------------------------------
+  postgres:
+    image: postgres:16-alpine
+    container_name: boilerplate-dev-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-boilerplate_db}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - dev_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-boilerplate_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - boilerplate-dev-net
+
+  # ----------------------------------------------------------------------------
+  # 2. Hono Backend API (Live Reloading via Bun --watch)
+  # ----------------------------------------------------------------------------
+  backend:
+    image: oven/bun:1.2-alpine
+    container_name: boilerplate-dev-backend
+    working_dir: /app
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    ports:
+      - "${BACKEND_PORT:-4000}:4000"
+    environment:
+      PORT: 4000
+      NODE_ENV: development
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-boilerplate_db}
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-your-super-secret-access-key-minimum-32-chars-length}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-your-super-secret-refresh-key-minimum-32-chars-length}
+      JWT_ACCESS_EXPIRES_IN: 15m
+      JWT_REFRESH_EXPIRES_IN: 7d
+      CORS_ORIGINS: http://localhost:5173,http://localhost:3000
+      LOG_LEVEL: debug
+    command: >
+      sh -c "bun install &&
+             bun run db:push &&
+             bun run dev"
+    networks:
+      - boilerplate-dev-net
+
+  # ----------------------------------------------------------------------------
+  # 3. React Vite Frontend (Vite HMR on port 5173)
+  # ----------------------------------------------------------------------------
+  frontend:
+    image: oven/bun:1.2-alpine
+    container_name: boilerplate-dev-frontend
+    working_dir: /app
+    restart: unless-stopped
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    ports:
+      - "${FRONTEND_PORT:-5173}:5173"
+    environment:
+      VITE_API_BASE_URL: http://localhost:${BACKEND_PORT:-4000}/api/v1
+    command: >
+      sh -c "bun install &&
+             bun run dev --host 0.0.0.0"
+    networks:
+      - boilerplate-dev-net
+
+volumes:
+  dev_postgres_data:
+    driver: local
+
+networks:
+  boilerplate-dev-net:
+    driver: bridge
