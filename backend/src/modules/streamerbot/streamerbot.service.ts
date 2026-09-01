@@ -177,19 +177,24 @@ export class StreamerbotService extends EventEmitter {
 
         logger.info(`💬 [Streamer.bot YouTube Chat] ${user.name || user.displayName}: "${data.message}"`);
 
+        const { pointsService } = await import('@modules/points/points.service');
+        const userProfile = await pointsService.getUserProfile(result.user.id);
+
         this.emit('chat:message', {
           id: result.message.id,
           streamId: result.stream.id,
           user: result.user.name,
           userId: result.user.id,
-          youtubeHandle: user.customUrl || null,
+          youtubeHandle: user.customUrl || result.user.youtubeHandle || null,
           avatarUrl: result.user.avatarUrl || user.profileImageUrl || user.avatarUrl || null,
           role: result.user.role,
+          tier: userProfile?.tier || 'bronze',
+          points: userProfile?.points || 5,
           message: result.message.message,
           isOwner: result.message.isOwner,
           isModerator: result.message.isModerator,
           isSponsor: result.message.isSponsor,
-          isVerified: result.message.isVerified,
+          isVerified: result.message.isVerified || user.isVerified || false,
           timestamp: result.message.publishedAt,
         });
       } catch (err) {

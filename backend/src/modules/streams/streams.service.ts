@@ -124,7 +124,18 @@ export class StreamsService {
   }> {
     const stream = await this.getOrCreateActiveStream();
 
-    // 1. Upsert User in database based on youtubeChannelId or username
+    // 1. Upsert into Better Auth 'user' and 'account' tables & award +5 loyalty PTS
+    const { pointsService } = await import('@modules/points/points.service');
+    const gamifiedProfile = await pointsService.upsertUserFromYouTubeChat({
+      username: dto.username,
+      youtubeChannelId: dto.youtubeChannelId,
+      userAvatarUrl: dto.userAvatarUrl,
+      isOwner: dto.isOwner,
+      isModerator: dto.isModerator,
+      isSponsor: dto.isSponsor,
+    });
+
+    // 2. Upsert User in database based on youtubeChannelId or username (Legacy users table)
     let user: UserTable | undefined;
 
     if (dto.youtubeChannelId) {
@@ -153,9 +164,10 @@ export class StreamsService {
       const [createdUser] = await db
         .insert(users)
         .values({
+          id: gamifiedProfile.user.id,
           name: dto.username,
           youtubeChannelId: dto.youtubeChannelId || null,
-          youtubeHandle: dto.username.startsWith('@') ? dto.username : `@${dto.username.toLowerCase().replace(/\s+/g, '')}`,
+          youtubeHandle: gamifiedProfile.user.youtubeHandle || `@${dto.username.toLowerCase().replace(/\s+/g, '')}`,
           avatarUrl: dto.userAvatarUrl || null,
           role: determinedRole,
           totalMessagesSent: '1',
@@ -169,6 +181,8 @@ export class StreamsService {
         userId: user.id,
         username: user.name,
         role: user.role,
+        tier: gamifiedProfile.user.tier,
+        points: gamifiedProfile.user.points,
       });
     } else {
       // Update existing user stats
