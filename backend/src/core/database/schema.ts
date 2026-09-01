@@ -1,6 +1,7 @@
 import { relations } from 'drizzle-orm';
 import {
   boolean,
+  index,
   integer,
   numeric,
   pgTable,
@@ -13,76 +14,108 @@ import {
 /**
  * Better Auth Tables (Audience / User Social Auth)
  */
-export const user = pgTable('user', {
-  id: text('id').primaryKey(),
-  name: text('name').notNull(),
-  email: text('email').notNull().unique(),
-  emailVerified: boolean('email_verified').default(false).notNull(),
-  image: text('image'),
-  role: text('role').default('viewer').notNull(),
-  // YouTube Data Tracking
-  youtubeChannelId: text('youtube_channel_id'),
-  youtubeHandle: text('youtube_handle'), // e.g. "@tyorespati"
-  youtubeChannelTitle: text('youtube_channel_title'), // e.g. "Tyo Respati Official"
-  // Gamification & Loyalty Point System
-  points: integer('points').default(0).notNull(),
-  tier: text('tier').default('bronze').notNull(), // 'bronze' | 'silver' | 'gold' | 'diamond'
-  totalChatCount: integer('total_chat_count').default(0).notNull(),
-  totalDonationAmount: integer('total_donation_amount').default(0).notNull(),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at')
-    .defaultNow()
-    .$onUpdate(() => new Date())
-    .notNull(),
-});
+export const user = pgTable(
+  'user',
+  {
+    id: text('id').primaryKey(),
+    name: text('name').notNull(),
+    email: text('email').notNull().unique(),
+    emailVerified: boolean('email_verified').default(false).notNull(),
+    image: text('image'),
+    role: text('role').default('viewer').notNull(),
+    // YouTube Data Tracking
+    youtubeChannelId: text('youtube_channel_id'),
+    youtubeHandle: text('youtube_handle'), // e.g. "@tyorespati"
+    youtubeChannelTitle: text('youtube_channel_title'), // e.g. "Tyo Respati Official"
+    // Gamification & Loyalty Point System
+    points: integer('points').default(0).notNull(),
+    tier: text('tier').default('bronze').notNull(), // 'bronze' | 'silver' | 'gold' | 'diamond'
+    totalChatCount: integer('total_chat_count').default(0).notNull(),
+    totalDonationAmount: integer('total_donation_amount').default(0).notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at')
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    index('idx_user_youtube_channel_id').on(table.youtubeChannelId),
+    index('idx_user_youtube_handle').on(table.youtubeHandle),
+    index('idx_user_points').on(table.points),
+    index('idx_user_tier').on(table.tier),
+    index('idx_user_created_at').on(table.createdAt),
+  ]
+);
 
-export const pointTransactions = pgTable('point_transactions', {
-  id: uuid('id').defaultRandom().primaryKey(),
-  userId: text('user_id')
-    .notNull()
-    .references(() => user.id, { onDelete: 'cascade' }),
-  amount: integer('amount').notNull(),
-  type: text('type').notNull(), // 'CHAT_REWARD' | 'DONATION_REWARD' | 'DAILY_BONUS' | 'REDEEM'
-  description: text('description'),
-  metadata: text('metadata'),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-});
+export const pointTransactions = pgTable(
+  'point_transactions',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    userId: text('user_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    amount: integer('amount').notNull(),
+    type: text('type').notNull(), // 'CHAT_REWARD' | 'DONATION_REWARD' | 'DAILY_BONUS' | 'REDEEM'
+    description: text('description'),
+    metadata: text('metadata'),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (table) => [
+    index('idx_point_tx_user_created').on(table.userId, table.createdAt),
+    index('idx_point_tx_type').on(table.type),
+  ]
+);
 
-export const session = pgTable('session', {
-  id: text('id').primaryKey(),
-  expiresAt: timestamp('expires_at').notNull(),
-  token: text('token').notNull().unique(),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at')
-    .$onUpdate(() => new Date())
-    .notNull(),
-  ipAddress: text('ip_address'),
-  userAgent: text('user_agent'),
-  userId: text('user_id')
-    .notNull()
-    .references(() => user.id, { onDelete: 'cascade' }),
-});
+export const session = pgTable(
+  'session',
+  {
+    id: text('id').primaryKey(),
+    expiresAt: timestamp('expires_at').notNull(),
+    token: text('token').notNull().unique(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at')
+      .$onUpdate(() => new Date())
+      .notNull(),
+    ipAddress: text('ip_address'),
+    userAgent: text('user_agent'),
+    userId: text('user_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+  },
+  (table) => [
+    index('idx_session_user_id').on(table.userId),
+    index('idx_session_token').on(table.token),
+    index('idx_session_expires_at').on(table.expiresAt),
+  ]
+);
 
-export const account = pgTable('account', {
-  id: text('id').primaryKey(),
-  accountId: text('account_id').notNull(),
-  providerId: text('provider_id').notNull(),
-  userId: text('user_id')
-    .notNull()
-    .references(() => user.id, { onDelete: 'cascade' }),
-  accessToken: text('access_token'),
-  refreshToken: text('refresh_token'),
-  idToken: text('id_token'),
-  accessTokenExpiresAt: timestamp('access_token_expires_at'),
-  refreshTokenExpiresAt: timestamp('refresh_token_expires_at'),
-  scope: text('scope'),
-  password: text('password'),
-  issuer: text('issuer'),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at')
-    .$onUpdate(() => new Date())
-    .notNull(),
-});
+export const account = pgTable(
+  'account',
+  {
+    id: text('id').primaryKey(),
+    accountId: text('account_id').notNull(),
+    providerId: text('provider_id').notNull(),
+    userId: text('user_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    accessToken: text('access_token'),
+    refreshToken: text('refresh_token'),
+    idToken: text('id_token'),
+    accessTokenExpiresAt: timestamp('access_token_expires_at'),
+    refreshTokenExpiresAt: timestamp('refresh_token_expires_at'),
+    scope: text('scope'),
+    password: text('password'),
+    issuer: text('issuer'),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at')
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    index('idx_account_user_id').on(table.userId),
+    index('idx_account_provider_account').on(table.providerId, table.accountId),
+  ]
+);
 
 export const verification = pgTable('verification', {
   id: text('id').primaryKey(),
@@ -118,23 +151,30 @@ export const accountRelations = relations(account, ({ one }) => ({
 /**
  * Users Table Schema (Supporting both Standard Auth & Google / YouTube OAuth)
  */
-export const users = pgTable('users', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  email: varchar('email', { length: 255 }).unique(), // Nullable for chat-only discovered users
-  name: varchar('name', { length: 255 }).notNull(),
-  passwordHash: varchar('password_hash', { length: 255 }), // Nullable for OAuth-only or chat users
-  role: varchar('role', { length: 50 }).notNull().default('viewer'), // 'admin' | 'moderator' | 'member' | 'viewer'
-  avatarUrl: text('avatar_url'),
-  googleId: varchar('google_id', { length: 255 }).unique(),
-  youtubeChannelId: varchar('youtube_channel_id', { length: 255 }).unique(),
-  youtubeHandle: varchar('youtube_handle', { length: 255 }), // e.g. "@respati_stream"
-  youtubeTitle: varchar('youtube_title', { length: 255 }), // e.g. "Respati Gaming"
-  totalMessagesSent: numeric('total_messages_sent').notNull().default('0'),
-  firstSeenAt: timestamp('first_seen_at', { withTimezone: true }).notNull().defaultNow(),
-  lastSeenAt: timestamp('last_seen_at', { withTimezone: true }).notNull().defaultNow(),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
-});
+export const users = pgTable(
+  'users',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    email: varchar('email', { length: 255 }).unique(), // Nullable for chat-only discovered users
+    name: varchar('name', { length: 255 }).notNull(),
+    passwordHash: varchar('password_hash', { length: 255 }), // Nullable for OAuth-only or chat users
+    role: varchar('role', { length: 50 }).notNull().default('viewer'), // 'admin' | 'moderator' | 'member' | 'viewer'
+    avatarUrl: text('avatar_url'),
+    googleId: varchar('google_id', { length: 255 }).unique(),
+    youtubeChannelId: varchar('youtube_channel_id', { length: 255 }).unique(),
+    youtubeHandle: varchar('youtube_handle', { length: 255 }), // e.g. "@respati_stream"
+    youtubeTitle: varchar('youtube_title', { length: 255 }), // e.g. "Respati Gaming"
+    totalMessagesSent: numeric('total_messages_sent').notNull().default('0'),
+    firstSeenAt: timestamp('first_seen_at', { withTimezone: true }).notNull().defaultNow(),
+    lastSeenAt: timestamp('last_seen_at', { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index('idx_users_youtube_channel_id').on(table.youtubeChannelId),
+    index('idx_users_role').on(table.role),
+  ]
+);
 
 /**
  * Refresh Tokens Table Schema
@@ -153,40 +193,56 @@ export const refreshTokens = pgTable('refresh_tokens', {
 /**
  * Stream Sessions Table (Each Live Stream has its own unique record)
  */
-export const streamSessions = pgTable('stream_sessions', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  title: varchar('title', { length: 255 }).notNull().default('Live Stream Session'),
-  youtubeBroadcastId: varchar('youtube_broadcast_id', { length: 255 }),
-  status: varchar('status', { length: 50 }).notNull().default('live'), // 'live' | 'ended'
-  startedAt: timestamp('started_at', { withTimezone: true }).notNull().defaultNow(),
-  endedAt: timestamp('ended_at', { withTimezone: true }),
-  totalMessages: numeric('total_messages').notNull().default('0'),
-  totalChatters: numeric('total_chatters').notNull().default('0'),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
-});
+export const streamSessions = pgTable(
+  'stream_sessions',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    title: varchar('title', { length: 255 }).notNull().default('Live Stream Session'),
+    youtubeBroadcastId: varchar('youtube_broadcast_id', { length: 255 }),
+    status: varchar('status', { length: 50 }).notNull().default('live'), // 'live' | 'ended'
+    startedAt: timestamp('started_at', { withTimezone: true }).notNull().defaultNow(),
+    endedAt: timestamp('ended_at', { withTimezone: true }),
+    totalMessages: numeric('total_messages').notNull().default('0'),
+    totalChatters: numeric('total_chatters').notNull().default('0'),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index('idx_stream_sessions_status').on(table.status),
+    index('idx_stream_sessions_started_at').on(table.startedAt),
+  ]
+);
 
 /**
  * Chat Messages Table (Linked to Stream Session & User)
  */
-export const chatMessages = pgTable('chat_messages', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  streamId: uuid('stream_id')
-    .notNull()
-    .references(() => streamSessions.id, { onDelete: 'cascade' }),
-  userId: uuid('user_id').references(() => users.id, { onDelete: 'set null' }),
-  youtubeMessageId: varchar('youtube_message_id', { length: 255 }),
-  username: varchar('username', { length: 255 }).notNull(), // The user's displayed name on YouTube/Google
-  youtubeChannelId: varchar('youtube_channel_id', { length: 255 }),
-  userAvatarUrl: text('user_avatar_url'),
-  message: text('message').notNull(),
-  isOwner: boolean('is_owner').notNull().default(false),
-  isModerator: boolean('is_moderator').notNull().default(false),
-  isSponsor: boolean('is_sponsor').notNull().default(false), // YouTube Member
-  isVerified: boolean('is_verified').notNull().default(false),
-  publishedAt: timestamp('published_at', { withTimezone: true }).notNull().defaultNow(),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-});
+export const chatMessages = pgTable(
+  'chat_messages',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    streamId: uuid('stream_id')
+      .notNull()
+      .references(() => streamSessions.id, { onDelete: 'cascade' }),
+    userId: uuid('user_id').references(() => users.id, { onDelete: 'set null' }),
+    youtubeMessageId: varchar('youtube_message_id', { length: 255 }),
+    username: varchar('username', { length: 255 }).notNull(), // The user's displayed name on YouTube/Google
+    youtubeChannelId: varchar('youtube_channel_id', { length: 255 }),
+    userAvatarUrl: text('user_avatar_url'),
+    message: text('message').notNull(),
+    isOwner: boolean('is_owner').notNull().default(false),
+    isModerator: boolean('is_moderator').notNull().default(false),
+    isSponsor: boolean('is_sponsor').notNull().default(false), // YouTube Member
+    isVerified: boolean('is_verified').notNull().default(false),
+    publishedAt: timestamp('published_at', { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index('idx_chat_messages_stream_published').on(table.streamId, table.publishedAt),
+    index('idx_chat_messages_user_id').on(table.userId),
+    index('idx_chat_messages_yt_channel_id').on(table.youtubeChannelId),
+    index('idx_chat_messages_yt_msg_id').on(table.youtubeMessageId),
+  ]
+);
 
 /**
  * Stream Settings Table (Singleton Configuration for Streamer identity & alerts)
@@ -220,22 +276,31 @@ export const streamGoals = pgTable('stream_goals', {
 /**
  * Donations Table Schema
  */
-export const donations = pgTable('donations', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  userId: uuid('user_id').references(() => users.id, { onDelete: 'set null' }),
-  streamId: uuid('stream_id').references(() => streamSessions.id, { onDelete: 'set null' }),
-  donorName: varchar('donor_name', { length: 255 }).notNull(),
-  donorEmail: varchar('donor_email', { length: 255 }),
-  amount: numeric('amount', { precision: 12, scale: 2 }).notNull(),
-  currency: varchar('currency', { length: 10 }).notNull().default('IDR'),
-  message: text('message'),
-  status: varchar('status', { length: 50 }).notNull().default('completed'), // 'pending' | 'completed' | 'failed'
-  paymentMethod: varchar('payment_method', { length: 50 }).notNull().default('sandbox_qris'), // 'sandbox_qris' | 'qris' | 'manual'
-  streamerbotTriggered: boolean('streamerbot_triggered').notNull().default(false),
-  streamerbotTriggeredAt: timestamp('streamerbot_triggered_at', { withTimezone: true }),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
-});
+export const donations = pgTable(
+  'donations',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id').references(() => users.id, { onDelete: 'set null' }),
+    streamId: uuid('stream_id').references(() => streamSessions.id, { onDelete: 'set null' }),
+    donorName: varchar('donor_name', { length: 255 }).notNull(),
+    donorEmail: varchar('donor_email', { length: 255 }),
+    amount: numeric('amount', { precision: 12, scale: 2 }).notNull(),
+    currency: varchar('currency', { length: 10 }).notNull().default('IDR'),
+    message: text('message'),
+    status: varchar('status', { length: 50 }).notNull().default('completed'), // 'pending' | 'completed' | 'failed'
+    paymentMethod: varchar('payment_method', { length: 50 }).notNull().default('sandbox_qris'), // 'sandbox_qris' | 'qris' | 'manual'
+    streamerbotTriggered: boolean('streamerbot_triggered').notNull().default(false),
+    streamerbotTriggeredAt: timestamp('streamerbot_triggered_at', { withTimezone: true }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index('idx_donations_stream_id').on(table.streamId),
+    index('idx_donations_user_id').on(table.userId),
+    index('idx_donations_status_created').on(table.status, table.createdAt),
+    index('idx_donations_created_at').on(table.createdAt),
+  ]
+);
 
 /**
  * Streamer.bot Action Triggers Table (Configurable Deck Buttons)
