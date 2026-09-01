@@ -208,6 +208,31 @@ export class StreamerbotService extends EventEmitter {
       logger.info('🏆 [StreamerbotService] YouTube Member Milestone', event.data);
       this.emit('member:milestone', event.data);
     });
+
+    // 5. YouTube New Subscriber
+    this.client.on('YouTube.NewSubscriber', (event: any) => {
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+      console.log('🔔 [STREAMER.BOT RAW NEW SUBSCRIBER RECEIVED]:');
+      console.log(JSON.stringify(event, null, 2));
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+
+      const data = event.data || {};
+      const user = data.user || {};
+      const subscriberName = user.name || user.displayName || 'New Subscriber';
+      const subscriberId = user.id || user.channelId;
+      const avatarUrl = user.profileImageUrl || user.avatarUrl || null;
+
+      logger.info(`🔔 [StreamerbotService] New YouTube Subscriber: ${subscriberName} (${subscriberId || 'No ID'})`);
+
+      this.emit('subscriber:new', {
+        id: data.id || `sub_${Date.now()}`,
+        subscriberName,
+        subscriberId,
+        avatarUrl,
+        source: 'youtube_subscriber',
+        timestamp: event.timeStamp || new Date().toISOString(),
+      });
+    });
   }
 
   /**

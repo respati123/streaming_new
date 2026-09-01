@@ -217,8 +217,10 @@ export default function OverlayPage() {
 
                   {/* Center Hero: Glowing Electric Cyan / Ice Blue Amount & White Donor Name */}
                   <div className="text-center py-1">
-                    <div className="font-black text-5xl sm:text-6xl font-mono tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white via-cyan-200 to-cyan-400 drop-shadow-[0_0_30px_rgba(0,240,255,0.9)] select-text">
-                      {activeAlert.currency === '$' || activeAlert.currency === 'USD'
+                    <div className="font-black text-4xl sm:text-5xl font-mono tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white via-cyan-200 to-cyan-400 drop-shadow-[0_0_30px_rgba(0,240,255,0.9)] select-text">
+                      {activeAlert.currency === 'SUB'
+                        ? 'NEW SUBSCRIBER! 🔔'
+                        : activeAlert.currency === '$' || activeAlert.currency === 'USD'
                         ? `$${activeAlert.amount.toFixed(2)}`
                         : `${activeAlert.currency} ${activeAlert.amount.toLocaleString('id-ID')}`}
                     </div>
@@ -256,7 +258,9 @@ export default function OverlayPage() {
                     <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-orange-950/90 border border-orange-500/60 text-amber-300 text-xs font-mono font-bold shadow-[0_0_15px_rgba(255,100,0,0.4)] backdrop-blur-md">
                       <RiSparklingFill className="text-amber-400 text-sm animate-spin" />
                       <span className="tracking-wider uppercase">
-                        {summary?.settings?.streamerName
+                        {activeAlert.currency === 'SUB'
+                          ? 'NEW SUBSCRIBER'
+                          : summary?.settings?.streamerName
                           ? `${summary.settings.streamerName.toUpperCase()}`
                           : 'LIVE DONATION'}
                       </span>
@@ -269,8 +273,10 @@ export default function OverlayPage() {
 
                   {/* Center Hero: 3D Metallic Golden Amount & Donor Name */}
                   <div className="text-center py-1">
-                    <div className="golden-3d-text font-black text-5xl sm:text-6xl font-mono tracking-tight select-text">
-                      {activeAlert.currency === '$' || activeAlert.currency === 'USD'
+                    <div className="golden-3d-text font-black text-4xl sm:text-5xl font-mono tracking-tight select-text">
+                      {activeAlert.currency === 'SUB'
+                        ? 'NEW SUBSCRIBER! 🔔'
+                        : activeAlert.currency === '$' || activeAlert.currency === 'USD'
                         ? `$${activeAlert.amount.toFixed(2)}`
                         : `${activeAlert.currency} ${activeAlert.amount.toLocaleString('id-ID')}`}
                     </div>

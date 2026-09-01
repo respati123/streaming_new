@@ -225,6 +225,21 @@ class WebSocketHub {
     streamerbotService.on('member:new', (data) => {
       this.broadcast('member:new', data);
     });
+
+    streamerbotService.on('subscriber:new', (data) => {
+      this.broadcast('subscriber:new', data);
+      // Trigger visual alert banner on OBS Overlay
+      this.broadcast('donation:alert', {
+        id: data.id,
+        donorName: data.subscriberName,
+        amount: 0,
+        currency: 'SUB',
+        message: 'Baru saja Subscribe channel YouTube! 🎉 Terima kasih dukungannya!',
+        template: 'fire-glass',
+        durationSec: 8,
+        source: 'youtube_subscriber',
+      });
+    });
   }
 
   /**
