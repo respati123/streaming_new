@@ -30,6 +30,10 @@ export interface ChatMessage {
   youtubeChannelId?: string | null;
   userAvatarUrl?: string | null;
   message: string;
+  emotes?: Array<{ name: string; imageUrl?: string; url?: string }>;
+  parts?: Array<{ emoji?: string; image?: string; text?: string }>;
+  tier?: string;
+  points?: number;
   isOwner?: boolean;
   isModerator?: boolean;
   isSponsor?: boolean;

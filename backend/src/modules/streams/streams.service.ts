@@ -10,6 +10,7 @@ import {
   streamGoals,
   streamSessions,
   user,
+  youtubeEmotes,
 } from '@core/database/schema';
 import { logger } from '@core/logger/logger';
 import { desc, eq, sql } from 'drizzle-orm';
@@ -137,7 +138,7 @@ export class StreamsService {
 
     const userRecord = gamifiedProfile.user;
 
-    // 2. Insert chat message linked to this stream session & user
+    // 2. Insert chat message linked to this stream session & user with emotes & rich parts
     const [insertedMsg] = await db
       .insert(chatMessages)
       .values({
@@ -148,6 +149,8 @@ export class StreamsService {
         youtubeMessageId: dto.youtubeMessageId || null,
         userAvatarUrl: dto.userAvatarUrl || null,
         message: dto.message,
+        emotes: dto.emotes ? JSON.stringify(dto.emotes) : null,
+        parts: dto.parts ? JSON.stringify(dto.parts) : null,
         isOwner: dto.isOwner || false,
         isModerator: dto.isModerator || false,
         isSponsor: dto.isSponsor || false,
@@ -156,7 +159,37 @@ export class StreamsService {
       })
       .returning();
 
-    // 3. Update Stream Session Counters
+    // 3. Cache discovered custom emotes in youtube_emotes table
+    if (dto.emotes && dto.emotes.length > 0) {
+      for (const emote of dto.emotes) {
+        const img = emote.imageUrl || emote.url;
+        if (emote.name && img) {
+          try {
+            await db
+              .insert(youtubeEmotes)
+              .values({
+                id: emote.name,
+                name: emote.name,
+                imageUrl: img,
+                type: emote.type || 'youtube',
+                useCount: 1,
+              })
+              .onConflictDoUpdate({
+                target: youtubeEmotes.name,
+                set: {
+                  useCount: sql`${youtubeEmotes.useCount} + 1`,
+                  imageUrl: img,
+                  lastSeenAt: new Date(),
+                },
+              });
+          } catch {
+            // non-blocking emote caching
+          }
+        }
+      }
+    }
+
+    // 4. Update Stream Session Counters
     const [updatedStream] = await db
       .update(streamSessions)
       .set({

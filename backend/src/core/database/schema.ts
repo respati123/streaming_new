@@ -187,6 +187,8 @@ export const chatMessages = pgTable(
     youtubeChannelId: varchar('youtube_channel_id', { length: 255 }),
     userAvatarUrl: text('user_avatar_url'),
     message: text('message').notNull(),
+    emotes: text('emotes'), // JSON array string of detected YouTube emotes
+    parts: text('parts'), // JSON array string of parsed rich message parts
     isOwner: boolean('is_owner').notNull().default(false),
     isModerator: boolean('is_moderator').notNull().default(false),
     isSponsor: boolean('is_sponsor').notNull().default(false), // YouTube Member
@@ -200,6 +202,23 @@ export const chatMessages = pgTable(
     index('idx_chat_messages_yt_channel_id').on(table.youtubeChannelId),
     index('idx_chat_messages_yt_msg_id').on(table.youtubeMessageId),
   ]
+);
+
+/**
+ * YouTube Custom Emotes & Badges Asset Cache
+ */
+export const youtubeEmotes = pgTable(
+  'youtube_emotes',
+  {
+    id: text('id').primaryKey(),
+    name: text('name').notNull().unique(), // e.g. ":text-green-game-over:"
+    imageUrl: text('image_url').notNull(),
+    type: text('type').default('youtube').notNull(),
+    useCount: integer('use_count').default(1).notNull(),
+    firstSeenAt: timestamp('first_seen_at', { withTimezone: true }).defaultNow().notNull(),
+    lastSeenAt: timestamp('last_seen_at', { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [index('idx_youtube_emotes_name').on(table.name)]
 );
 
 /**
@@ -330,3 +349,5 @@ export type DonationTable = typeof donations.$inferSelect;
 export type NewDonationTable = typeof donations.$inferInsert;
 export type StreamerbotActionTable = typeof streamerbotActions.$inferSelect;
 export type NewStreamerbotActionTable = typeof streamerbotActions.$inferInsert;
+export type YoutubeEmoteTable = typeof youtubeEmotes.$inferSelect;
+export type NewYoutubeEmoteTable = typeof youtubeEmotes.$inferInsert;

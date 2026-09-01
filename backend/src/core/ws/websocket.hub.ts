@@ -159,6 +159,8 @@ class WebSocketHub {
             tier: pointsInfo?.tier || 'bronze',
             points: pointsInfo?.totalPoints,
             message: result.message.message,
+            emotes: chatPayload.emotes || [],
+            parts: chatPayload.parts || [],
             isOwner: result.message.isOwner,
             isModerator: result.message.isModerator,
             isSponsor: result.message.isSponsor,

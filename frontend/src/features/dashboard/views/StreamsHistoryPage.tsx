@@ -17,6 +17,7 @@ import {
 } from 'react-icons/ri';
 import { dashboardService } from '../services/dashboardService';
 import type { ChatMessage, Chatter, StreamSession } from '../types/dashboard.types';
+import { EmoteMessageRenderer } from '@shared/components/ui/EmoteMessageRenderer';
 
 export default function StreamsHistoryPage() {
   const [selectedStream, setSelectedStream] = useState<StreamSession | null>(null);
@@ -528,9 +529,14 @@ export default function StreamsHistoryPage() {
                           </span>
                         </div>
 
-                        {/* Message Text */}
-                        <div className="mt-1 text-xs text-zinc-800 leading-relaxed font-sans break-words select-text">
-                          {msg.message}
+                        {/* Message Text with YouTube Emotes */}
+                        <div className="mt-1">
+                          <EmoteMessageRenderer
+                            message={msg.message}
+                            emotes={typeof msg.emotes === 'string' ? JSON.parse(msg.emotes) : msg.emotes}
+                            parts={typeof msg.parts === 'string' ? JSON.parse(msg.parts) : msg.parts}
+                            className="text-xs text-zinc-800 leading-relaxed font-sans break-words select-text"
+                          />
                         </div>
                       </div>
                     </div>

@@ -7,6 +7,7 @@ import {
   RiVipCrownFill,
 } from 'react-icons/ri';
 import type { ChatMessage } from '../types/dashboard.types';
+import { EmoteMessageRenderer } from '@shared/components/ui/EmoteMessageRenderer';
 
 interface LiveChatConsoleProps {
   messages: ChatMessage[];
@@ -141,9 +142,12 @@ export const LiveChatConsole: React.FC<LiveChatConsoleProps> = ({
                 </span>
               </div>
 
-              <p className="text-xs text-zinc-800 leading-relaxed break-words font-sans">
-                {msg.message}
-              </p>
+              <EmoteMessageRenderer
+                message={msg.message}
+                emotes={msg.emotes}
+                parts={msg.parts}
+                className="text-xs text-zinc-800 leading-relaxed break-words font-sans"
+              />
             </div>
           ))
         )}

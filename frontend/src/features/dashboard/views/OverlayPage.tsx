@@ -22,12 +22,15 @@ import {
 } from '../constants/overlayGifs';
 import { ElectricLightningFrame } from '../components/ElectricLightningFrame';
 import { FireFlameFrame } from '../components/FireFlameFrame';
+import { EmoteMessageRenderer, type ChatEmote, type ChatPart } from '@shared/components/ui/EmoteMessageRenderer';
 
 interface ChatOverlayMsg {
   id: string;
   username: string;
   youtubeHandle?: string | null;
   message: string;
+  emotes?: ChatEmote[];
+  parts?: ChatPart[];
   avatarUrl?: string | null;
   isOwner?: boolean;
   isModerator?: boolean;
@@ -512,9 +515,11 @@ export default function OverlayPage() {
                           })}
                         </span>
                       </div>
-                      <p className="text-zinc-100 text-[11px] leading-snug font-sans break-words select-text">
-                        {msg.message}
-                      </p>
+                      <EmoteMessageRenderer
+                        message={msg.message}
+                        emotes={msg.emotes}
+                        parts={msg.parts}
+                      />
                     </div>
                   </div>
                 ))
