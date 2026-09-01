@@ -31,6 +31,7 @@ interface ChatOverlayMsg {
   isOwner?: boolean;
   isModerator?: boolean;
   isSponsor?: boolean;
+  isVerified?: boolean;
   timestamp: string;
 }
 
@@ -143,11 +144,12 @@ export default function OverlayPage() {
         id: payload.id || Date.now().toString(),
         username: payload.user || payload.username || 'Anonymous',
         message: payload.message || '',
-        avatarUrl: payload.avatarUrl || null,
+        avatarUrl: payload.avatarUrl || payload.userAvatarUrl || null,
         isOwner: payload.isOwner || payload.role === 'streamer' || payload.role === 'owner',
         isModerator: payload.isModerator || payload.role === 'moderator',
         isSponsor: payload.isSponsor || payload.role === 'member' || payload.role === 'sponsor',
-        timestamp: payload.timestamp || new Date().toISOString(),
+        isVerified: payload.isVerified || false,
+        timestamp: payload.timestamp || payload.publishedAt || new Date().toISOString(),
       };
 
       setMessages((prev) => [...prev.slice(-12), newMsg]);
@@ -439,40 +441,60 @@ export default function OverlayPage() {
                 messages.slice(-6).map((msg) => (
                   <div
                     key={msg.id}
-                    className="bg-black/45 border border-white/10 rounded-xl px-2.5 py-1.5 text-xs animate-in slide-in-from-bottom-2 duration-150 backdrop-blur-sm shadow-md pointer-events-auto"
+                    className="bg-black/55 border border-white/15 rounded-xl px-2.5 py-1.5 text-xs animate-in slide-in-from-bottom-2 duration-150 backdrop-blur-md shadow-lg pointer-events-auto flex items-start gap-2"
                   >
-                    <div className="flex items-center justify-between gap-1.5 mb-0.5">
-                      <div className="flex items-center gap-1 flex-wrap min-w-0">
-                        {msg.isOwner && (
-                          <span className="px-1 py-0.2 rounded text-[8px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40 font-mono flex items-center gap-0.5">
-                            <RiVipCrownFill className="text-[9px]" /> HOST
+                    {/* Viewer Avatar (Google Profile Picture if logged in) */}
+                    {msg.avatarUrl ? (
+                      <img
+                        src={msg.avatarUrl}
+                        alt={msg.username}
+                        className="w-5 h-5 rounded-full object-cover border border-cyan-400/60 shrink-0 mt-0.5 shadow-sm"
+                      />
+                    ) : (
+                      <div className="w-5 h-5 rounded-full bg-zinc-800 border border-white/10 flex items-center justify-center shrink-0 mt-0.5 text-[9px] font-bold text-zinc-300">
+                        {msg.username.charAt(0).toUpperCase()}
+                      </div>
+                    )}
+
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-1.5 mb-0.5">
+                        <div className="flex items-center gap-1 flex-wrap min-w-0">
+                          {msg.isOwner && (
+                            <span className="px-1 py-0.2 rounded text-[8px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40 font-mono flex items-center gap-0.5">
+                              <RiVipCrownFill className="text-[9px]" /> HOST
+                            </span>
+                          )}
+                          {msg.isModerator && (
+                            <span className="px-1 py-0.2 rounded text-[8px] font-bold bg-blue-500/20 text-blue-300 border border-blue-500/40 font-mono flex items-center gap-0.5">
+                              <RiShieldCheckFill className="text-[9px]" /> MOD
+                            </span>
+                          )}
+                          {msg.isSponsor && (
+                            <span className="px-1 py-0.2 rounded text-[8px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-mono flex items-center gap-0.5">
+                              <RiStarFill className="text-[9px]" /> MEMBER
+                            </span>
+                          )}
+                          {msg.isVerified && !msg.isOwner && (
+                            <span className="px-1 py-0.2 rounded text-[8px] font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-mono flex items-center gap-0.5">
+                              <RiShieldCheckFill className="text-[9px]" /> GOOGLE
+                            </span>
+                          )}
+                          <span className="font-extrabold font-sans text-white truncate text-[11px]">
+                            {msg.username}
                           </span>
-                        )}
-                        {msg.isModerator && (
-                          <span className="px-1 py-0.2 rounded text-[8px] font-bold bg-blue-500/20 text-blue-300 border border-blue-500/40 font-mono flex items-center gap-0.5">
-                            <RiShieldCheckFill className="text-[9px]" /> MOD
-                          </span>
-                        )}
-                        {msg.isSponsor && (
-                          <span className="px-1 py-0.2 rounded text-[8px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-mono flex items-center gap-0.5">
-                            <RiStarFill className="text-[9px]" /> MEMBER
-                          </span>
-                        )}
-                        <span className="font-extrabold font-sans text-white truncate text-[11px]">
-                          {msg.username}
+                        </div>
+
+                        <span className="text-[8px] font-mono text-zinc-400 shrink-0">
+                          {new Date(msg.timestamp).toLocaleTimeString('id-ID', {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })}
                         </span>
                       </div>
-
-                      <span className="text-[8px] font-mono text-zinc-400 shrink-0">
-                        {new Date(msg.timestamp).toLocaleTimeString('id-ID', {
-                          hour: '2-digit',
-                          minute: '2-digit',
-                        })}
-                      </span>
+                      <p className="text-zinc-100 text-[11px] leading-snug font-sans break-words select-text">
+                        {msg.message}
+                      </p>
                     </div>
-                    <p className="text-zinc-100 text-[11px] leading-snug font-sans break-words select-text">
-                      {msg.message}
-                    </p>
                   </div>
                 ))
               )}
