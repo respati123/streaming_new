@@ -1,5 +1,6 @@
 import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from '@better-auth/drizzle-adapter';
+import { dash } from '@better-auth/infra';
 import { db } from '@core/database';
 import * as schema from '@core/database/schema';
 import { env } from '@core/config/env';
@@ -22,6 +23,11 @@ export const auth = betterAuth({
     'http://127.0.0.1:3000',
     'http://127.0.0.1:5173',
     env.FRONTEND_URL,
+  ],
+  plugins: [
+    dash({
+      apiKey: env.BETTER_AUTH_API_KEY,
+    }),
   ],
   socialProviders: {
     google: {
