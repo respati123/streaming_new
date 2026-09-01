@@ -12,5 +12,8 @@
     "build": "bun run --cwd frontend build && bun run --cwd backend build",
     "test": "bun run --cwd backend test && bun run --cwd frontend test",
     "test:e2e": "bun run --cwd frontend test:e2e"
+  },
+  "dependencies": {
+    "@better-auth/infra": "^0.4.5"
   }
 }
