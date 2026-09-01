@@ -24,8 +24,10 @@ const envSchema = z.object({
     .string()
     .transform((val) => val === 'true')
     .default('false'),
+  STREAMERBOT_SCHEME: z.string().default('ws'),
   STREAMERBOT_HOST: z.string().default('127.0.0.1'),
   STREAMERBOT_PORT: z.coerce.number().default(8080),
+  STREAMERBOT_ENDPOINT: z.string().default('/websocket'),
   STREAMERBOT_PASSWORD: z.string().optional(),
 
   // Google OAuth & Better Auth Configuration

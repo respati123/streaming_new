@@ -13,12 +13,37 @@ export class StreamerbotService extends EventEmitter {
   private lastConnectedAt: string | null = null;
   private host: string;
   private port: number;
+  private scheme: string;
+  private endpoint: string;
   private password?: string;
 
   constructor() {
     super();
-    this.host = env.STREAMERBOT_HOST;
-    this.port = env.STREAMERBOT_PORT;
+    let rawHost = env.STREAMERBOT_HOST;
+    let scheme = env.STREAMERBOT_SCHEME || 'ws';
+    let port = env.STREAMERBOT_PORT || 8080;
+    let endpoint = env.STREAMERBOT_ENDPOINT || '/websocket';
+
+    // Auto-detect and parse full URLs (such as ngrok HTTPS/WSS URLs)
+    if (rawHost.includes('://')) {
+      try {
+        const parsedUrl = new URL(rawHost);
+        scheme = parsedUrl.protocol.startsWith('https') || parsedUrl.protocol.startsWith('wss') ? 'wss' : 'ws';
+        rawHost = parsedUrl.hostname;
+        port = parsedUrl.port ? Number(parsedUrl.port) : (scheme === 'wss' ? 443 : 8080);
+        if (parsedUrl.pathname && parsedUrl.pathname !== '/') {
+          endpoint = parsedUrl.pathname;
+        }
+      } catch {}
+    } else if (rawHost.includes('ngrok')) {
+      scheme = 'wss';
+      if (port === 8080) port = 443;
+    }
+
+    this.host = rawHost;
+    this.scheme = scheme;
+    this.port = port;
+    this.endpoint = endpoint;
     this.password = env.STREAMERBOT_PASSWORD;
   }
 
@@ -45,12 +70,14 @@ export class StreamerbotService extends EventEmitter {
     }
 
     this.setStatus('CONNECTING');
-    logger.info(`[StreamerbotService] Connecting to Streamer.bot at ${this.host}:${this.port}...`);
+    logger.info(`[StreamerbotService] Connecting to Streamer.bot at ${this.scheme}://${this.host}:${this.port}${this.endpoint}...`);
 
     try {
       this.client = new StreamerbotClient({
         host: this.host,
         port: this.port,
+        scheme: this.scheme as any,
+        endpoint: this.endpoint,
         password: this.password,
         autoReconnect: true,
         retries: -1,
