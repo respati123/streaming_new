@@ -230,11 +230,13 @@ export default function OverlayPage() {
     <div className="w-full h-full min-h-screen overflow-hidden bg-transparent relative font-sans select-none pointer-events-none">
       {/* ─── 00. FULLSCREEN GAME WALLPAPER BACKGROUND ─────────────────────────── */}
       {showWallpaper && (
-        <img
-          src="/wallpaper_live.webp"
-          alt="Live Game Wallpaper"
-          className="fixed inset-0 w-full h-full object-cover -z-10 select-none pointer-events-none"
-        />
+        <div className="fixed inset-0 w-full h-full z-0 overflow-hidden select-none pointer-events-none">
+          <img
+            src="/wallpaper_live.webp"
+            alt="Live Game Wallpaper"
+            className="w-full h-full object-cover"
+          />
+        </div>
       )}
 
       {/* ─── 02. ACTIVE DONATION ALERT TOAST (Animated GIF / MP4 Template Wrapper) ─── */}
@@ -478,7 +480,7 @@ export default function OverlayPage() {
 
         {/* ─── 03. LIVE CHAT OVERLAY (Individual Message Card Boxes) ───────── */}
         {(widgetFilter === 'all' || widgetFilter === 'chat') && (
-          <div className="absolute left-4 bottom-4 w-[430px] max-w-[90vw] flex flex-col justify-end pointer-events-none space-y-2.5 overflow-hidden bg-transparent">
+          <div className="absolute left-4 bottom-4 w-[430px] max-w-[90vw] z-20 flex flex-col justify-end pointer-events-none space-y-2.5 overflow-hidden bg-transparent">
             {messages.slice(-7).map((msg) => (
               <div
                 key={msg.id}
