@@ -88,9 +88,11 @@ function playChimeAlert() {
 export default function OverlayPage() {
   const [searchParams] = useSearchParams();
   const widgetFilter = searchParams.get('widget') || 'all'; // 'all' | 'alert' | 'chat' | 'ticker' | 'webcam'
+  const bgParam = searchParams.get('bg');
+  const showWallpaper = bgParam !== 'none' && bgParam !== 'transparent';
   const [messages, setMessages] = useState<ChatOverlayMsg[]>([]);
   const [activeAlert, setActiveAlert] = useState<AlertToast | null>(null);
-  const [showWebcamFrame, setShowWebcamFrame] = useState(true);
+  const [showWebcamFrame, setShowWebcamFrame] = useState(searchParams.get('webcam') === 'true');
   const [showPreviewTools, setShowPreviewTools] = useState(false);
   const alertTimerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -226,6 +228,15 @@ export default function OverlayPage() {
 
   return (
     <div className="w-full h-full min-h-screen overflow-hidden bg-transparent relative font-sans select-none pointer-events-none">
+      {/* ─── 00. FULLSCREEN GAME WALLPAPER BACKGROUND ─────────────────────────── */}
+      {showWallpaper && (
+        <img
+          src="/wallpaper_live.webp"
+          alt="Live Game Wallpaper"
+          className="fixed inset-0 w-full h-full object-cover -z-10 select-none pointer-events-none"
+        />
+      )}
+
       {/* ─── 02. ACTIVE DONATION ALERT TOAST (Animated GIF / MP4 Template Wrapper) ─── */}
       {(widgetFilter === 'all' || widgetFilter === 'alert') && activeAlert && (
         <div className="absolute left-1/2 -translate-x-1/2 top-8 w-full max-w-[760px] z-50 animate-in zoom-in-95 duration-200 pointer-events-auto">
