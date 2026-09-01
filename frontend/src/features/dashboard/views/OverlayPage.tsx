@@ -431,86 +431,86 @@ export default function OverlayPage() {
 
         {/* ─── 03. LIVE CHAT OVERLAY BOX ───────────────────────────────────────── */}
         {(widgetFilter === 'all' || widgetFilter === 'chat') && (
-          <div className="absolute left-0 bottom-0 w-[300px] h-[380px] bg-transparent pl-3 pb-2 flex flex-col justify-end pointer-events-none">
+          <div className="absolute left-0 bottom-0 w-[420px] max-w-[92vw] h-[480px] bg-transparent pl-4 pb-4 flex flex-col justify-end pointer-events-none">
             {/* Header */}
-            <div className="flex items-center justify-between pb-1.5 mb-1.5 border-b border-white/10 px-1">
-              <div className="flex items-center gap-1.5 text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
-                <RiChat1Line className="text-blue-400 text-sm" />
-                <span className="text-[11px] font-extrabold uppercase font-mono tracking-wider">
-                  Live Chat
+            <div className="flex items-center justify-between pb-2 mb-2 border-b border-white/15 px-1.5">
+              <div className="flex items-center gap-2 text-white drop-shadow-[0_2px_6px_rgba(0,0,0,0.9)]">
+                <RiChat1Line className="text-cyan-400 text-base" />
+                <span className="text-xs font-black uppercase font-mono tracking-wider">
+                  Live Chat Stream
                 </span>
               </div>
-              <div className="flex items-center gap-1 text-[9px] font-mono text-emerald-400 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.9)] animate-pulse" />
+              <div className="flex items-center gap-1.5 text-[10px] font-mono font-bold text-emerald-400 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/30">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,1)] animate-pulse" />
                 <span>LIVE</span>
               </div>
             </div>
 
             {/* Messages Feed */}
-            <div className="flex-1 overflow-hidden flex flex-col justify-end space-y-1.5 py-1">
+            <div className="flex-1 overflow-hidden flex flex-col justify-end space-y-2 py-1">
               {messages.length === 0 ? (
-                <div className="py-6 text-left text-zinc-400 font-mono text-[11px] drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] px-1">
+                <div className="py-6 text-left text-zinc-400 font-mono text-xs drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] px-2">
                   <span>Waiting for messages...</span>
                 </div>
               ) : (
                 messages.slice(-6).map((msg) => (
                   <div
                     key={msg.id}
-                    className="bg-black/55 border border-white/15 rounded-xl px-2.5 py-1.5 text-xs animate-in slide-in-from-bottom-2 duration-150 backdrop-blur-md shadow-lg pointer-events-auto flex items-start gap-2"
+                    className="bg-zinc-950/85 border border-white/20 rounded-2xl px-3.5 py-2.5 text-sm animate-in slide-in-from-bottom-3 duration-200 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.85)] pointer-events-auto flex items-start gap-3"
                   >
-                    {/* Viewer Avatar (Google Profile Picture if logged in) */}
+                    {/* Viewer Avatar */}
                     {msg.avatarUrl ? (
                       <img
                         src={msg.avatarUrl}
                         alt={msg.username}
-                        className="w-5 h-5 rounded-full object-cover border border-cyan-400/60 shrink-0 mt-0.5 shadow-sm"
+                        className="w-8 h-8 rounded-full object-cover border-2 border-cyan-400/80 shrink-0 mt-0.5 shadow-md ring-2 ring-black/40"
                       />
                     ) : (
-                      <div className="w-5 h-5 rounded-full bg-zinc-800 border border-white/10 flex items-center justify-center shrink-0 mt-0.5 text-[9px] font-bold text-zinc-300">
+                      <div className="w-8 h-8 rounded-full bg-zinc-800 border-2 border-white/20 flex items-center justify-center shrink-0 mt-0.5 text-xs font-black text-zinc-200 shadow-md">
                         {msg.username.charAt(0).toUpperCase()}
                       </div>
                     )}
 
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between gap-1.5 mb-0.5">
-                        <div className="flex items-center gap-1 flex-wrap min-w-0">
+                      <div className="flex items-center justify-between gap-1.5 mb-1">
+                        <div className="flex items-center gap-1.5 flex-wrap min-w-0">
                           {msg.isOwner && (
-                            <span className="px-1 py-0.2 rounded text-[8px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40 font-mono flex items-center gap-0.5">
-                              <RiVipCrownFill className="text-[9px]" /> HOST
+                            <span className="px-1.5 py-0.5 rounded-md text-[9px] font-black bg-amber-500/25 text-amber-300 border border-amber-500/50 font-mono flex items-center gap-0.5 shadow-xs">
+                              <RiVipCrownFill className="text-[10px]" /> HOST
                             </span>
                           )}
                           {msg.isModerator && (
-                            <span className="px-1 py-0.2 rounded text-[8px] font-bold bg-blue-500/20 text-blue-300 border border-blue-500/40 font-mono flex items-center gap-0.5">
-                              <RiShieldCheckFill className="text-[9px]" /> MOD
+                            <span className="px-1.5 py-0.5 rounded-md text-[9px] font-black bg-blue-500/25 text-blue-300 border border-blue-500/50 font-mono flex items-center gap-0.5 shadow-xs">
+                              <RiShieldCheckFill className="text-[10px]" /> MOD
                             </span>
                           )}
                           {msg.isSponsor && (
-                            <span className="px-1 py-0.2 rounded text-[8px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-mono flex items-center gap-0.5">
-                              <RiStarFill className="text-[9px]" /> MEMBER
+                            <span className="px-1.5 py-0.5 rounded-md text-[9px] font-black bg-emerald-500/25 text-emerald-300 border border-emerald-500/50 font-mono flex items-center gap-0.5 shadow-xs">
+                              <RiStarFill className="text-[10px]" /> MEMBER
                             </span>
                           )}
                           {msg.tier && msg.tier !== 'bronze' && !msg.isOwner && (
-                            <span className={`px-1 py-0.2 rounded text-[8px] font-bold uppercase font-mono flex items-center gap-0.5 ${
+                            <span className={`px-1.5 py-0.5 rounded-md text-[9px] font-black uppercase font-mono flex items-center gap-0.5 shadow-xs ${
                               msg.tier === 'diamond'
-                                ? 'bg-cyan-500/30 text-cyan-200 border border-cyan-400/80 shadow-[0_0_8px_rgba(0,212,255,0.4)]'
+                                ? 'bg-cyan-500/35 text-cyan-200 border border-cyan-400 shadow-[0_0_10px_rgba(0,212,255,0.5)]'
                                 : msg.tier === 'gold'
-                                ? 'bg-amber-500/30 text-amber-200 border border-amber-400/80'
-                                : 'bg-zinc-400/30 text-zinc-200 border border-zinc-400/80'
+                                ? 'bg-amber-500/35 text-amber-200 border border-amber-400'
+                                : 'bg-zinc-400/35 text-zinc-200 border border-zinc-400'
                             }`}>
-                              <RiSparklingFill className="text-[8px]" /> {msg.tier}
+                              <RiSparklingFill className="text-[9px]" /> {msg.tier}
                             </span>
                           )}
                           {msg.isVerified && !msg.isOwner && (
-                            <span className="px-1 py-0.2 rounded text-[8px] font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-mono flex items-center gap-0.5">
-                              <RiShieldCheckFill className="text-[9px]" /> GOOGLE
+                            <span className="px-1.5 py-0.5 rounded-md text-[9px] font-black bg-cyan-500/25 text-cyan-300 border border-cyan-500/50 font-mono flex items-center gap-0.5 shadow-xs">
+                              <RiShieldCheckFill className="text-[10px]" /> GOOGLE
                             </span>
                           )}
-                          <span className="font-extrabold font-sans text-white truncate text-[11px]">
+                          <span className="font-black font-sans text-white truncate text-[13px] drop-shadow-sm">
                             {msg.username}
                           </span>
                         </div>
 
-                        <span className="text-[8px] font-mono text-zinc-400 shrink-0">
+                        <span className="text-[10px] font-mono font-medium text-zinc-400 shrink-0">
                           {new Date(msg.timestamp).toLocaleTimeString('id-ID', {
                             hour: '2-digit',
                             minute: '2-digit',
@@ -521,6 +521,8 @@ export default function OverlayPage() {
                         message={msg.message}
                         emotes={msg.emotes}
                         parts={msg.parts}
+                        className="text-zinc-100 text-[13.5px] leading-snug font-medium break-words drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)] select-text"
+                        emoteSizeClassName="inline-block h-[26px] w-[26px] mx-0.5 object-contain align-middle -mt-0.5 drop-shadow-sm"
                       />
                     </div>
                   </div>
