@@ -124,6 +124,11 @@ export class StreamerbotService extends EventEmitter {
 
     // 1. YouTube SuperChat
     this.client.on('YouTube.SuperChat', (event: any) => {
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+      console.log('🎉 [STREAMER.BOT RAW SUPERCHAT RECEIVED]:');
+      console.log(JSON.stringify(event, null, 2));
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+
       const data = event.data || {};
       const alert: DonationAlertEventData = {
         id: data.id,
@@ -148,6 +153,12 @@ export class StreamerbotService extends EventEmitter {
     this.client.on('YouTube.Message', async (event: any) => {
       const data = event.data || {};
       const user = data.user || {};
+
+      // ─── FULL RAW LOGS FROM STREAMER.BOT ───
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+      console.log('📥 [STREAMER.BOT RAW CHAT EVENT RECEIVED]:');
+      console.log(JSON.stringify(event, null, 2));
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
 
       try {
         const { streamsService } = await import('@modules/streams/streams.service');
