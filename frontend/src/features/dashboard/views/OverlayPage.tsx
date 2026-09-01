@@ -465,106 +465,83 @@ export default function OverlayPage() {
           </div>
         )}
 
-        {/* ─── 03. LIVE CHAT OVERLAY BOX ───────────────────────────────────────── */}
+        {/* ─── 03. LIVE CHAT OVERLAY (Pure Floating Message Cards List) ───────── */}
         {(widgetFilter === 'all' || widgetFilter === 'chat') && (
-          <div className="absolute left-0 bottom-0 w-[420px] max-w-[92vw] h-[480px] bg-transparent pl-4 pb-4 flex flex-col justify-end pointer-events-none">
-            {/* Header */}
-            <div className="flex items-center justify-between pb-2 mb-2 border-b border-white/15 px-1.5">
-              <div className="flex items-center gap-2 text-white drop-shadow-[0_2px_6px_rgba(0,0,0,0.9)]">
-                <RiChat1Line className="text-cyan-400 text-base" />
-                <span className="text-xs font-black uppercase font-mono tracking-wider">
-                  Live Chat Stream
-                </span>
-              </div>
-              <div className="flex items-center gap-1.5 text-[10px] font-mono font-bold text-emerald-400 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/30">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,1)] animate-pulse" />
-                <span>LIVE</span>
-              </div>
-            </div>
-
-            {/* Messages Feed */}
-            <div className="flex-1 overflow-hidden flex flex-col justify-end space-y-2 py-1">
-              {messages.length === 0 ? (
-                <div className="py-6 text-left text-zinc-400 font-mono text-xs drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] px-2">
-                  <span>Waiting for messages...</span>
-                </div>
-              ) : (
-                messages.slice(-6).map((msg) => (
-                  <div
-                    key={msg.id}
-                    className="bg-zinc-950/85 border border-white/20 rounded-2xl px-3.5 py-2.5 text-sm animate-in slide-in-from-bottom-3 duration-200 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.85)] pointer-events-auto flex items-start gap-3"
-                  >
-                    {/* Viewer Avatar */}
-                    {msg.avatarUrl ? (
-                      <img
-                        src={msg.avatarUrl}
-                        alt={msg.username}
-                        className="w-8 h-8 rounded-full object-cover border-2 border-cyan-400/80 shrink-0 mt-0.5 shadow-md ring-2 ring-black/40"
-                      />
-                    ) : (
-                      <div className="w-8 h-8 rounded-full bg-zinc-800 border-2 border-white/20 flex items-center justify-center shrink-0 mt-0.5 text-xs font-black text-zinc-200 shadow-md">
-                        {msg.username.charAt(0).toUpperCase()}
-                      </div>
-                    )}
-
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between gap-1.5 mb-1">
-                        <div className="flex items-center gap-1.5 flex-wrap min-w-0">
-                          {msg.isOwner && (
-                            <span className="px-1.5 py-0.5 rounded-md text-[9px] font-black bg-amber-500/25 text-amber-300 border border-amber-500/50 font-mono flex items-center gap-0.5 shadow-xs">
-                              <RiVipCrownFill className="text-[10px]" /> HOST
-                            </span>
-                          )}
-                          {msg.isModerator && (
-                            <span className="px-1.5 py-0.5 rounded-md text-[9px] font-black bg-blue-500/25 text-blue-300 border border-blue-500/50 font-mono flex items-center gap-0.5 shadow-xs">
-                              <RiShieldCheckFill className="text-[10px]" /> MOD
-                            </span>
-                          )}
-                          {msg.isSponsor && (
-                            <span className="px-1.5 py-0.5 rounded-md text-[9px] font-black bg-emerald-500/25 text-emerald-300 border border-emerald-500/50 font-mono flex items-center gap-0.5 shadow-xs">
-                              <RiStarFill className="text-[10px]" /> MEMBER
-                            </span>
-                          )}
-                          {msg.tier && msg.tier !== 'bronze' && !msg.isOwner && (
-                            <span className={`px-1.5 py-0.5 rounded-md text-[9px] font-black uppercase font-mono flex items-center gap-0.5 shadow-xs ${
-                              msg.tier === 'diamond'
-                                ? 'bg-cyan-500/35 text-cyan-200 border border-cyan-400 shadow-[0_0_10px_rgba(0,212,255,0.5)]'
-                                : msg.tier === 'gold'
-                                ? 'bg-amber-500/35 text-amber-200 border border-amber-400'
-                                : 'bg-zinc-400/35 text-zinc-200 border border-zinc-400'
-                            }`}>
-                              <RiSparklingFill className="text-[9px]" /> {msg.tier}
-                            </span>
-                          )}
-                          {msg.isVerified && !msg.isOwner && (
-                            <span className="px-1.5 py-0.5 rounded-md text-[9px] font-black bg-cyan-500/25 text-cyan-300 border border-cyan-500/50 font-mono flex items-center gap-0.5 shadow-xs">
-                              <RiShieldCheckFill className="text-[10px]" /> GOOGLE
-                            </span>
-                          )}
-                          <span className="font-black font-sans text-white truncate text-[13px] drop-shadow-sm">
-                            {msg.username}
-                          </span>
-                        </div>
-
-                        <span className="text-[10px] font-mono font-medium text-zinc-400 shrink-0">
-                          {new Date(msg.timestamp).toLocaleTimeString('id-ID', {
-                            hour: '2-digit',
-                            minute: '2-digit',
-                          })}
-                        </span>
-                      </div>
-                      <EmoteMessageRenderer
-                        message={msg.message}
-                        emotes={msg.emotes}
-                        parts={msg.parts}
-                        className="text-zinc-100 text-[13.5px] leading-snug font-medium break-words drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)] select-text"
-                        emoteSizeClassName="inline-block h-[26px] w-[26px] mx-0.5 object-contain align-middle -mt-0.5 drop-shadow-sm"
-                      />
-                    </div>
+          <div className="absolute left-4 bottom-4 w-[430px] max-w-[90vw] flex flex-col justify-end pointer-events-none space-y-2.5 overflow-hidden">
+            {messages.slice(-7).map((msg) => (
+              <div
+                key={msg.id}
+                className="bg-black/75 border border-white/20 rounded-2xl px-3.5 py-2.5 text-sm animate-in slide-in-from-bottom-3 duration-200 backdrop-blur-md shadow-[0_8px_32px_rgba(0,0,0,0.85)] pointer-events-auto flex items-start gap-3"
+              >
+                {/* Viewer Avatar */}
+                {msg.avatarUrl ? (
+                  <img
+                    src={msg.avatarUrl}
+                    alt={msg.username}
+                    className="w-8 h-8 rounded-full object-cover border-2 border-cyan-400/80 shrink-0 mt-0.5 shadow-md ring-2 ring-black/40"
+                  />
+                ) : (
+                  <div className="w-8 h-8 rounded-full bg-zinc-800 border-2 border-white/20 flex items-center justify-center shrink-0 mt-0.5 text-xs font-black text-zinc-200 shadow-md">
+                    {msg.username.charAt(0).toUpperCase()}
                   </div>
-                ))
-              )}
-            </div>
+                )}
+
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between gap-1.5 mb-1">
+                    <div className="flex items-center gap-1.5 flex-wrap min-w-0">
+                      {msg.isOwner && (
+                        <span className="px-1.5 py-0.5 rounded-md text-[9px] font-black bg-amber-500/25 text-amber-300 border border-amber-500/50 font-mono flex items-center gap-0.5 shadow-xs">
+                          <RiVipCrownFill className="text-[10px]" /> HOST
+                        </span>
+                      )}
+                      {msg.isModerator && (
+                        <span className="px-1.5 py-0.5 rounded-md text-[9px] font-black bg-blue-500/25 text-blue-300 border border-blue-500/50 font-mono flex items-center gap-0.5 shadow-xs">
+                          <RiShieldCheckFill className="text-[10px]" /> MOD
+                        </span>
+                      )}
+                      {msg.isSponsor && (
+                        <span className="px-1.5 py-0.5 rounded-md text-[9px] font-black bg-emerald-500/25 text-emerald-300 border border-emerald-500/50 font-mono flex items-center gap-0.5 shadow-xs">
+                          <RiStarFill className="text-[10px]" /> MEMBER
+                        </span>
+                      )}
+                      {msg.tier && msg.tier !== 'bronze' && !msg.isOwner && (
+                        <span className={`px-1.5 py-0.5 rounded-md text-[9px] font-black uppercase font-mono flex items-center gap-0.5 shadow-xs ${
+                          msg.tier === 'diamond'
+                            ? 'bg-cyan-500/35 text-cyan-200 border border-cyan-400 shadow-[0_0_10px_rgba(0,212,255,0.5)]'
+                            : msg.tier === 'gold'
+                            ? 'bg-amber-500/35 text-amber-200 border border-amber-400'
+                            : 'bg-zinc-400/35 text-zinc-200 border border-zinc-400'
+                        }`}>
+                          <RiSparklingFill className="text-[9px]" /> {msg.tier}
+                        </span>
+                      )}
+                      {msg.isVerified && !msg.isOwner && (
+                        <span className="px-1.5 py-0.5 rounded-md text-[9px] font-black bg-cyan-500/25 text-cyan-300 border border-cyan-500/50 font-mono flex items-center gap-0.5 shadow-xs">
+                          <RiShieldCheckFill className="text-[10px]" /> GOOGLE
+                        </span>
+                      )}
+                      <span className="font-black font-sans text-white truncate text-[13px] drop-shadow-sm">
+                        {msg.username}
+                      </span>
+                    </div>
+
+                    <span className="text-[10px] font-mono font-medium text-zinc-400 shrink-0">
+                      {new Date(msg.timestamp).toLocaleTimeString('id-ID', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
+                    </span>
+                  </div>
+                  <EmoteMessageRenderer
+                    message={msg.message}
+                    emotes={msg.emotes}
+                    parts={msg.parts}
+                    className="text-zinc-100 text-[13.5px] leading-snug font-medium break-words drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)] select-text"
+                    emoteSizeClassName="inline-block h-[26px] w-[26px] mx-0.5 object-contain align-middle -mt-0.5 drop-shadow-sm"
+                  />
+                </div>
+              </div>
+            ))}
           </div>
         )}
 
