@@ -37,9 +37,14 @@ export function useDashboardRealtime(onNewChat?: (msg: ChatMessage) => void) {
           userId: data.userId,
           userAvatarUrl: data.avatarUrl,
           message: data.message,
+          emotes: data.emotes || [],
+          parts: data.parts || [],
+          tier: data.tier,
+          points: data.points,
           isOwner: data.isOwner,
           isModerator: data.isModerator,
           isSponsor: data.isSponsor,
+          isVerified: data.isVerified,
           publishedAt: data.timestamp || new Date().toISOString(),
         });
       }

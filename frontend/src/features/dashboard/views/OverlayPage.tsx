@@ -150,6 +150,8 @@ export default function OverlayPage() {
         username: payload.user || payload.username || 'Anonymous',
         youtubeHandle: payload.youtubeHandle || null,
         message: payload.message || '',
+        emotes: payload.emotes || [],
+        parts: payload.parts || [],
         avatarUrl: payload.avatarUrl || payload.userAvatarUrl || null,
         isOwner: payload.isOwner || payload.role === 'streamer' || payload.role === 'owner',
         isModerator: payload.isModerator || payload.role === 'moderator',

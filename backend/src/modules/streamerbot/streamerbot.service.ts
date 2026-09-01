@@ -160,16 +160,21 @@ export class StreamerbotService extends EventEmitter {
       console.log(JSON.stringify(event, null, 2));
       console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
 
+      const parts = data.parts || [];
+      const cleanMessage = parts.length > 0
+        ? parts.map((p: any) => p.text || p.emoji || '').join('')
+        : data.message || '';
+
       try {
         const { streamsService } = await import('@modules/streams/streams.service');
         const result = await streamsService.ingestChatMessage({
-          message: data.message || '',
+          message: cleanMessage,
           username: user.name || user.displayName || 'Viewer',
           youtubeChannelId: user.id || user.channelId,
           youtubeMessageId: data.id,
           userAvatarUrl: user.profileImageUrl || user.avatarUrl || null,
           emotes: data.emotes || [],
-          parts: data.parts || [],
+          parts: parts,
           isOwner: data.isOwner || user.isOwner || false,
           isModerator: data.isModerator || user.isModerator || false,
           isSponsor: data.isSponsor || user.isSponsor || false,
@@ -177,7 +182,7 @@ export class StreamerbotService extends EventEmitter {
           publishedAt: event.timeStamp || new Date().toISOString(),
         });
 
-        logger.info(`💬 [Streamer.bot YouTube Chat] ${user.name || user.displayName}: "${data.message}"`);
+        logger.info(`💬 [Streamer.bot YouTube Chat] ${user.name || user.displayName}: "${cleanMessage}"`);
 
         const { pointsService } = await import('@modules/points/points.service');
         const userProfile = await pointsService.getUserProfile(result.user.id);
