@@ -139,6 +139,42 @@ export default function OverlayPage() {
     }, alert.durationMs || 8000);
   }, []);
 
+  // 2. Fetch Initial 15-20 Messages for the currently Live Stream Session
+  const { data: initialChats = [] } = useQuery({
+    queryKey: ['overlay-initial-chats'],
+    queryFn: async () => {
+      try {
+        const chats = await dashboardService.getStreamChats('active', 20);
+        return chats;
+      } catch {
+        return [];
+      }
+    },
+    staleTime: Infinity,
+  });
+
+  // Populate initial chat history on overlay load
+  useEffect(() => {
+    if (initialChats.length > 0 && messages.length === 0) {
+      const mappedChats: ChatOverlayMsg[] = [...initialChats].reverse().map((msg: any) => ({
+        id: msg.id,
+        username: msg.user?.name || msg.username || 'Anonymous',
+        youtubeHandle: msg.user?.youtubeHandle || null,
+        message: msg.message,
+        emotes: typeof msg.emotes === 'string' ? JSON.parse(msg.emotes) : msg.emotes || [],
+        parts: typeof msg.parts === 'string' ? JSON.parse(msg.parts) : msg.parts || [],
+        avatarUrl: msg.user?.image || msg.userAvatarUrl || null,
+        isOwner: msg.isOwner || msg.user?.role === 'streamer' || msg.user?.role === 'owner',
+        isModerator: msg.isModerator || msg.user?.role === 'moderator',
+        isSponsor: msg.isSponsor || msg.user?.role === 'member' || msg.user?.role === 'sponsor',
+        isVerified: msg.isVerified || false,
+        tier: msg.user?.tier || msg.tier || 'bronze',
+        timestamp: msg.publishedAt || new Date().toISOString(),
+      }));
+      setMessages(mappedChats.slice(-15));
+    }
+  }, [initialChats]);
+
   // 3. Real-time WebSocket Listeners
   useEffect(() => {
     overlaySocket.connect();

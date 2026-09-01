@@ -33,8 +33,8 @@ export const dashboardService = {
     return res.data.data;
   },
 
-  async getStreamChats(streamId: string): Promise<ChatMessage[]> {
-    const res = await apiClient.get<{ data: ChatMessage[] }>(`/streams/${streamId}/chats`);
+  async getStreamChats(streamId: string = 'active', limit: number = 20): Promise<ChatMessage[]> {
+    const res = await apiClient.get<{ data: ChatMessage[] }>(`/streams/${streamId}/chats?limit=${limit}`);
     return res.data.data;
   },
 

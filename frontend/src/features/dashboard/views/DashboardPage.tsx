@@ -25,17 +25,36 @@ export default function DashboardPage() {
     enabled: !!activeStream?.id,
   });
 
-  // 3. Fetch Historical Chats for active stream
+  // 3. Fetch Initial 20 Historical Chats for active stream
   const { data: initialChats = [], isLoading: isChatsLoading } = useQuery({
     queryKey: ['stream-chats', activeStream?.id],
-    queryFn: () => (activeStream ? dashboardService.getStreamChats(activeStream.id) : []),
+    queryFn: () => (activeStream ? dashboardService.getStreamChats(activeStream.id, 20) : []),
     enabled: !!activeStream?.id,
+    staleTime: Infinity,
   });
 
   // Sync historical chats when loaded
   useEffect(() => {
     if (initialChats.length > 0 && liveMessages.length === 0) {
-      setLiveMessages([...initialChats].reverse());
+      const mapped: ChatMessage[] = [...initialChats].reverse().map((msg: any) => ({
+        id: msg.id,
+        streamId: msg.streamId,
+        userId: msg.userId,
+        username: msg.user?.name || msg.username || 'Anonymous',
+        youtubeChannelId: msg.user?.youtubeChannelId || null,
+        userAvatarUrl: msg.user?.image || msg.userAvatarUrl || null,
+        message: msg.message,
+        emotes: typeof msg.emotes === 'string' ? JSON.parse(msg.emotes) : msg.emotes || [],
+        parts: typeof msg.parts === 'string' ? JSON.parse(msg.parts) : msg.parts || [],
+        tier: msg.user?.tier || 'bronze',
+        points: msg.user?.points || 0,
+        isOwner: msg.isOwner || msg.user?.role === 'streamer' || msg.user?.role === 'owner',
+        isModerator: msg.isModerator || msg.user?.role === 'moderator',
+        isSponsor: msg.isSponsor || msg.user?.role === 'member' || msg.user?.role === 'sponsor',
+        isVerified: msg.isVerified || false,
+        publishedAt: msg.publishedAt,
+      }));
+      setLiveMessages(mapped.slice(-20));
     }
   }, [initialChats]);
 

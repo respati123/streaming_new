@@ -49,11 +49,20 @@ streamsController.get('/:id/chatters', async (c) => {
 
 /**
  * GET /api/v1/streams/:id/chats
- * Get chat messages for this stream session
+ * Get chat messages for this stream session (Supports limit=20 and id='active')
  */
 streamsController.get('/:id/chats', async (c) => {
   const streamId = c.req.param('id');
-  const chats = await streamsService.getStreamChats(streamId);
+  const limitQuery = c.req.query('limit');
+  const limit = limitQuery ? Math.min(Math.max(parseInt(limitQuery, 10) || 20, 1), 100) : 20;
+
+  let targetStreamId = streamId;
+  if (streamId === 'active') {
+    const activeStream = await streamsService.getOrCreateActiveStream();
+    targetStreamId = activeStream.id;
+  }
+
+  const chats = await streamsService.getStreamChats(targetStreamId, limit);
   return sendSuccess(c, chats, 'Stream chat messages retrieved');
 });
 
