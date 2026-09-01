@@ -484,7 +484,7 @@ export default function OverlayPage() {
             {messages.slice(-7).map((msg) => (
               <div
                 key={msg.id}
-                className="bg-black/35 border border-white/15 rounded-2xl p-2.5 text-sm animate-in slide-in-from-bottom-2 duration-150 backdrop-blur-md shadow-lg pointer-events-auto flex items-start gap-2.5"
+                className="chat-bubble-enter bg-black/35 border border-white/15 rounded-2xl p-2.5 text-sm backdrop-blur-md shadow-lg pointer-events-auto flex items-start gap-2.5 will-change-transform"
               >
                 {/* Viewer Avatar */}
                 {msg.avatarUrl ? (

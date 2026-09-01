@@ -112,7 +112,7 @@ export const LiveChatConsole: React.FC<LiveChatConsoleProps> = ({
           messages.map((msg, idx) => (
             <div
               key={msg.id || idx}
-              className="p-3 bg-white rounded-xl border border-zinc-200/90 shadow-xs flex items-start gap-2.5 hover:border-zinc-300 transition-colors"
+              className="chat-bubble-enter p-3 bg-white rounded-xl border border-zinc-200/90 shadow-xs flex items-start gap-2.5 hover:border-zinc-300 transition-colors"
             >
               {/* Chatter Avatar */}
               {msg.userAvatarUrl ? (
