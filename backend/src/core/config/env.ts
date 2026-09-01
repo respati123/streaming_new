@@ -29,8 +29,8 @@ const envSchema = z.object({
   STREAMERBOT_PASSWORD: z.string().optional(),
 
   // Google OAuth & Better Auth Configuration
-  BETTER_AUTH_API_KEY: z.string().optional().default('ba_6u0ygwr75rd0eibspjzwc6daluznyesg'),
-  BETTER_AUTH_SECRET: z.string().default('ba_6u0ygwr75rd0eibspjzwc6daluznyesg'),
+  BETTER_AUTH_API_KEY: z.string().optional().default('ba_mrgchyx7eet6z35es2h7f3ag8i2c9va3'),
+  BETTER_AUTH_SECRET: z.string().default('ba_mrgchyx7eet6z35es2h7f3ag8i2c9va3'),
   BETTER_AUTH_URL: z.string().default('http://localhost:4000'),
   GOOGLE_CLIENT_ID: z.string().optional().default(''),
   GOOGLE_CLIENT_SECRET: z.string().optional().default(''),
