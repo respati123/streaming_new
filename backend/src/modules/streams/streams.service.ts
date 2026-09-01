@@ -144,10 +144,7 @@ export class StreamsService {
       .values({
         streamId: stream.id,
         userId: userRecord.id,
-        username: dto.username,
-        youtubeChannelId: dto.youtubeChannelId || null,
         youtubeMessageId: dto.youtubeMessageId || null,
-        userAvatarUrl: dto.userAvatarUrl || null,
         message: dto.message,
         emotes: dto.emotes ? JSON.stringify(dto.emotes) : null,
         parts: dto.parts ? JSON.stringify(dto.parts) : null,
@@ -210,13 +207,15 @@ export class StreamsService {
    * Get unique chatters / users who participated in a specific stream session
    */
   async getStreamChatters(streamId: string) {
-    // Aggregate distinct users and message counts in this stream
+    // Aggregate distinct users and message counts in this stream joining 'user' table
     const chatters = await db
       .select({
         userId: chatMessages.userId,
-        username: chatMessages.username,
-        youtubeChannelId: chatMessages.youtubeChannelId,
-        userAvatarUrl: chatMessages.userAvatarUrl,
+        username: sql<string>`coalesce(${user.name}, 'Anonymous')`,
+        youtubeChannelId: user.youtubeChannelId,
+        userAvatarUrl: user.image,
+        tier: user.tier,
+        points: user.points,
         isOwner: chatMessages.isOwner,
         isModerator: chatMessages.isModerator,
         isSponsor: chatMessages.isSponsor,
@@ -224,12 +223,15 @@ export class StreamsService {
         lastMessageAt: sql<string>`max(${chatMessages.publishedAt})`,
       })
       .from(chatMessages)
+      .leftJoin(user, eq(chatMessages.userId, user.id))
       .where(eq(chatMessages.streamId, streamId))
       .groupBy(
         chatMessages.userId,
-        chatMessages.username,
-        chatMessages.youtubeChannelId,
-        chatMessages.userAvatarUrl,
+        user.name,
+        user.youtubeChannelId,
+        user.image,
+        user.tier,
+        user.points,
         chatMessages.isOwner,
         chatMessages.isModerator,
         chatMessages.isSponsor
@@ -242,9 +244,12 @@ export class StreamsService {
   /**
    * Get message history for a stream session
    */
-  async getStreamChats(streamId: string, limit = 100): Promise<ChatMessageTable[]> {
+  async getStreamChats(streamId: string, limit = 100) {
     return await db.query.chatMessages.findMany({
       where: eq(chatMessages.streamId, streamId),
+      with: {
+        user: true,
+      },
       orderBy: [desc(chatMessages.publishedAt)],
       limit,
     });

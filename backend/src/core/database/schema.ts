@@ -183,9 +183,6 @@ export const chatMessages = pgTable(
       .references(() => streamSessions.id, { onDelete: 'cascade' }),
     userId: text('user_id').references(() => user.id, { onDelete: 'set null' }),
     youtubeMessageId: varchar('youtube_message_id', { length: 255 }),
-    username: varchar('username', { length: 255 }).notNull(), // The user's displayed name on YouTube/Google
-    youtubeChannelId: varchar('youtube_channel_id', { length: 255 }),
-    userAvatarUrl: text('user_avatar_url'),
     message: text('message').notNull(),
     emotes: text('emotes'), // JSON array string of detected YouTube emotes
     parts: text('parts'), // JSON array string of parsed rich message parts
@@ -199,7 +196,6 @@ export const chatMessages = pgTable(
   (table) => [
     index('idx_chat_messages_stream_published').on(table.streamId, table.publishedAt),
     index('idx_chat_messages_user_id').on(table.userId),
-    index('idx_chat_messages_yt_channel_id').on(table.youtubeChannelId),
     index('idx_chat_messages_yt_msg_id').on(table.youtubeMessageId),
   ]
 );
