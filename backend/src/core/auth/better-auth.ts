@@ -25,9 +25,7 @@ export const auth = betterAuth({
     env.FRONTEND_URL,
   ],
   plugins: [
-    dash({
-      apiKey: env.BETTER_AUTH_API_KEY,
-    }),
+    dash(),
   ],
   socialProviders: {
     google: {
