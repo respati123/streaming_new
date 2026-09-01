@@ -3,13 +3,12 @@ import {
   type ChatMessageTable,
   type StreamGoalTable,
   type StreamSessionTable,
-  type StreamSettingTable,
+  type StreamSettingsTable,
   type UserTable,
   chatMessages,
   donations,
   streamGoals,
   streamSessions,
-  streamSettings,
   users,
 } from '@core/database/schema';
 import { logger } from '@core/logger/logger';
@@ -290,7 +289,7 @@ export class StreamsService {
   /**
    * Get singleton Stream Settings
    */
-  async getStreamSettings(): Promise<StreamSettingTable | null> {
+  async getStreamSettings(): Promise<StreamSettingsTable | null> {
     const settings = await db.query.streamSettings.findFirst();
     return settings || null;
   }

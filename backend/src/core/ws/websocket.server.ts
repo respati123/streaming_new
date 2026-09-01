@@ -19,7 +19,7 @@ export const handleWebSocket = upgradeWebSocket((c) => {
       wsHub.registerClient(clientId, ws, clientType, clientIp);
     },
     onMessage(event) {
-      wsHub.handleMessage(clientId, event.data);
+      wsHub.handleMessage(clientId, event.data as string | ArrayBuffer);
     },
     onClose() {
       wsHub.unregisterClient(clientId);

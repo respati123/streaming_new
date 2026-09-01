@@ -158,15 +158,31 @@ export function AdminLayout() {
           })}
 
           <div className="pt-4 px-3 py-1.5 text-[10px] font-bold text-zinc-400 uppercase tracking-widest font-mono">
-            OBS Studio Output
+            Audience & OBS
           </div>
+
+          {/* Dedicated Link to Penonton / Audience Portal */}
+          <Link
+            to="/user"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-between px-3 py-2 text-xs font-semibold text-zinc-800 bg-white hover:bg-zinc-50 rounded-lg border border-zinc-200/90 shadow-xs transition-all group active:scale-[0.99] mb-1.5"
+          >
+            <div className="flex items-center gap-3">
+              <RiGroupLine className="text-base text-cyan-600 group-hover:text-cyan-700" />
+              <span>Portal Penonton</span>
+            </div>
+            <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-cyan-50 text-cyan-700 border border-cyan-200">
+              Google Auth
+            </span>
+          </Link>
 
           {/* Dedicated Link to OBS Transparent Overlay */}
           <Link
             to="/overlay"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center justify-between px-3 py-2.5 text-xs font-semibold text-zinc-800 bg-white hover:bg-zinc-50 rounded-lg border border-zinc-200/90 shadow-sm transition-all group active:scale-[0.99]"
+            className="flex items-center justify-between px-3 py-2 text-xs font-semibold text-zinc-800 bg-white hover:bg-zinc-50 rounded-lg border border-zinc-200/90 shadow-xs transition-all group active:scale-[0.99]"
           >
             <div className="flex items-center gap-3">
               <RiTvLine className="text-base text-zinc-700 group-hover:text-zinc-950" />

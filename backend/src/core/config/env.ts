@@ -28,10 +28,12 @@ const envSchema = z.object({
   STREAMERBOT_PORT: z.coerce.number().default(8080),
   STREAMERBOT_PASSWORD: z.string().optional(),
 
-  // Google OAuth Configuration
-  GOOGLE_CLIENT_ID: z.string().optional(),
-  GOOGLE_CLIENT_SECRET: z.string().optional(),
-  GOOGLE_REDIRECT_URI: z.string().default('http://localhost:4000/api/v1/auth/google/callback'),
+  // Google OAuth & Better Auth Configuration
+  BETTER_AUTH_SECRET: z.string().default('better-auth-secret-key-at-least-32-chars-long-random'),
+  BETTER_AUTH_URL: z.string().default('http://localhost:4000'),
+  GOOGLE_CLIENT_ID: z.string().optional().default(''),
+  GOOGLE_CLIENT_SECRET: z.string().optional().default(''),
+  GOOGLE_REDIRECT_URI: z.string().default('http://localhost:4000/api/auth/callback/google'),
   FRONTEND_URL: z.string().default('http://localhost:5173'),
 });
 

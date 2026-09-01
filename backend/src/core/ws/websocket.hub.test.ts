@@ -5,7 +5,7 @@ describe('WebSocketHub Unit Tests', () => {
   it('should register and track connected clients', () => {
     const mockWs: any = {
       readyState: 1,
-      send: (data: string) => {},
+      send: (_data: string) => {},
     };
 
     wsHub.registerClient('test-client-1', mockWs, 'dashboard', '127.0.0.1');

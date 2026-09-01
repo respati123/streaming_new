@@ -9,6 +9,7 @@ const StreamsHistoryPage = lazy(() => import('@features/dashboard/views/StreamsH
 const StreamerbotPage = lazy(() => import('@features/dashboard/views/StreamerbotPage'));
 const OverlayStudioPage = lazy(() => import('@features/dashboard/views/OverlayStudioPage'));
 const OverlayPage = lazy(() => import('@features/dashboard/views/OverlayPage'));
+const UserPortalPage = lazy(() => import('@features/user/views/UserPortalPage'));
 const NotFoundPage = lazy(() => import('../views/NotFoundPage'));
 
 export function AppRoutes() {
@@ -29,6 +30,10 @@ export function AppRoutes() {
           <Route path="overlay-studio" element={<OverlayStudioPage />} />
           <Route path="streamerbot" element={<StreamerbotPage />} />
         </Route>
+
+        {/* Audience / Penonton Control Panel with Better Auth Google Login */}
+        <Route path="/user" element={<UserPortalPage />} />
+        <Route path="/portal" element={<UserPortalPage />} />
 
         {/* OBS 1080p Transparent Browser Source Overlay (Standalone) */}
         <Route path="/overlay" element={<OverlayPage />} />

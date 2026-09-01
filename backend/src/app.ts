@@ -16,6 +16,7 @@ import { streamerbotController } from '@modules/streamerbot/streamerbot.controll
 import { streamsController } from '@modules/streams/streams.controller';
 import { handleWebSocket } from '@core/ws/websocket.server';
 import { wsHub } from '@core/ws/websocket.hub';
+import { auth } from '@core/auth/better-auth';
 import { apiReference } from '@scalar/hono-api-reference';
 import { Hono } from 'hono';
 import { secureHeaders } from 'hono/secure-headers';
@@ -39,6 +40,9 @@ export function createApp() {
       message: 'Too many authentication attempts. Please try again after 1 minute.',
     })
   );
+
+  // ─── BETTER AUTH (Google OAuth & Audience Social Auth) ───────────────────
+  app.on(['POST', 'GET'], '/api/auth/**', (c) => auth.handler(c.req.raw));
 
   app.onError(errorHandler);
   app.notFound((c) => {

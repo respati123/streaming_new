@@ -20,7 +20,6 @@ export interface WSEventMessage<T = any> {
 
 class WebSocketHub {
   private clients = new Map<string, WSClientInfo>();
-  private pingInterval: ReturnType<typeof setInterval> | null = null;
 
   constructor() {
     this.setupStreamerbotBridge();
@@ -138,6 +137,7 @@ class WebSocketHub {
             isOwner: chatPayload.isOwner || false,
             isModerator: chatPayload.isModerator || false,
             isSponsor: chatPayload.isSponsor || false,
+            isVerified: chatPayload.isVerified || false,
           });
 
           // Broadcast new chat to all clients
