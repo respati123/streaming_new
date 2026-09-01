@@ -83,7 +83,7 @@ export class StreamerbotService extends EventEmitter {
         retries: -1,
         immediate: true,
         subscribe: {
-          YouTube: ['SuperChat', 'SuperSticker', 'NewSponsor', 'NewSubscriber', 'Message'],
+          YouTube: ['SuperChat', 'SuperSticker', 'NewSponsor', 'MemberMileStone', 'NewSubscriber', 'Message', 'FirstWords'],
           Twitch: ['Cheer', 'ChatMessage', 'Sub', 'ReSub', 'GiftSub'],
           General: ['Custom'],
         },
@@ -144,20 +144,19 @@ export class StreamerbotService extends EventEmitter {
       this.emit('donation:alert', alert);
     });
 
-    // 2. YouTube Chat Message -> Auto Ingest to Database
+    // 2. YouTube Chat Message -> Auto Ingest to Database & Broadcast
     this.client.on('YouTube.Message', async (event: any) => {
       const data = event.data || {};
       const user = data.user || {};
 
       try {
-        // Dynamically import or call streamsService to avoid circular dependency
         const { streamsService } = await import('@modules/streams/streams.service');
         const result = await streamsService.ingestChatMessage({
           message: data.message || '',
           username: user.name || user.displayName || 'Viewer',
           youtubeChannelId: user.id || user.channelId,
           youtubeMessageId: data.id,
-          userAvatarUrl: user.profileImageUrl || user.avatarUrl,
+          userAvatarUrl: user.profileImageUrl || user.avatarUrl || null,
           isOwner: data.isOwner || user.isOwner || false,
           isModerator: data.isModerator || user.isModerator || false,
           isSponsor: data.isSponsor || user.isSponsor || false,
@@ -165,17 +164,21 @@ export class StreamerbotService extends EventEmitter {
           publishedAt: event.timeStamp || new Date().toISOString(),
         });
 
+        logger.info(`💬 [Streamer.bot YouTube Chat] ${user.name || user.displayName}: "${data.message}"`);
+
         this.emit('chat:message', {
           id: result.message.id,
           streamId: result.stream.id,
           user: result.user.name,
           userId: result.user.id,
-          avatarUrl: result.user.avatarUrl,
+          youtubeHandle: user.customUrl || null,
+          avatarUrl: result.user.avatarUrl || user.profileImageUrl || user.avatarUrl || null,
           role: result.user.role,
           message: result.message.message,
           isOwner: result.message.isOwner,
           isModerator: result.message.isModerator,
           isSponsor: result.message.isSponsor,
+          isVerified: result.message.isVerified,
           timestamp: result.message.publishedAt,
         });
       } catch (err) {
@@ -187,6 +190,12 @@ export class StreamerbotService extends EventEmitter {
     this.client.on('YouTube.NewSponsor', (event: any) => {
       logger.info('⭐ [StreamerbotService] New YouTube Member joined', event.data);
       this.emit('member:new', event.data);
+    });
+
+    // 4. YouTube Member Milestone
+    this.client.on('YouTube.MemberMileStone', (event: any) => {
+      logger.info('🏆 [StreamerbotService] YouTube Member Milestone', event.data);
+      this.emit('member:milestone', event.data);
     });
   }
 
