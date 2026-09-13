@@ -247,9 +247,13 @@ export default function OverlayPage() {
       {/* ─── 00. FULLSCREEN GAME WALLPAPER BACKGROUND ─────────────────────────── */}
       {showWallpaper && (
         <div className="fixed inset-0 w-full h-full z-0 overflow-hidden select-none pointer-events-none">
-          <img
-            src="/wallpaper_live.webp"
-            alt="Live Game Wallpaper"
+          <video
+            src="/wallpaper_dota.mp4"
+            poster="/wallpaper_live.webp"
+            autoPlay
+            loop
+            muted
+            playsInline
             className="w-full h-full object-cover"
           />
         </div>
