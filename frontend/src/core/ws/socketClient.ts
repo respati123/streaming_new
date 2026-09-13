@@ -5,6 +5,10 @@ export type SocketEventType =
   | 'system:ready'
   | 'status:changed'
   | 'chat:message'
+  | 'chatai:progress'
+  | 'chatai:ready'
+  | 'chatai:playback-completed'
+  | 'chatai:finished'
   | 'chat:send'
   | 'donation:alert'
   | 'member:new'
@@ -17,6 +21,14 @@ export type SocketEventType =
   | 'connection:state';
 
 export type ConnectionState = 'CONNECTING' | 'CONNECTED' | 'DISCONNECTED' | 'RECONNECTING';
+export type OverlayPlaybackMode = 'controller' | 'monitor';
+
+export function getOverlayPlaybackMode(): OverlayPlaybackMode {
+  if (typeof window === 'undefined') return 'controller';
+  return new URLSearchParams(window.location.search).get('mode') === 'monitor'
+    ? 'monitor'
+    : 'controller';
+}
 
 export interface SocketMessage<T = any> {
   event: SocketEventType | string;
@@ -36,9 +48,11 @@ export class StreamSocketClient {
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
   private heartbeatTimer: ReturnType<typeof setInterval> | null = null;
   private clientType: 'dashboard' | 'overlay' | 'viewer' = 'dashboard';
+  private playbackMode: OverlayPlaybackMode;
 
   constructor(clientType: 'dashboard' | 'overlay' | 'viewer' = 'dashboard') {
     this.clientType = clientType;
+    this.playbackMode = getOverlayPlaybackMode();
     this.url = this.resolveWsUrl();
   }
 
@@ -47,20 +61,26 @@ export class StreamSocketClient {
       if (env.VITE_WS_URL) {
         const url = new URL(env.VITE_WS_URL);
         url.searchParams.set('type', this.clientType);
+        if (this.clientType === 'overlay') url.searchParams.set('mode', this.playbackMode);
         return url.toString();
       }
 
       const httpUrl = env.VITE_API_BASE_URL || 'http://localhost:4000/api/v1';
       const parsed = new URL(httpUrl);
       const wsProtocol = parsed.protocol === 'https:' ? 'wss:' : 'ws:';
-      return `${wsProtocol}//${parsed.host}/ws?type=${this.clientType}`;
+      const mode = this.clientType === 'overlay' ? `&mode=${this.playbackMode}` : '';
+      return `${wsProtocol}//${parsed.host}/ws?type=${this.clientType}${mode}`;
     } catch {
-      return `ws://localhost:4000/ws?type=${this.clientType}`;
+      const mode = this.clientType === 'overlay' ? `&mode=${this.playbackMode}` : '';
+      return `ws://localhost:4000/ws?type=${this.clientType}${mode}`;
     }
   }
 
   public connect(): void {
-    if (this.ws && (this.ws.readyState === WebSocket.OPEN || this.ws.readyState === WebSocket.CONNECTING)) {
+    if (
+      this.ws &&
+      (this.ws.readyState === WebSocket.OPEN || this.ws.readyState === WebSocket.CONNECTING)
+    ) {
       return;
     }
 
@@ -73,7 +93,7 @@ export class StreamSocketClient {
         this.reconnectAttempts = 0;
         this.setState('CONNECTED');
         this.startHeartbeat();
-        this.send('client:identify', { type: this.clientType });
+        this.send('client:identify', { type: this.clientType, mode: this.playbackMode });
       };
 
       this.ws.onmessage = (event) => {
@@ -135,11 +155,14 @@ export class StreamSocketClient {
     }
   }
 
-  public on<T = any>(event: SocketEventType | string, listener: SocketEventListener<T>): () => void {
+  public on<T = any>(
+    event: SocketEventType | string,
+    listener: SocketEventListener<T>
+  ): () => void {
     if (!this.listeners.has(event)) {
       this.listeners.set(event, new Set());
     }
-    this.listeners.get(event)!.add(listener);
+    this.listeners.get(event)?.add(listener);
 
     return () => {
       this.off(event, listener);

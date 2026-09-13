@@ -2,11 +2,7 @@ import { Button } from '@shared/components/ui/Button';
 import { Heading, Text } from '@shared/components/ui/Typography';
 import { useDocumentTitle } from '@shared/hooks/useDocumentTitle';
 import { useTranslation } from '@shared/hooks/useTranslation';
-import {
-  RiArrowLeftLine,
-  RiCompass3Line,
-  RiHome4Line,
-} from 'react-icons/ri';
+import { RiArrowLeftLine, RiCompass3Line, RiHome4Line } from 'react-icons/ri';
 import { Link, useNavigate } from 'react-router-dom';
 import type { NotFoundPageProps } from '../types/app.types';
 

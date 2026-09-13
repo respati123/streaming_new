@@ -3,10 +3,12 @@ import { streamerbotService } from '@modules/streamerbot/streamerbot.service';
 import type { WSContext } from 'hono/ws';
 
 export type ClientType = 'dashboard' | 'overlay' | 'viewer' | 'unknown';
+export type PlaybackMode = 'controller' | 'monitor';
 
 export interface WSClientInfo {
   id: string;
   type: ClientType;
+  playbackMode: PlaybackMode;
   connectedAt: string;
   ip?: string;
   ws: WSContext;
@@ -28,17 +30,26 @@ class WebSocketHub {
   /**
    * Register new WebSocket client
    */
-  public registerClient(id: string, ws: WSContext, type: ClientType = 'unknown', ip?: string): void {
+  public registerClient(
+    id: string,
+    ws: WSContext,
+    type: ClientType = 'unknown',
+    ip?: string,
+    playbackMode: PlaybackMode = 'controller'
+  ): void {
     const client: WSClientInfo = {
       id,
       type,
+      playbackMode,
       connectedAt: new Date().toISOString(),
       ip,
       ws,
     };
     this.clients.set(id, client);
 
-    logger.info(`🔌 [WebSocketHub] Client connected: ${id} (${type}) [Total: ${this.clients.size}]`);
+    logger.info(
+      `🔌 [WebSocketHub] Client connected: ${id} (${type}) [Total: ${this.clients.size}]`
+    );
 
     // Send welcome / initial status snapshot
     this.sendTo(id, 'system:welcome', {
@@ -57,6 +68,14 @@ class WebSocketHub {
     if (client) {
       this.clients.delete(id);
       logger.info(`❌ [WebSocketHub] Client disconnected: ${id} [Remaining: ${this.clients.size}]`);
+      if (
+        client.type === 'overlay' &&
+        (client.playbackMode === 'controller' || !this.hasOverlayClient())
+      ) {
+        void import('@modules/ai/chat-ai.service').then(({ chatAiService }) =>
+          chatAiService.releasePlayback()
+        );
+      }
     }
   }
 
@@ -74,7 +93,8 @@ class WebSocketHub {
       if (targetType && client.type !== targetType) continue;
 
       try {
-        if (client.ws.readyState === 1) { // OPEN
+        if (client.ws.readyState === 1) {
+          // OPEN
           client.ws.send(payload);
         }
       } catch (err) {
@@ -89,7 +109,7 @@ class WebSocketHub {
    */
   public sendTo<T = any>(clientId: string, event: string, data: T): boolean {
     const client = this.clients.get(clientId);
-    if (!client || client.ws.readyState !== 1) return false;
+    if (client?.ws.readyState !== 1) return false;
 
     try {
       client.ws.send(
@@ -111,7 +131,8 @@ class WebSocketHub {
    */
   public async handleMessage(clientId: string, rawMessage: string | ArrayBuffer): Promise<void> {
     try {
-      const text = typeof rawMessage === 'string' ? rawMessage : new TextDecoder().decode(rawMessage);
+      const text =
+        typeof rawMessage === 'string' ? rawMessage : new TextDecoder().decode(rawMessage);
       const parsed: WSEventMessage = JSON.parse(text);
 
       switch (parsed.event) {
@@ -120,9 +141,27 @@ class WebSocketHub {
           break;
 
         case 'client:identify':
-          if (this.clients.has(clientId) && parsed.data?.type) {
-            this.clients.get(clientId)!.type = parsed.data.type;
+          {
+            const client = this.clients.get(clientId);
+            if (!client || !parsed.data?.type) break;
+            client.type = parsed.data.type;
+            if (parsed.data.mode === 'monitor' || parsed.data.mode === 'controller') {
+              client.playbackMode = parsed.data.mode;
+            }
             logger.info(`🏷️ [WebSocketHub] Client ${clientId} identified as ${parsed.data.type}`);
+            if (parsed.data.type === 'overlay' && this.hasPlaybackController()) {
+              this.dispatchChatAi();
+            }
+          }
+          break;
+
+        case 'chatai:finished':
+          if (
+            this.clients.get(clientId)?.playbackMode === 'controller' &&
+            typeof parsed.data?.interactionId === 'string'
+          ) {
+            const { chatAiService } = await import('@modules/ai/chat-ai.service');
+            await chatAiService.completePlayback(parsed.data.interactionId);
           }
           break;
 
@@ -147,8 +186,7 @@ class WebSocketHub {
             pointsInfo = await pointsService.awardChatPoints(chatPayload.userId, result.message.id);
           }
 
-          // Broadcast new chat to all clients
-          this.broadcast('chat:message', {
+          streamerbotService.publishChatMessage({
             id: result.message.id,
             streamId: result.stream.id,
             user: result.user.name,
@@ -189,7 +227,11 @@ class WebSocketHub {
 
           // Award loyalty points for donation (+1 PTS per Rp 100)
           if (alertData.userId && alertData.amount) {
-            await pointsService.awardDonationPoints(alertData.userId, Number(alertData.amount), alertData.id);
+            await pointsService.awardDonationPoints(
+              alertData.userId,
+              Number(alertData.amount),
+              alertData.id
+            );
           }
 
           await streamerbotService.triggerDonationAlert(alertData);
@@ -201,7 +243,11 @@ class WebSocketHub {
           logger.debug(`[WebSocketHub] Unhandled event: ${parsed.event}`, parsed.data);
       }
     } catch (err) {
-      logger.error(`[WebSocketHub] Error parsing client message from ${clientId}`, {}, err as Error);
+      logger.error(
+        `[WebSocketHub] Error parsing client message from ${clientId}`,
+        {},
+        err as Error
+      );
     }
   }
 
@@ -211,6 +257,22 @@ class WebSocketHub {
   private setupStreamerbotBridge(): void {
     streamerbotService.on('chat:message', (data) => {
       this.broadcast('chat:message', data);
+    });
+
+    streamerbotService.on('chatai:interaction-ready', () => {
+      if (this.hasPlaybackController()) this.dispatchChatAi();
+    });
+
+    streamerbotService.on('chatai:progress', (data) => {
+      this.broadcast('chatai:progress', data, 'dashboard');
+    });
+
+    streamerbotService.on('chatai:ready', (data) => {
+      this.broadcast('chatai:ready', data, 'overlay');
+    });
+
+    streamerbotService.on('chatai:playback-completed', (data) => {
+      this.broadcast('chatai:playback-completed', data, 'overlay');
     });
 
     streamerbotService.on('donation:alert', (data) => {
@@ -257,6 +319,24 @@ class WebSocketHub {
         ip: c.ip,
       })),
     };
+  }
+
+  private hasOverlayClient(): boolean {
+    return [...this.clients.values()].some((client) => client.type === 'overlay');
+  }
+
+  private hasPlaybackController(): boolean {
+    return [...this.clients.values()].some(
+      (client) => client.type === 'overlay' && client.playbackMode === 'controller'
+    );
+  }
+
+  private dispatchChatAi(): void {
+    void import('@modules/ai/chat-ai.service')
+      .then(({ chatAiService }) => chatAiService.dispatchNext())
+      .catch((error) =>
+        logger.error('[WebSocketHub] Failed to dispatch ChatAI', {}, error as Error)
+      );
   }
 }
 

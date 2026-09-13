@@ -1,8 +1,8 @@
 import { logger } from '@core/logger/logger';
-import { createBunWebSocket } from 'hono/bun';
 import type { ServerWebSocket } from 'bun';
+import { createBunWebSocket } from 'hono/bun';
 import { nanoid } from 'nanoid';
-import { wsHub, type ClientType } from './websocket.hub';
+import { type ClientType, type PlaybackMode, wsHub } from './websocket.hub';
 
 export const { upgradeWebSocket, websocket } = createBunWebSocket<ServerWebSocket>();
 
@@ -12,11 +12,12 @@ export const { upgradeWebSocket, websocket } = createBunWebSocket<ServerWebSocke
 export const handleWebSocket = upgradeWebSocket((c) => {
   const clientId = nanoid(10);
   const clientType = (c.req.query('type') as ClientType) || 'unknown';
+  const playbackMode: PlaybackMode = c.req.query('mode') === 'monitor' ? 'monitor' : 'controller';
   const clientIp = c.req.header('x-forwarded-for') || c.req.header('x-real-ip') || '127.0.0.1';
 
   return {
     onOpen(_event, ws) {
-      wsHub.registerClient(clientId, ws, clientType, clientIp);
+      wsHub.registerClient(clientId, ws, clientType, clientIp, playbackMode);
     },
     onMessage(event) {
       wsHub.handleMessage(clientId, event.data as string | ArrayBuffer);

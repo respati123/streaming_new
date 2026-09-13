@@ -115,28 +115,24 @@ streamsController.get('/chatters/all', async (c) => {
  * POST /api/v1/streams/test-chat
  * Test endpoint to inject a simulated chat message for testing
  */
-streamsController.post(
-  '/test-chat',
-  zValidator('json', incomingChatMessageSchema),
-  async (c) => {
-    const body = c.req.valid('json');
-    const result = await streamsService.ingestChatMessage(body);
+streamsController.post('/test-chat', zValidator('json', incomingChatMessageSchema), async (c) => {
+  const body = c.req.valid('json');
+  const result = await streamsService.ingestChatMessage(body);
 
-    // Emit live event to SSE for real-time frontend update
-    streamerbotService.emit('chat:message', {
-      id: result.message.id,
-      streamId: result.stream.id,
-      user: result.user.name,
-      userId: result.user.id,
-      avatarUrl: result.user.image,
-      role: result.user.role,
-      message: result.message.message,
-      isOwner: result.message.isOwner,
-      isModerator: result.message.isModerator,
-      isSponsor: result.message.isSponsor,
-      timestamp: result.message.publishedAt,
-    });
+  streamerbotService.publishChatMessage({
+    id: result.message.id,
+    streamId: result.stream.id,
+    user: result.user.name,
+    userId: result.user.id,
+    avatarUrl: result.user.image,
+    role: result.user.role,
+    message: result.message.message,
+    isOwner: result.message.isOwner,
+    isModerator: result.message.isModerator,
+    isSponsor: result.message.isSponsor,
+    isVerified: result.message.isVerified,
+    timestamp: result.message.publishedAt,
+  });
 
-    return sendSuccess(c, result, 'Simulated chat message ingested successfully', 201);
-  }
-);
+  return sendSuccess(c, result, 'Simulated chat message ingested successfully', 201);
+});

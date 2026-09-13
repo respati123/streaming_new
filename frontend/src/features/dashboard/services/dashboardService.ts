@@ -1,11 +1,12 @@
 import { apiClient } from '@core/http/api-client';
 import type {
   ActionItem,
+  ChatAiInteractionSummary,
   ChatMessage,
   Chatter,
   OverlaySummary,
-  StreamSession,
   StreamerbotStatus,
+  StreamSession,
 } from '../types/dashboard.types';
 
 export const dashboardService = {
@@ -34,7 +35,16 @@ export const dashboardService = {
   },
 
   async getStreamChats(streamId: string = 'active', limit: number = 20): Promise<ChatMessage[]> {
-    const res = await apiClient.get<{ data: ChatMessage[] }>(`/streams/${streamId}/chats?limit=${limit}`);
+    const res = await apiClient.get<{ data: ChatMessage[] }>(
+      `/streams/${streamId}/chats?limit=${limit}`
+    );
+    return res.data.data;
+  },
+
+  async getChatAiInteractions(limit: number = 10): Promise<ChatAiInteractionSummary[]> {
+    const res = await apiClient.get<{ data: ChatAiInteractionSummary[] }>(
+      `/ai/interactions?limit=${limit}`
+    );
     return res.data.data;
   },
 
@@ -70,9 +80,9 @@ export const dashboardService = {
   },
 
   async getActions(): Promise<{ liveActions: any[]; savedDeckActions: ActionItem[] }> {
-    const res = await apiClient.get<{ data: { liveActions: any[]; savedDeckActions: ActionItem[] } }>(
-      '/streamerbot/actions'
-    );
+    const res = await apiClient.get<{
+      data: { liveActions: any[]; savedDeckActions: ActionItem[] };
+    }>('/streamerbot/actions');
     return res.data.data;
   },
 

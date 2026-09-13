@@ -32,7 +32,9 @@ export default function ProductListPage() {
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-zinc-950">
             {t('products.catalog.title')}
           </h1>
-          <p className="mt-1 text-xs sm:text-sm text-zinc-500 font-mono">{t('products.catalog.subtitle')}</p>
+          <p className="mt-1 text-xs sm:text-sm text-zinc-500 font-mono">
+            {t('products.catalog.subtitle')}
+          </p>
         </div>
 
         <div className="flex items-center gap-3">
@@ -71,7 +73,9 @@ export default function ProductListPage() {
               <RiInbox2Line className="text-lg" />
             </div>
           </div>
-          <p className="mt-2 text-2xl font-black text-zinc-950 font-mono">{state.statistics.totalItems}</p>
+          <p className="mt-2 text-2xl font-black text-zinc-950 font-mono">
+            {state.statistics.totalItems}
+          </p>
         </div>
 
         <div
@@ -103,7 +107,9 @@ export default function ProductListPage() {
               <RiAlertLine className="text-lg" />
             </div>
           </div>
-          <p className="mt-2 text-2xl font-black text-amber-700 font-mono">{state.statistics.lowStockCount}</p>
+          <p className="mt-2 text-2xl font-black text-amber-700 font-mono">
+            {state.statistics.lowStockCount}
+          </p>
         </div>
       </div>
 

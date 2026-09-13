@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import type React from 'react';
+import { useState } from 'react';
 import {
   RiBroadcastFill,
   RiCloseLine,
@@ -8,7 +9,7 @@ import {
   RiStopFill,
   RiVideoAddFill,
 } from 'react-icons/ri';
-import type { StreamSession, StreamerbotStatus } from '../types/dashboard.types';
+import type { StreamerbotStatus, StreamSession } from '../types/dashboard.types';
 
 interface StreamControlHeaderProps {
   activeStream: StreamSession | null;
@@ -62,7 +63,6 @@ export const StreamControlHeader: React.FC<StreamControlHeaderProps> = ({
   return (
     <header className="px-5 py-3.5 border-b border-zinc-200 bg-white/95 backdrop-blur-md sticky top-0 z-30 shadow-xs font-sans">
       <div className="flex flex-wrap items-center justify-between gap-4 max-w-[1920px] mx-auto">
-        
         {/* Left: Stream Identity & Status */}
         <div className="flex items-center gap-3.5">
           <div
@@ -208,11 +208,15 @@ export const StreamControlHeader: React.FC<StreamControlHeaderProps> = ({
 
             <form onSubmit={handleStartSubmit} className="mt-4 space-y-4">
               <div>
-                <label className="block text-xs font-bold text-zinc-800 mb-1.5">
+                <label
+                  htmlFor="new-stream-title"
+                  className="block text-xs font-bold text-zinc-800 mb-1.5"
+                >
                   Stream Title / Topic
                 </label>
                 <input
                   type="text"
+                  id="new-stream-title"
                   required
                   placeholder="e.g. Competitive Ranked Match + Live Q&A Discussion"
                   value={newTitle}

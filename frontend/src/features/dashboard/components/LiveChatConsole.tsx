@@ -1,4 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { EmoteMessageRenderer } from '@shared/components/ui/EmoteMessageRenderer';
+import type React from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   RiChat1Line,
   RiSendPlaneFill,
@@ -7,7 +9,6 @@ import {
   RiVipCrownFill,
 } from 'react-icons/ri';
 import type { ChatMessage } from '../types/dashboard.types';
-import { EmoteMessageRenderer } from '@shared/components/ui/EmoteMessageRenderer';
 
 interface LiveChatConsoleProps {
   messages: ChatMessage[];
@@ -37,7 +38,7 @@ export const LiveChatConsole: React.FC<LiveChatConsoleProps> = ({
     if (autoScroll && scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [messages, autoScroll]);
+  }, [autoScroll]);
 
   const handleTestSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

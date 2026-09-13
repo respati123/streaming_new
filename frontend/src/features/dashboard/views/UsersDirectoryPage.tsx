@@ -40,8 +40,8 @@ export default function UsersDirectoryPage() {
     return usersList.filter((u) => {
       const matchesSearch =
         u.name.toLowerCase().includes(search.toLowerCase()) ||
-        (u.youtubeHandle && u.youtubeHandle.toLowerCase().includes(search.toLowerCase())) ||
-        (u.youtubeChannelId && u.youtubeChannelId.toLowerCase().includes(search.toLowerCase()));
+        u.youtubeHandle?.toLowerCase().includes(search.toLowerCase()) ||
+        u.youtubeChannelId?.toLowerCase().includes(search.toLowerCase());
 
       const matchesRole = roleFilter === 'all' || u.role.toLowerCase() === roleFilter.toLowerCase();
 
@@ -157,7 +157,8 @@ export default function UsersDirectoryPage() {
                         <div>
                           <div className="font-bold text-zinc-950">{user.name}</div>
                           <div className="text-[11px] text-zinc-400 font-mono">
-                            {user.youtubeHandle || `@${user.name.toLowerCase().replace(/\s+/g, '')}`}
+                            {user.youtubeHandle ||
+                              `@${user.name.toLowerCase().replace(/\s+/g, '')}`}
                           </div>
                         </div>
                       </div>

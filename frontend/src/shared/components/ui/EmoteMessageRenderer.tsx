@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 
 export interface ChatEmote {
   type?: string;
@@ -36,12 +36,12 @@ export const EmoteMessageRenderer: React.FC<EmoteMessageRendererProps> = ({
   if (parts && parts.length > 0) {
     return (
       <p className={className}>
-        {parts.map((part, idx) => {
+        {parts.map((part) => {
           const imgSrc = part.image;
           if (imgSrc) {
             return (
               <img
-                key={`part-${idx}`}
+                key={`part-${part.image || part.text || part.emoji || 'empty'}`}
                 src={imgSrc}
                 alt={part.emoji || part.text || 'emote'}
                 title={part.emoji || part.text || ''}
@@ -51,7 +51,11 @@ export const EmoteMessageRenderer: React.FC<EmoteMessageRendererProps> = ({
               />
             );
           }
-          return <span key={`part-txt-${idx}`}>{part.text || part.emoji || ''}</span>;
+          return (
+            <span key={`part-txt-${part.text || part.emoji || 'empty'}`}>
+              {part.text || part.emoji || ''}
+            </span>
+          );
         })}
       </p>
     );
@@ -78,12 +82,12 @@ export const EmoteMessageRenderer: React.FC<EmoteMessageRendererProps> = ({
 
       return (
         <p className={className}>
-          {tokens.map((token, idx) => {
+          {tokens.map((token) => {
             const emoteImg = emoteMap.get(token);
             if (emoteImg) {
               return (
                 <img
-                  key={`token-${idx}`}
+                  key={`token-${token}`}
                   src={emoteImg}
                   alt={token}
                   title={token}
@@ -93,7 +97,7 @@ export const EmoteMessageRenderer: React.FC<EmoteMessageRendererProps> = ({
                 />
               );
             }
-            return <span key={`txt-${idx}`}>{token}</span>;
+            return <span key={`txt-${token}`}>{token}</span>;
           })}
         </p>
       );

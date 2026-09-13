@@ -62,7 +62,7 @@ export function ElectricLightningFrame({
     const updateSize = () => {
       const rect = container.getBoundingClientRect();
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      
+
       // Add padding for outer lightning arc overhangs
       const padding = 40;
       const width = Math.max(rect.width + padding * 2, 100);

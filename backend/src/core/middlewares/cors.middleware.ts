@@ -11,7 +11,15 @@ export const corsMiddleware = cors({
     return allowed[0] || '*';
   },
   allowMethods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowHeaders: ['Content-Type', 'Authorization', 'x-request-id', 'Cookie', 'Set-Cookie', 'better-auth-api-key', 'better-auth-session-token'],
+  allowHeaders: [
+    'Content-Type',
+    'Authorization',
+    'x-request-id',
+    'Cookie',
+    'Set-Cookie',
+    'better-auth-api-key',
+    'better-auth-session-token',
+  ],
   exposeHeaders: ['x-request-id', 'Content-Length', 'Set-Cookie'],
   credentials: true,
   maxAge: 86400,

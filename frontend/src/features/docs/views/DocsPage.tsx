@@ -164,12 +164,12 @@ export default function DocsPage() {
                 }`}
               >
                 <div className="flex items-center gap-2.5 font-bold text-xs">
-                  <span className={isActive ? 'text-white' : 'text-zinc-500'}>
-                    {topic.icon}
-                  </span>
+                  <span className={isActive ? 'text-white' : 'text-zinc-500'}>{topic.icon}</span>
                   <span>{topic.title}</span>
                 </div>
-                <p className={`mt-1 text-xs line-clamp-2 leading-relaxed ${isActive ? 'text-zinc-300' : 'text-zinc-500'}`}>
+                <p
+                  className={`mt-1 text-xs line-clamp-2 leading-relaxed ${isActive ? 'text-zinc-300' : 'text-zinc-500'}`}
+                >
                   {topic.summary}
                 </p>
               </button>

@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import type React from 'react';
+import { useState } from 'react';
 import {
   RiFireLine,
   RiFlashlightLine,
@@ -30,7 +31,9 @@ export const ActionDeckPad: React.FC<ActionDeckPadProps> = ({
   const [activeTrigger, setActiveTrigger] = useState<string | null>(null);
   const [testDonor, setTestDonor] = useState('Budi_Santoso');
   const [testAmount, setTestAmount] = useState('50000');
-  const [testMessage, setTestMessage] = useState('Semangat live streamnya bang! Tetap konsisten gass');
+  const [testMessage, setTestMessage] = useState(
+    'Semangat live streamnya bang! Tetap konsisten gass'
+  );
   const [isAlertSending, setIsAlertSending] = useState(false);
 
   const handleActionClick = async (action: ActionItem) => {
@@ -108,9 +111,7 @@ export const ActionDeckPad: React.FC<ActionDeckPadProps> = ({
             <h3 className="text-[11px] font-bold text-zinc-600 uppercase font-mono tracking-wider">
               Streamer.bot Key Deck
             </h3>
-            <span className="text-[10px] text-zinc-400 font-mono">
-              {actions.length} Keys
-            </span>
+            <span className="text-[10px] text-zinc-400 font-mono">{actions.length} Keys</span>
           </div>
 
           <div className="grid grid-cols-2 gap-2">
@@ -163,13 +164,20 @@ export const ActionDeckPad: React.FC<ActionDeckPadProps> = ({
             <span>Simulate Donation Alert</span>
           </h3>
 
-          <form onSubmit={handleAlertSubmit} className="space-y-2.5 bg-zinc-50/70 p-3 rounded-xl border border-zinc-200/90">
+          <form
+            onSubmit={handleAlertSubmit}
+            className="space-y-2.5 bg-zinc-50/70 p-3 rounded-xl border border-zinc-200/90"
+          >
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="block text-[10px] font-bold text-zinc-700 mb-1 font-sans">
+                <label
+                  htmlFor="test-donor"
+                  className="block text-[10px] font-bold text-zinc-700 mb-1 font-sans"
+                >
                   Donor Name
                 </label>
                 <input
+                  id="test-donor"
                   type="text"
                   value={testDonor}
                   onChange={(e) => setTestDonor(e.target.value)}
@@ -178,10 +186,14 @@ export const ActionDeckPad: React.FC<ActionDeckPadProps> = ({
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold text-zinc-700 mb-1 font-sans">
+                <label
+                  htmlFor="test-amount"
+                  className="block text-[10px] font-bold text-zinc-700 mb-1 font-sans"
+                >
                   Amount (IDR)
                 </label>
                 <input
+                  id="test-amount"
                   type="number"
                   step="5000"
                   value={testAmount}
@@ -192,11 +204,15 @@ export const ActionDeckPad: React.FC<ActionDeckPadProps> = ({
             </div>
 
             <div>
-              <label className="block text-[10px] font-bold text-zinc-700 mb-1 font-sans">
+              <label
+                htmlFor="test-message"
+                className="block text-[10px] font-bold text-zinc-700 mb-1 font-sans"
+              >
                 Donation Message
               </label>
               <textarea
                 rows={2}
+                id="test-message"
                 value={testMessage}
                 onChange={(e) => setTestMessage(e.target.value)}
                 className="w-full px-2.5 py-1.5 text-xs bg-white border border-zinc-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-zinc-950 font-sans text-zinc-800"

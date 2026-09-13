@@ -21,11 +21,8 @@ import {
   RiTvLine,
   RiVipCrownFill,
 } from 'react-icons/ri';
+import { type AlertLayoutTemplate, DONATION_GIF_PRESETS } from '../constants/overlayGifs';
 import { dashboardService } from '../services/dashboardService';
-import {
-  DONATION_GIF_PRESETS,
-  type AlertLayoutTemplate,
-} from '../constants/overlayGifs';
 
 type WidgetPreset = 'all' | 'alert' | 'chat' | 'ticker' | 'webcam';
 type BackdropStyle = 'grid' | 'game' | 'dark';
@@ -40,10 +37,13 @@ export default function OverlayStudioPage() {
   const [donorName, setDonorName] = useState('Sultan_Streaming');
   const [donationAmount, setDonationAmount] = useState('50000');
   const [donationCurrency] = useState('Rp');
-  const [donationMessage, setDonationMessage] = useState('Semangat live stream-nya bang! GGWP 🔥☕');
+  const [donationMessage, setDonationMessage] = useState(
+    'Semangat live stream-nya bang! GGWP 🔥☕'
+  );
   const [selectedGifId, setSelectedGifId] = useState<string>('cat_jam');
   const [customGifUrl, setCustomGifUrl] = useState('');
-  const [selectedTemplate, setSelectedTemplate] = useState<AlertLayoutTemplate>('electric-lightning');
+  const [selectedTemplate, setSelectedTemplate] =
+    useState<AlertLayoutTemplate>('electric-lightning');
   const [alertSuccessToast, setAlertSuccessToast] = useState(false);
 
   // Chat Simulator State
@@ -55,9 +55,7 @@ export default function OverlayStudioPage() {
   // Base URL for OBS Browser Source
   const origin = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000';
   const overlayUrl =
-    activeWidget === 'all'
-      ? `${origin}/overlay`
-      : `${origin}/overlay?widget=${activeWidget}`;
+    activeWidget === 'all' ? `${origin}/overlay` : `${origin}/overlay?widget=${activeWidget}`;
 
   // Widget Resolution Recommendations
   const widgetSpecs = {
@@ -155,7 +153,11 @@ export default function OverlayStudioPage() {
   const handleRapidChatSpam = () => {
     const mockChats = [
       { user: 'Gamer_Santai', msg: 'Wih mulai rame nih!', role: 'viewer' as const },
-      { user: 'Respati Host', msg: 'Selamat datang semuanya di live stream!', role: 'owner' as const },
+      {
+        user: 'Respati Host',
+        msg: 'Selamat datang semuanya di live stream!',
+        role: 'owner' as const,
+      },
       { user: 'Mod_Super', msg: 'Jangan lupa like dan share ya guys!', role: 'moderator' as const },
       { user: 'Member_Setia', msg: 'Emote hype spam 🔥🔥🔥', role: 'sponsor' as const },
       { user: 'Budi_Pro', msg: 'Lanjut terus bang jangan kasih kendor!', role: 'viewer' as const },
@@ -183,7 +185,8 @@ export default function OverlayStudioPage() {
             <span>OBS Overlay Studio & Testing Lab</span>
           </h1>
           <p className="text-xs text-zinc-500 font-mono mt-1">
-            Simulasi live preview untuk seluruh komponen overlay siaran, pengujian event real-time, dan URL Browser Source OBS
+            Simulasi live preview untuk seluruh komponen overlay siaran, pengujian event real-time,
+            dan URL Browser Source OBS
           </p>
         </div>
 
@@ -295,7 +298,9 @@ export default function OverlayStudioPage() {
             type="button"
             onClick={() => setBackdrop('game')}
             className={`px-2 py-0.5 rounded-lg flex items-center gap-1 ${
-              backdrop === 'game' ? 'bg-zinc-900 text-white font-bold' : 'text-zinc-600 hover:bg-zinc-100'
+              backdrop === 'game'
+                ? 'bg-zinc-900 text-white font-bold'
+                : 'text-zinc-600 hover:bg-zinc-100'
             }`}
             title="Simulasi Gameplay Game"
           >
@@ -306,7 +311,9 @@ export default function OverlayStudioPage() {
             type="button"
             onClick={() => setBackdrop('grid')}
             className={`px-2 py-0.5 rounded-lg flex items-center gap-1 ${
-              backdrop === 'grid' ? 'bg-zinc-900 text-white font-bold' : 'text-zinc-600 hover:bg-zinc-100'
+              backdrop === 'grid'
+                ? 'bg-zinc-900 text-white font-bold'
+                : 'text-zinc-600 hover:bg-zinc-100'
             }`}
             title="Latar Transparan / Alpha Checkerboard"
           >
@@ -317,7 +324,9 @@ export default function OverlayStudioPage() {
             type="button"
             onClick={() => setBackdrop('dark')}
             className={`px-2 py-0.5 rounded-lg flex items-center gap-1 ${
-              backdrop === 'dark' ? 'bg-zinc-900 text-white font-bold' : 'text-zinc-600 hover:bg-zinc-100'
+              backdrop === 'dark'
+                ? 'bg-zinc-900 text-white font-bold'
+                : 'text-zinc-600 hover:bg-zinc-100'
             }`}
             title="Latar Hitam Solid"
           >
@@ -335,9 +344,7 @@ export default function OverlayStudioPage() {
             <div className="px-4 py-2.5 bg-zinc-900/90 border-b border-zinc-800 flex items-center justify-between text-xs text-white">
               <div className="flex items-center gap-2 font-mono">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_6px_rgba(16,185,129,0.8)]" />
-                <span className="font-bold text-zinc-200">
-                  {widgetSpecs[activeWidget].name}
-                </span>
+                <span className="font-bold text-zinc-200">{widgetSpecs[activeWidget].name}</span>
                 <span className="text-zinc-500">
                   ({widgetSpecs[activeWidget].w}x{widgetSpecs[activeWidget].h})
                 </span>
@@ -418,7 +425,8 @@ export default function OverlayStudioPage() {
             </div>
 
             <p className="text-[11px] text-zinc-500 leading-relaxed font-sans">
-              Di OBS Studio, tambahkan <strong>Sources ➡️ Browser</strong>, paste URL di atas, dan set Width:{' '}
+              Di OBS Studio, tambahkan <strong>Sources ➡️ Browser</strong>, paste URL di atas, dan
+              set Width:{' '}
               <code className="bg-zinc-100 px-1 py-0.5 rounded font-mono font-bold text-zinc-800">
                 {widgetSpecs[activeWidget].w}
               </code>{' '}
@@ -444,7 +452,9 @@ export default function OverlayStudioPage() {
                   <h3 className="text-xs font-extrabold text-zinc-950 uppercase tracking-wide">
                     Donation Alert Simulator
                   </h3>
-                  <p className="text-[11px] text-zinc-400">Trigger alert donasi suara & visual di overlay</p>
+                  <p className="text-[11px] text-zinc-400">
+                    Trigger alert donasi suara & visual di overlay
+                  </p>
                 </div>
               </div>
 
@@ -457,9 +467,9 @@ export default function OverlayStudioPage() {
 
             {/* Preset Donation Buttons */}
             <div className="space-y-1.5">
-              <label className="text-[11px] font-mono text-zinc-500 font-bold uppercase">
+              <span className="text-[11px] font-mono text-zinc-500 font-bold uppercase">
                 Quick Presets (1-Click Trigger):
-              </label>
+              </span>
               <div className="grid grid-cols-3 gap-2">
                 <button
                   type="button"
@@ -510,7 +520,9 @@ export default function OverlayStudioPage() {
                   }
                   className="px-2.5 py-1.5 rounded-xl border border-amber-200 bg-amber-50/50 hover:bg-amber-100/80 text-left transition-all text-xs font-semibold text-zinc-900"
                 >
-                  <div className="text-[10px] text-amber-600 font-mono font-bold">Mega Whale 👑</div>
+                  <div className="text-[10px] text-amber-600 font-mono font-bold">
+                    Mega Whale 👑
+                  </div>
                   <div className="font-extrabold text-amber-700">Rp 500.000</div>
                   <div className="text-[9px] text-amber-600 font-mono mt-0.5">Gold Rain • Epic</div>
                 </button>
@@ -519,9 +531,9 @@ export default function OverlayStudioPage() {
 
             {/* Template Layout Selector */}
             <div className="space-y-1.5 pt-1">
-              <label className="text-[11px] font-mono text-zinc-500 font-bold uppercase">
+              <span className="text-[11px] font-mono text-zinc-500 font-bold uppercase">
                 Pilih Layout Template Alert:
-              </label>
+              </span>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                 <button
                   type="button"
@@ -532,7 +544,9 @@ export default function OverlayStudioPage() {
                       : 'border-zinc-200 bg-zinc-50 text-zinc-600 hover:bg-zinc-100'
                   }`}
                 >
-                  <div className="text-[10px] text-cyan-600 font-mono font-bold">⚡ Template 1 (Realtime)</div>
+                  <div className="text-[10px] text-cyan-600 font-mono font-bold">
+                    ⚡ Template 1 (Realtime)
+                  </div>
                   <div className="font-bold text-zinc-900 truncate">Electric Code VFX</div>
                 </button>
 
@@ -545,7 +559,9 @@ export default function OverlayStudioPage() {
                       : 'border-zinc-200 bg-zinc-50 text-zinc-600 hover:bg-zinc-100'
                   }`}
                 >
-                  <div className="text-[10px] text-orange-600 font-mono font-bold">🔥 Template 2 (Realtime)</div>
+                  <div className="text-[10px] text-orange-600 font-mono font-bold">
+                    🔥 Template 2 (Realtime)
+                  </div>
                   <div className="font-bold text-zinc-900 truncate">Inferno Flame VFX</div>
                 </button>
 
@@ -592,9 +608,9 @@ export default function OverlayStudioPage() {
 
             {/* Animated GIF Presets Selector */}
             <div className="space-y-1.5 pt-1">
-              <label className="text-[11px] font-mono text-zinc-500 font-bold uppercase">
+              <span className="text-[11px] font-mono text-zinc-500 font-bold uppercase">
                 Pilih Animasi GIF Sticker Alert:
-              </label>
+              </span>
               <div className="grid grid-cols-3 gap-2">
                 {DONATION_GIF_PRESETS.map((gif) => (
                   <button
@@ -607,11 +623,7 @@ export default function OverlayStudioPage() {
                         : 'border-zinc-200 bg-zinc-50 hover:bg-zinc-100'
                     }`}
                   >
-                    <img
-                      src={gif.previewUrl}
-                      alt={gif.name}
-                      className="w-12 h-12 object-contain"
-                    />
+                    <img src={gif.previewUrl} alt={gif.name} className="w-12 h-12 object-contain" />
                     <span className="text-[10px] font-bold text-zinc-800 text-center truncate w-full">
                       {gif.name}
                     </span>
@@ -621,9 +633,9 @@ export default function OverlayStudioPage() {
 
               {/* Custom GIF URL input */}
               <div className="pt-2">
-                <label className="text-[10px] font-mono text-zinc-400 block mb-1">
+                <span className="text-[10px] font-mono text-zinc-400 block mb-1">
                   Atau gunakan Custom GIF URL (Giphy / Tenor / Direct GIF Link):
-                </label>
+                </span>
                 <input
                   type="text"
                   value={customGifUrl}
@@ -641,8 +653,14 @@ export default function OverlayStudioPage() {
             <div className="space-y-3 pt-2">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-[11px] font-mono text-zinc-500 block mb-1">Nama Donatur</label>
+                  <label
+                    htmlFor="overlay-donor-name"
+                    className="text-[11px] font-mono text-zinc-500 block mb-1"
+                  >
+                    Nama Donatur
+                  </label>
                   <input
+                    id="overlay-donor-name"
                     type="text"
                     value={donorName}
                     onChange={(e) => setDonorName(e.target.value)}
@@ -651,8 +669,14 @@ export default function OverlayStudioPage() {
                   />
                 </div>
                 <div>
-                  <label className="text-[11px] font-mono text-zinc-500 block mb-1">Nominal (Rp)</label>
+                  <label
+                    htmlFor="overlay-donation-amount"
+                    className="text-[11px] font-mono text-zinc-500 block mb-1"
+                  >
+                    Nominal (Rp)
+                  </label>
                   <input
+                    id="overlay-donation-amount"
                     type="number"
                     value={donationAmount}
                     onChange={(e) => setDonationAmount(e.target.value)}
@@ -663,8 +687,14 @@ export default function OverlayStudioPage() {
               </div>
 
               <div>
-                <label className="text-[11px] font-mono text-zinc-500 block mb-1">Pesan Donasi (TTS)</label>
+                <label
+                  htmlFor="overlay-donation-message"
+                  className="text-[11px] font-mono text-zinc-500 block mb-1"
+                >
+                  Pesan Donasi (TTS)
+                </label>
                 <textarea
+                  id="overlay-donation-message"
                   value={donationMessage}
                   onChange={(e) => setDonationMessage(e.target.value)}
                   rows={2}
@@ -695,7 +725,9 @@ export default function OverlayStudioPage() {
                   <h3 className="text-xs font-extrabold text-zinc-950 uppercase tracking-wide">
                     Live Chat Stream Simulator
                   </h3>
-                  <p className="text-[11px] text-zinc-400">Kirim pesan chat simulasi dengan berbagai role</p>
+                  <p className="text-[11px] text-zinc-400">
+                    Kirim pesan chat simulasi dengan berbagai role
+                  </p>
                 </div>
               </div>
 
@@ -708,7 +740,9 @@ export default function OverlayStudioPage() {
 
             {/* Role Selector Pills */}
             <div className="space-y-1.5">
-              <label className="text-[11px] font-mono text-zinc-500 font-bold uppercase">Pilih Role User:</label>
+              <span className="text-[11px] font-mono text-zinc-500 font-bold uppercase">
+                Pilih Role User:
+              </span>
               <div className="grid grid-cols-4 gap-1.5 text-xs">
                 <button
                   type="button"
@@ -763,8 +797,14 @@ export default function OverlayStudioPage() {
             {/* Chat Inputs */}
             <div className="space-y-3">
               <div>
-                <label className="text-[11px] font-mono text-zinc-500 block mb-1">Username Pengirim</label>
+                <label
+                  htmlFor="chat-user"
+                  className="text-[11px] font-mono text-zinc-500 block mb-1"
+                >
+                  Username Pengirim
+                </label>
                 <input
+                  id="chat-user"
                   type="text"
                   value={chatUser}
                   onChange={(e) => setChatUser(e.target.value)}
@@ -772,11 +812,16 @@ export default function OverlayStudioPage() {
                   className="w-full px-3 py-1.5 text-xs rounded-lg border border-zinc-200 bg-white font-sans focus:ring-1 focus:ring-zinc-900 focus:outline-none"
                 />
               </div>
-
               <div>
-                <label className="text-[11px] font-mono text-zinc-500 block mb-1">Isi Pesan Chat</label>
+                <label
+                  htmlFor="chat-message"
+                  className="text-[11px] font-mono text-zinc-500 block mb-1"
+                >
+                  Isi Pesan Chat
+                </label>
                 <div className="flex gap-2">
                   <input
+                    id="chat-message"
                     type="text"
                     value={chatMessage}
                     onChange={(e) => setChatMessage(e.target.value)}

@@ -1,7 +1,7 @@
 import { logger } from '@core/logger/logger';
 import { eq } from 'drizzle-orm';
 import { db, queryClient } from './index';
-import { donations, streamGoals, streamSettings, streamerbotActions, user } from './schema';
+import { donations, streamerbotActions, streamGoals, streamSettings, user } from './schema';
 
 async function seed() {
   logger.info('Starting streaming database seeding...');

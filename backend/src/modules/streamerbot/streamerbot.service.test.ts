@@ -8,7 +8,7 @@ describe('StreamerbotService Unit Tests', () => {
 
     expect(status.status).toBe('DISCONNECTED');
     expect(status.host).toBe('127.0.0.1');
-    expect(status.port).toBe(8080);
+    expect(status.port).toBe(8086);
     expect(status.lastConnectedAt).toBeNull();
   });
 

@@ -1,9 +1,11 @@
 import { EventEmitter } from 'node:events';
 import { env } from '@core/config/env';
 import { logger } from '@core/logger/logger';
+import { parseChatAiPrompt } from '@modules/ai/chat-ai.command';
 import { StreamerbotClient } from '@streamerbot/client';
 import type {
   DonationAlertEventData,
+  LiveChatEventData,
   StreamerbotConnectionStatus,
 } from './streamerbot.types';
 
@@ -21,23 +23,26 @@ export class StreamerbotService extends EventEmitter {
     super();
     let rawHost = env.STREAMERBOT_HOST;
     let scheme = env.STREAMERBOT_SCHEME || 'ws';
-    let port = env.STREAMERBOT_PORT || 8080;
-    let endpoint = env.STREAMERBOT_ENDPOINT || '/websocket';
+    let port = env.STREAMERBOT_PORT || 8086;
+    let endpoint = env.STREAMERBOT_ENDPOINT || '/';
 
     // Auto-detect and parse full URLs (such as ngrok HTTPS/WSS URLs)
     if (rawHost.includes('://')) {
       try {
         const parsedUrl = new URL(rawHost);
-        scheme = parsedUrl.protocol.startsWith('https') || parsedUrl.protocol.startsWith('wss') ? 'wss' : 'ws';
+        scheme =
+          parsedUrl.protocol.startsWith('https') || parsedUrl.protocol.startsWith('wss')
+            ? 'wss'
+            : 'ws';
         rawHost = parsedUrl.hostname;
-        port = parsedUrl.port ? Number(parsedUrl.port) : (scheme === 'wss' ? 443 : 8080);
+        port = parsedUrl.port ? Number(parsedUrl.port) : scheme === 'wss' ? 443 : 8086;
         if (parsedUrl.pathname && parsedUrl.pathname !== '/') {
           endpoint = parsedUrl.pathname;
         }
       } catch {}
     } else if (rawHost.includes('ngrok')) {
       scheme = 'wss';
-      if (port === 8080) port = 443;
+      if (port === 8086) port = 443;
     }
 
     this.host = rawHost;
@@ -70,7 +75,9 @@ export class StreamerbotService extends EventEmitter {
     }
 
     this.setStatus('CONNECTING');
-    logger.info(`[StreamerbotService] Connecting to Streamer.bot at ${this.scheme}://${this.host}:${this.port}${this.endpoint}...`);
+    logger.info(
+      `[StreamerbotService] Connecting to Streamer.bot at ${this.scheme}://${this.host}:${this.port}${this.endpoint}...`
+    );
 
     try {
       this.client = new StreamerbotClient({
@@ -83,7 +90,15 @@ export class StreamerbotService extends EventEmitter {
         retries: -1,
         immediate: true,
         subscribe: {
-          YouTube: ['SuperChat', 'SuperSticker', 'NewSponsor', 'MemberMileStone', 'NewSubscriber', 'Message', 'FirstWords'],
+          YouTube: [
+            'SuperChat',
+            'SuperSticker',
+            'NewSponsor',
+            'MemberMileStone',
+            'NewSubscriber',
+            'Message',
+            'FirstWords',
+          ],
           Twitch: ['Cheer', 'ChatMessage', 'Sub', 'ReSub', 'GiftSub'],
           General: ['Custom'],
         },
@@ -99,7 +114,9 @@ export class StreamerbotService extends EventEmitter {
         },
         onDisconnect: () => {
           this.setStatus('RECONNECTING');
-          logger.warn('⚠️ [StreamerbotService] Disconnected from Streamer.bot. Auto-reconnecting...');
+          logger.warn(
+            '⚠️ [StreamerbotService] Disconnected from Streamer.bot. Auto-reconnecting...'
+          );
           this.emit('disconnected');
         },
         onError: (err) => {
@@ -112,7 +129,11 @@ export class StreamerbotService extends EventEmitter {
       this.setupEventListeners();
     } catch (error) {
       this.setStatus('ERROR');
-      logger.error('[StreamerbotService] Failed to instantiate StreamerbotClient', {}, error as Error);
+      logger.error(
+        '[StreamerbotService] Failed to instantiate StreamerbotClient',
+        {},
+        error as Error
+      );
     }
   }
 
@@ -133,7 +154,9 @@ export class StreamerbotService extends EventEmitter {
       const alert: DonationAlertEventData = {
         id: data.id,
         donorName: data.user?.name || data.user?.displayName || 'Anonymous',
-        amount: data.microAmount ? data.microAmount / 1_000_000 : parseFloat(data.amount?.replace(/[^0-9.]/g, '') || '0'),
+        amount: data.microAmount
+          ? data.microAmount / 1_000_000
+          : parseFloat(data.amount?.replace(/[^0-9.]/g, '') || '0'),
         currency: data.currency || 'IDR',
         message: data.message || '',
         source: 'youtube_superchat',
@@ -161,9 +184,10 @@ export class StreamerbotService extends EventEmitter {
       console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
 
       const parts = data.parts || [];
-      const cleanMessage = parts.length > 0
-        ? parts.map((p: any) => p.text || p.emoji || '').join('')
-        : data.message || '';
+      const cleanMessage =
+        parts.length > 0
+          ? parts.map((p: any) => p.text || p.emoji || '').join('')
+          : data.message || '';
 
       try {
         const { streamsService } = await import('@modules/streams/streams.service');
@@ -182,12 +206,14 @@ export class StreamerbotService extends EventEmitter {
           publishedAt: event.timeStamp || new Date().toISOString(),
         });
 
-        logger.info(`💬 [Streamer.bot YouTube Chat] ${user.name || user.displayName}: "${cleanMessage}"`);
+        logger.info(
+          `💬 [Streamer.bot YouTube Chat] ${user.name || user.displayName}: "${cleanMessage}"`
+        );
 
         const { pointsService } = await import('@modules/points/points.service');
         const userProfile = await pointsService.getUserProfile(result.user.id);
 
-        this.emit('chat:message', {
+        this.publishChatMessage({
           id: result.message.id,
           streamId: result.stream.id,
           user: result.user.name,
@@ -236,7 +262,9 @@ export class StreamerbotService extends EventEmitter {
       const subscriberId = user.id || user.channelId;
       const avatarUrl = user.profileImageUrl || user.avatarUrl || null;
 
-      logger.info(`🔔 [StreamerbotService] New YouTube Subscriber: ${subscriberName} (${subscriberId || 'No ID'})`);
+      logger.info(
+        `🔔 [StreamerbotService] New YouTube Subscriber: ${subscriberName} (${subscriberId || 'No ID'})`
+      );
 
       this.emit('subscriber:new', {
         id: data.id || `sub_${Date.now()}`,
@@ -268,7 +296,10 @@ export class StreamerbotService extends EventEmitter {
         : { name: actionIdOrName };
 
       const response = await this.client.doAction(actionIdentifier, args);
-      logger.info(`[StreamerbotService] Action '${actionIdOrName}' triggered successfully`, { args, response });
+      logger.info(`[StreamerbotService] Action '${actionIdOrName}' triggered successfully`, {
+        args,
+        response,
+      });
       return { success: true, data: response };
     } catch (error) {
       const err = error as Error;
@@ -300,6 +331,27 @@ export class StreamerbotService extends EventEmitter {
     return result.success;
   }
 
+  public publishChatMessage(data: LiveChatEventData): void {
+    const prompt = parseChatAiPrompt(data.message);
+    if (!prompt) {
+      this.emit('chat:message', data);
+      return;
+    }
+
+    this.emit('chat:message', {
+      ...data,
+      isChatAiCommand: true,
+      chatAiPrompt: prompt,
+    });
+
+    logger.info('[ChatAi] Command received', {
+      chatId: data.id,
+      streamId: data.streamId,
+      userId: data.userId,
+    });
+    this.emit('chatai:request', { ...data, prompt });
+  }
+
   /**
    * Fetch all registered Actions from Streamer.bot
    */
@@ -312,7 +364,11 @@ export class StreamerbotService extends EventEmitter {
       const res = await this.client.getActions();
       return res?.actions || [];
     } catch (error) {
-      logger.error('[StreamerbotService] Failed to fetch actions from Streamer.bot', {}, error as Error);
+      logger.error(
+        '[StreamerbotService] Failed to fetch actions from Streamer.bot',
+        {},
+        error as Error
+      );
       return [];
     }
   }

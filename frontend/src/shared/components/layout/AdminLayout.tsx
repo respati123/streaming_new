@@ -22,7 +22,7 @@ export function AdminLayout() {
   // Close mobile drawer on route change
   useEffect(() => {
     setMobileMenuOpen(false);
-  }, [location.pathname]);
+  }, []);
 
   const isConnected = isSocketConnected;
 
@@ -71,9 +71,7 @@ export function AdminLayout() {
                 <div className="text-xs font-bold tracking-tight text-zinc-950 uppercase font-mono">
                   Stream Hub Pro
                 </div>
-                <div className="text-[11px] text-zinc-500 font-mono truncate">
-                  @respati_stream
-                </div>
+                <div className="text-[11px] text-zinc-500 font-mono truncate">@respati_stream</div>
               </div>
             </div>
 
@@ -188,9 +186,7 @@ export function AdminLayout() {
               <RiTvLine className="text-base text-zinc-700 group-hover:text-zinc-950" />
               <span>OBS Overlay (1080p)</span>
             </div>
-            <RiExternalLinkLine
-              className="text-sm text-zinc-400 group-hover:text-zinc-800 group-hover:translate-x-0.5 transition-transform"
-            />
+            <RiExternalLinkLine className="text-sm text-zinc-400 group-hover:text-zinc-800 group-hover:translate-x-0.5 transition-transform" />
           </Link>
         </nav>
       </div>
@@ -220,16 +216,16 @@ export function AdminLayout() {
             <RiBroadcastFill className="text-rose-500 animate-pulse text-base" />
           </div>
           <div>
-            <div className="text-xs font-bold font-mono uppercase text-zinc-950">Stream Hub Pro</div>
+            <div className="text-xs font-bold font-mono uppercase text-zinc-950">
+              Stream Hub Pro
+            </div>
             <div className="text-[10px] font-mono text-zinc-500">@respati_stream</div>
           </div>
         </div>
 
         <div className="flex items-center gap-2">
           <span
-            className={`w-2 h-2 rounded-full ${
-              isConnected ? 'bg-emerald-500' : 'bg-amber-500'
-            }`}
+            className={`w-2 h-2 rounded-full ${isConnected ? 'bg-emerald-500' : 'bg-amber-500'}`}
           />
           <button
             type="button"

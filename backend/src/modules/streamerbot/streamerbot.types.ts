@@ -13,14 +13,41 @@ export interface DonationAlertEventData {
   amount: number;
   currency: string;
   message?: string;
+  template?: 'electric-lightning' | 'fire-glass';
   source: 'portal_donation' | 'youtube_superchat' | 'twitch_cheer' | 'manual_test';
   timestamp: string;
+}
+
+export interface LiveChatEventData {
+  id: string;
+  streamId: string;
+  user: string;
+  userId: string;
+  youtubeHandle?: string | null;
+  avatarUrl?: string | null;
+  role: string;
+  tier?: string;
+  points?: number | null;
+  message: string;
+  isChatAiCommand?: boolean;
+  chatAiPrompt?: string;
+  emotes?: unknown[];
+  parts?: unknown[];
+  isOwner: boolean;
+  isModerator: boolean;
+  isSponsor: boolean;
+  isVerified: boolean;
+  timestamp: Date | string;
+}
+
+export interface ChatAiRequestEventData extends LiveChatEventData {
+  prompt: string;
 }
 
 export interface StreamerbotLiveEvent {
   source: string;
   type: string;
-  data: Record<string, any>;
+  data: Record<string, unknown>;
   timestamp: string;
 }
 

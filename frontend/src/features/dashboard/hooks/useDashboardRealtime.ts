@@ -1,8 +1,15 @@
-import { dashboardSocket, type ConnectionState } from '@core/ws/socketClient';
+import { type ConnectionState, dashboardSocket } from '@core/ws/socketClient';
 import { useCallback, useEffect, useState } from 'react';
-import type { ChatMessage, StreamerbotStatus } from '../types/dashboard.types';
+import type {
+  ChatAiProgressEvent,
+  ChatMessage,
+  StreamerbotStatus,
+} from '../types/dashboard.types';
 
-export function useDashboardRealtime(onNewChat?: (msg: ChatMessage) => void) {
+export function useDashboardRealtime(
+  onNewChat?: (msg: ChatMessage) => void,
+  onChatAiProgress?: (progress: ChatAiProgressEvent) => void
+) {
   const [connectionState, setConnectionState] = useState<ConnectionState>('DISCONNECTED');
   const [botStatus, setBotStatus] = useState<StreamerbotStatus | null>(null);
   const [lastAlert, setLastAlert] = useState<any | null>(null);
@@ -50,6 +57,11 @@ export function useDashboardRealtime(onNewChat?: (msg: ChatMessage) => void) {
       }
     });
 
+    const unsubChatAiProgress = dashboardSocket.on<ChatAiProgressEvent>(
+      'chatai:progress',
+      (progress) => onChatAiProgress?.(progress)
+    );
+
     const unsubAlert = dashboardSocket.on('donation:alert', (data) => {
       setLastAlert(data);
     });
@@ -63,10 +75,11 @@ export function useDashboardRealtime(onNewChat?: (msg: ChatMessage) => void) {
       unsubWelcome();
       unsubStatus();
       unsubChat();
+      unsubChatAiProgress();
       unsubAlert();
       unsubActionResult();
     };
-  }, [onNewChat]);
+  }, [onChatAiProgress, onNewChat]);
 
   // Direct Sender Helpers
   const sendChatMessage = useCallback((message: string, username = 'Streamer Host') => {

@@ -1,12 +1,17 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useEffect, useState } from 'react';
 import { ActionDeckPad } from '../components/ActionDeckPad';
+import { ChatAiHistoryPanel } from '../components/ChatAiHistoryPanel';
 import { ChattersList } from '../components/ChattersList';
 import { LiveChatConsole } from '../components/LiveChatConsole';
 import { StreamControlHeader } from '../components/StreamControlHeader';
 import { useDashboardRealtime } from '../hooks/useDashboardRealtime';
 import { dashboardService } from '../services/dashboardService';
-import type { ChatMessage } from '../types/dashboard.types';
+import type {
+  ChatAiInteractionSummary,
+  ChatAiProgressEvent,
+  ChatMessage,
+} from '../types/dashboard.types';
 
 export default function DashboardPage() {
   const queryClient = useQueryClient();
@@ -33,6 +38,12 @@ export default function DashboardPage() {
     staleTime: Infinity,
   });
 
+  const { data: chatAiInteractions = [], isLoading: isChatAiLoading } = useQuery({
+    queryKey: ['chat-ai-interactions'],
+    queryFn: () => dashboardService.getChatAiInteractions(10),
+    refetchInterval: 5000,
+  });
+
   // Sync historical chats when loaded
   useEffect(() => {
     if (initialChats.length > 0 && liveMessages.length === 0) {
@@ -56,7 +67,7 @@ export default function DashboardPage() {
       }));
       setLiveMessages(mapped.slice(-20));
     }
-  }, [initialChats]);
+  }, [initialChats, liveMessages.length]);
 
   // 4. Fetch Actions Catalog
   const { data: actionsData } = useQuery({
@@ -65,11 +76,44 @@ export default function DashboardPage() {
   });
 
   // 5. Real-time WebSocket Handler (Zero HTTP Polling)
-  const handleNewLiveChat = useCallback((msg: ChatMessage) => {
-    setLiveMessages((prev) => [...prev, msg]);
-    // Invalidate chatters list to update counters
-    queryClient.invalidateQueries({ queryKey: ['stream-chatters'] });
-  }, [queryClient]);
+  const handleNewLiveChat = useCallback(
+    (msg: ChatMessage) => {
+      setLiveMessages((prev) => [...prev, msg]);
+      // Invalidate chatters list to update counters
+      queryClient.invalidateQueries({ queryKey: ['stream-chatters'] });
+    },
+    [queryClient]
+  );
+
+  const handleChatAiProgress = useCallback(
+    (progress: ChatAiProgressEvent) => {
+      queryClient.setQueryData<ChatAiInteractionSummary[]>(
+        ['chat-ai-interactions'],
+        (current = []) => {
+          const updated: ChatAiInteractionSummary = {
+            id: progress.interactionId,
+            viewerName: progress.viewerName,
+            viewerAvatarUrl: progress.viewerAvatarUrl,
+            prompt: progress.prompt,
+            answer: progress.answer,
+            mood: progress.mood,
+            status: progress.status,
+            phase: progress.phase,
+            error: progress.error,
+            attempts: progress.attempts,
+            createdAt: progress.createdAt,
+            questionAudioUrl: progress.questionAudioUrl,
+            answerAudioUrl: progress.answerAudioUrl,
+          };
+          return [updated, ...current.filter((interaction) => interaction.id !== updated.id)].slice(
+            0,
+            10
+          );
+        }
+      );
+    },
+    [queryClient]
+  );
 
   const {
     isSocketConnected,
@@ -77,7 +121,7 @@ export default function DashboardPage() {
     sendChatMessage,
     triggerAction,
     triggerTestAlert,
-  } = useDashboardRealtime(handleNewLiveChat);
+  } = useDashboardRealtime(handleNewLiveChat, handleChatAiProgress);
 
   const effectiveBotStatus = liveBotStatus || null;
 
@@ -157,23 +201,26 @@ export default function DashboardPage() {
         </section>
 
         {/* Column 3: Action Deck & Alert Trigger Pad (Width: 4/12) */}
-        <section className="lg:col-span-4 h-[560px] lg:h-[calc(100dvh-5.5rem)] min-h-[420px]">
-          <ActionDeckPad
-            actions={actionsData?.savedDeckActions || []}
-            onTriggerAction={async (actionId) => {
-              const sent = triggerAction(actionId);
-              if (!sent) {
-                await triggerActionMutation.mutateAsync(actionId);
-              }
-            }}
-            onTriggerTestAlert={async (payload) => {
-              const sent = triggerTestAlert(payload);
-              if (!sent) {
-                await triggerAlertMutation.mutateAsync(payload);
-              }
-            }}
-            isBotConnected={effectiveBotStatus?.status === 'CONNECTED'}
-          />
+        <section className="lg:col-span-4 flex h-[560px] min-h-[420px] flex-col gap-4 lg:h-[calc(100dvh-5.5rem)]">
+          <div className="min-h-0 flex-1">
+            <ActionDeckPad
+              actions={actionsData?.savedDeckActions || []}
+              onTriggerAction={async (actionId) => {
+                const sent = triggerAction(actionId);
+                if (!sent) {
+                  await triggerActionMutation.mutateAsync(actionId);
+                }
+              }}
+              onTriggerTestAlert={async (payload) => {
+                const sent = triggerTestAlert(payload);
+                if (!sent) {
+                  await triggerAlertMutation.mutateAsync(payload);
+                }
+              }}
+              isBotConnected={effectiveBotStatus?.status === 'CONNECTED'}
+            />
+          </div>
+          <ChatAiHistoryPanel interactions={chatAiInteractions} isLoading={isChatAiLoading} />
         </section>
       </main>
     </div>

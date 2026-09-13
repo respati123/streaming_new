@@ -1,4 +1,5 @@
-import React, { useMemo, useState } from 'react';
+import type React from 'react';
+import { useMemo, useState } from 'react';
 import {
   RiGroupLine,
   RiSearchLine,
@@ -21,9 +22,7 @@ export const ChattersList: React.FC<ChattersListProps> = ({ chatters, isLoading 
     if (!search.trim()) return chatters;
     const q = search.toLowerCase();
     return chatters.filter(
-      (c) =>
-        c.username.toLowerCase().includes(q) ||
-        (c.youtubeChannelId && c.youtubeChannelId.toLowerCase().includes(q))
+      (c) => c.username.toLowerCase().includes(q) || c.youtubeChannelId?.toLowerCase().includes(q)
     );
   }, [chatters, search]);
 
@@ -78,9 +77,9 @@ export const ChattersList: React.FC<ChattersListProps> = ({ chatters, isLoading 
             </p>
           </div>
         ) : (
-          filteredChatters.map((chatter, idx) => (
+          filteredChatters.map((chatter) => (
             <div
-              key={`${chatter.username}-${idx}`}
+              key={chatter.youtubeChannelId || chatter.username}
               className="p-2.5 hover:bg-zinc-50/80 rounded-lg transition-colors flex items-center justify-between gap-3 group"
             >
               <div className="flex items-center gap-2.5 min-w-0">

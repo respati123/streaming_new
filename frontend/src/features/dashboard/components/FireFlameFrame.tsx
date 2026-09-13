@@ -130,13 +130,7 @@ export function FireFlameFrame({
         const ex = isBottom ? Math.random() * w : Math.random() > 0.5 ? 0 : w;
         const ey = isBottom ? h : Math.random() * h;
 
-        const emberColorChoices = [
-          '#ffffff',
-          '#fff275',
-          secondaryColor,
-          primaryColor,
-          '#ff2a00',
-        ];
+        const emberColorChoices = ['#ffffff', '#fff275', secondaryColor, primaryColor, '#ff2a00'];
 
         embers.push({
           x: ex + (Math.random() - 0.5) * 10,
