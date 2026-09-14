@@ -2,8 +2,8 @@ import { Button } from '@shared/components/ui/Button';
 import { Input } from '@shared/components/ui/Input';
 import { Modal } from '@shared/components/ui/Modal';
 import { useTranslation } from '@shared/hooks/useTranslation';
-import type { ProductFormModalProps } from '../types/product-component.types';
 import type { ProductCategory } from '../types/product.types';
+import type { ProductFormModalProps } from '../types/product-component.types';
 import { useProductFormViewModel } from '../viewmodels/useProductFormViewModel';
 
 export function ProductFormModal({ isOpen, onClose, initialProduct }: ProductFormModalProps) {
@@ -23,7 +23,11 @@ export function ProductFormModal({ isOpen, onClose, initialProduct }: ProductFor
       description={t('products.modal.description')}
       maxWidth="lg"
     >
-      <form data-testid="product-form" onSubmit={actions.handleSubmit} className="space-y-4 font-sans">
+      <form
+        data-testid="product-form"
+        onSubmit={actions.handleSubmit}
+        className="space-y-4 font-sans"
+      >
         {/* Name */}
         <Input
           data-testid="input-product-name"
@@ -52,7 +56,9 @@ export function ProductFormModal({ isOpen, onClose, initialProduct }: ProductFor
             className="block w-full rounded-xl border border-zinc-300 bg-white px-3.5 py-2 text-xs sm:text-sm text-zinc-900 placeholder-zinc-400 focus:border-zinc-950 focus:outline-none focus:ring-2 focus:ring-zinc-950/20 font-sans"
           />
           {state.errors.description && (
-            <p className="text-xs font-semibold text-rose-600 animate-fadeIn">{state.errors.description}</p>
+            <p className="text-xs font-semibold text-rose-600 animate-fadeIn">
+              {state.errors.description}
+            </p>
           )}
         </div>
 
@@ -102,7 +108,9 @@ export function ProductFormModal({ isOpen, onClose, initialProduct }: ProductFor
             <option value="accessories">{t('products.categories.accessories')}</option>
           </select>
           {state.errors.category && (
-            <p className="text-xs font-semibold text-rose-600 animate-fadeIn">{state.errors.category}</p>
+            <p className="text-xs font-semibold text-rose-600 animate-fadeIn">
+              {state.errors.category}
+            </p>
           )}
         </div>
 

@@ -18,6 +18,17 @@ export default {
         'deck-key': '0 2px 0 0 rgba(203, 213, 225, 0.8), 0 1px 3px rgba(0, 0, 0, 0.04)',
       },
       colors: {
+        obsidian: {
+          bg: '#0A0A0E',
+          surface: '#131318',
+          subtle: '#16161D',
+          hover: '#1A1A22',
+          line: '#272733',
+          lineSubtle: '#1E1E28',
+          ink: '#F4F4F6',
+          muted: '#A0A0AC',
+          dim: '#70707E',
+        },
         studio: {
           50: '#FAFAFA',
           100: '#F4F4F5',

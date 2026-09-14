@@ -79,32 +79,28 @@ streamerbotController.post(
  * POST /api/v1/streamerbot/test-alert
  * Trigger a simulated donation alert
  */
-streamerbotController.post(
-  '/test-alert',
-  zValidator('json', testAlertSchema),
-  async (c) => {
-    const body = c.req.valid('json');
-    const alertData = {
-      donorName: body.donorName,
-      amount: body.amount,
-      currency: body.currency,
-      message: body.message,
-      source: 'manual_test' as const,
-      timestamp: new Date().toISOString(),
-    };
+streamerbotController.post('/test-alert', zValidator('json', testAlertSchema), async (c) => {
+  const body = c.req.valid('json');
+  const alertData = {
+    donorName: body.donorName,
+    amount: body.amount,
+    currency: body.currency,
+    message: body.message,
+    source: 'manual_test' as const,
+    timestamp: new Date().toISOString(),
+  };
 
-    const isExecutedInBot = await streamerbotService.triggerDonationAlert(alertData);
+  const isExecutedInBot = await streamerbotService.triggerDonationAlert(alertData);
 
-    return sendSuccess(
-      c,
-      {
-        alert: alertData,
-        streamerbotTriggered: isExecutedInBot,
-      },
-      'Test donation alert broadcasted successfully'
-    );
-  }
-);
+  return sendSuccess(
+    c,
+    {
+      alert: alertData,
+      streamerbotTriggered: isExecutedInBot,
+    },
+    'Test donation alert broadcasted successfully'
+  );
+});
 
 /**
  * GET /api/v1/streamerbot/events/stream

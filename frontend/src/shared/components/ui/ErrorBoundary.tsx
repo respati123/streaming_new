@@ -41,7 +41,9 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
             <RiAlertLine className="text-3xl" />
           </div>
 
-          <h2 className="text-base font-extrabold text-zinc-950 tracking-tight">Broadcast Exception Occurred</h2>
+          <h2 className="text-base font-extrabold text-zinc-950 tracking-tight">
+            Broadcast Exception Occurred
+          </h2>
 
           <p className="mt-2 text-xs text-zinc-600 max-w-md mx-auto leading-relaxed font-mono">
             {this.state.error?.message ||

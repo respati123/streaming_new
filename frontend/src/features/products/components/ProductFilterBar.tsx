@@ -65,7 +65,9 @@ export function ProductFilterBar({
 
       {/* Sort Buttons */}
       <div className="flex items-center gap-2">
-        <span className="text-xs font-bold text-zinc-400 font-mono uppercase text-[10px]">{t('common.sortBy')}</span>
+        <span className="text-xs font-bold text-zinc-400 font-mono uppercase text-[10px]">
+          {t('common.sortBy')}
+        </span>
         <button
           type="button"
           data-testid="product-sort-date"

@@ -1,7 +1,7 @@
 import { db } from '@core/database';
 import * as schema from '@core/database/schema';
-import { eq } from 'drizzle-orm';
 import { logger } from '@core/logger/logger';
+import { eq } from 'drizzle-orm';
 
 export interface UserGamificationProfile {
   userId: string;
@@ -38,10 +38,20 @@ export class PointsService {
     isModerator?: boolean;
     isSponsor?: boolean;
   }): Promise<{ user: typeof schema.user.$inferSelect; pointsAdded: number }> {
-    const determinedRole = dto.isOwner ? 'admin' : dto.isModerator ? 'moderator' : dto.isSponsor ? 'member' : 'viewer';
+    const determinedRole = dto.isOwner
+      ? 'admin'
+      : dto.isModerator
+        ? 'moderator'
+        : dto.isSponsor
+          ? 'member'
+          : 'viewer';
     const cleanUsername = dto.username || 'YouTube Viewer';
     const channelId = dto.youtubeChannelId || null;
-    const handle = dto.youtubeHandle || (cleanUsername.startsWith('@') ? cleanUsername : `@${cleanUsername.toLowerCase().replace(/\s+/g, '')}`);
+    const handle =
+      dto.youtubeHandle ||
+      (cleanUsername.startsWith('@')
+        ? cleanUsername
+        : `@${cleanUsername.toLowerCase().replace(/\s+/g, '')}`);
     const email = `${channelId || cleanUsername.toLowerCase().replace(/[^a-z0-9]/g, '')}@youtube.viewer`;
 
     let existingUser: typeof schema.user.$inferSelect | undefined;
@@ -58,11 +68,7 @@ export class PointsService {
 
     // 2. Search existing user by email
     if (!existingUser) {
-      const [u] = await db
-        .select()
-        .from(schema.user)
-        .where(eq(schema.user.email, email))
-        .limit(1);
+      const [u] = await db.select().from(schema.user).where(eq(schema.user.email, email)).limit(1);
       existingUser = u;
     }
 
@@ -130,7 +136,9 @@ export class PointsService {
       return { user: updatedUser, pointsAdded: pointsToAdd };
     } else {
       // Create new user in `user` table
-      const newUserId = channelId ? `yt_${channelId}` : `yt_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+      const newUserId = channelId
+        ? `yt_${channelId}`
+        : `yt_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
       const initialPoints = pointsToAdd;
       const initialTier = this.calculateTier(initialPoints);
 
@@ -170,7 +178,9 @@ export class PointsService {
         metadata: JSON.stringify({ youtubeChannelId: channelId, handle }),
       });
 
-      logger.info(`👤 [PointsService] Created new user & account from YouTube chat: ${cleanUsername} (${newUserId})`);
+      logger.info(
+        `👤 [PointsService] Created new user & account from YouTube chat: ${cleanUsername} (${newUserId})`
+      );
 
       return { user: createdUser, pointsAdded: initialPoints };
     }
@@ -179,7 +189,10 @@ export class PointsService {
   /**
    * Award points when a viewer sends a chat message (+5 points per chat)
    */
-  async awardChatPoints(userId: string, chatMessageId?: string): Promise<{ pointsAdded: number; totalPoints: number; tier: string } | null> {
+  async awardChatPoints(
+    userId: string,
+    chatMessageId?: string
+  ): Promise<{ pointsAdded: number; totalPoints: number; tier: string } | null> {
     try {
       const [currentUser] = await db
         .select()
@@ -213,7 +226,9 @@ export class PointsService {
         metadata: JSON.stringify({ chatMessageId }),
       });
 
-      logger.info(`[PointsService] Awarded +${pointsToAdd} PTS to user ${currentUser.name} (${userId}). Total: ${newPoints} PTS (Tier: ${newTier})`);
+      logger.info(
+        `[PointsService] Awarded +${pointsToAdd} PTS to user ${currentUser.name} (${userId}). Total: ${newPoints} PTS (Tier: ${newTier})`
+      );
 
       return {
         pointsAdded: pointsToAdd,
@@ -267,7 +282,9 @@ export class PointsService {
         metadata: JSON.stringify({ donationId, amount }),
       });
 
-      logger.info(`[PointsService] Awarded +${pointsToAdd} PTS for Rp ${amount} donation to user ${currentUser.name} (${userId})`);
+      logger.info(
+        `[PointsService] Awarded +${pointsToAdd} PTS for Rp ${amount} donation to user ${currentUser.name} (${userId})`
+      );
 
       return {
         pointsAdded: pointsToAdd,
@@ -285,14 +302,19 @@ export class PointsService {
    */
   async syncYouTubeProfile(userId: string, accessToken: string): Promise<void> {
     try {
-      const response = await fetch('https://www.googleapis.com/youtube/v3/channels?part=snippet&mine=true', {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
+      const response = await fetch(
+        'https://www.googleapis.com/youtube/v3/channels?part=snippet&mine=true',
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
 
       if (!response.ok) {
-        logger.warn(`[YouTube Sync] YouTube API returned status ${response.status} for user ${userId}`);
+        logger.warn(
+          `[YouTube Sync] YouTube API returned status ${response.status} for user ${userId}`
+        );
         return;
       }
 
@@ -302,7 +324,10 @@ export class PointsService {
         const youtubeChannelId = channel.id;
         const youtubeChannelTitle = channel.snippet?.title || null;
         const youtubeHandle = channel.snippet?.customUrl || null;
-        const youtubeAvatar = channel.snippet?.thumbnails?.high?.url || channel.snippet?.thumbnails?.default?.url || null;
+        const youtubeAvatar =
+          channel.snippet?.thumbnails?.high?.url ||
+          channel.snippet?.thumbnails?.default?.url ||
+          null;
 
         await db
           .update(schema.user)
@@ -315,10 +340,16 @@ export class PointsService {
           })
           .where(eq(schema.user.id, userId));
 
-        logger.info(`[YouTube Sync] Synced YouTube channel for user ${userId}: ${youtubeChannelTitle} (${youtubeHandle || 'No handle'})`);
+        logger.info(
+          `[YouTube Sync] Synced YouTube channel for user ${userId}: ${youtubeChannelTitle} (${youtubeHandle || 'No handle'})`
+        );
       }
     } catch (error) {
-      logger.error(`[YouTube Sync] Error syncing YouTube channel for user ${userId}:`, {}, error as Error);
+      logger.error(
+        `[YouTube Sync] Error syncing YouTube channel for user ${userId}:`,
+        {},
+        error as Error
+      );
     }
   }
 
@@ -326,11 +357,7 @@ export class PointsService {
    * Get complete gamification profile for user
    */
   async getUserProfile(userId: string): Promise<UserGamificationProfile | null> {
-    const [user] = await db
-      .select()
-      .from(schema.user)
-      .where(eq(schema.user.id, userId))
-      .limit(1);
+    const [user] = await db.select().from(schema.user).where(eq(schema.user.id, userId)).limit(1);
 
     if (!user) return null;
 

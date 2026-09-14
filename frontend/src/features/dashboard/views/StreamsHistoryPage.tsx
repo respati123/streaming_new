@@ -1,4 +1,5 @@
 import { apiClient } from '@core/http/api-client';
+import { EmoteMessageRenderer } from '@shared/components/ui/EmoteMessageRenderer';
 import { useQuery } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
 import {
@@ -17,7 +18,6 @@ import {
 } from 'react-icons/ri';
 import { dashboardService } from '../services/dashboardService';
 import type { ChatMessage, Chatter, StreamSession } from '../types/dashboard.types';
-import { EmoteMessageRenderer } from '@shared/components/ui/EmoteMessageRenderer';
 
 export default function StreamsHistoryPage() {
   const [selectedStream, setSelectedStream] = useState<StreamSession | null>(null);
@@ -78,7 +78,13 @@ export default function StreamsHistoryPage() {
           minute: '2-digit',
           second: '2-digit',
         });
-        const role = msg.isOwner ? '[STREAMER]' : msg.isModerator ? '[MOD]' : msg.isSponsor ? '[MEMBER]' : '';
+        const role = msg.isOwner
+          ? '[STREAMER]'
+          : msg.isModerator
+            ? '[MOD]'
+            : msg.isSponsor
+              ? '[MEMBER]'
+              : '';
         return `[${time}] ${role} ${msg.username}: ${msg.message}`;
       })
       .join('\n');
@@ -100,7 +106,8 @@ export default function StreamsHistoryPage() {
             <span>Live Stream Sessions Archive</span>
           </h1>
           <p className="text-xs text-zinc-500 font-mono mt-1">
-            Klik pada baris sesi siaran untuk melihat seluruh arsip riwayat pesan chat dan engagement
+            Klik pada baris sesi siaran untuk melihat seluruh arsip riwayat pesan chat dan
+            engagement
           </p>
         </div>
 
@@ -188,9 +195,7 @@ export default function StreamsHistoryPage() {
                             (Klik untuk lihat pesan)
                           </span>
                         </div>
-                        <div className="text-[11px] text-zinc-400 font-mono">
-                          ID: {s.id}
-                        </div>
+                        <div className="text-[11px] text-zinc-400 font-mono">ID: {s.id}</div>
                       </td>
 
                       {/* Started At */}
@@ -496,9 +501,7 @@ export default function StreamsHistoryPage() {
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center justify-between gap-2">
                           <div className="flex items-center gap-1.5">
-                            <span className="font-bold text-zinc-950 text-xs">
-                              {msg.username}
-                            </span>
+                            <span className="font-bold text-zinc-950 text-xs">{msg.username}</span>
 
                             {isHost && (
                               <span className="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-amber-100 text-amber-800 border border-amber-300 flex items-center gap-0.5">
@@ -533,8 +536,8 @@ export default function StreamsHistoryPage() {
                         <div className="mt-1">
                           <EmoteMessageRenderer
                             message={msg.message}
-                            emotes={typeof msg.emotes === 'string' ? JSON.parse(msg.emotes) : msg.emotes}
-                            parts={typeof msg.parts === 'string' ? JSON.parse(msg.parts) : msg.parts}
+                            emotes={msg.emotes}
+                            parts={msg.parts}
                             className="text-xs text-zinc-800 leading-relaxed font-sans break-words select-text"
                           />
                         </div>

@@ -1,9 +1,9 @@
 import { env } from '@core/config/env';
 import { queryClient } from '@core/database';
 import { logger } from '@core/logger/logger';
-import { app } from './app';
 import { websocket } from '@core/ws/websocket.server';
 import { streamerbotService } from '@modules/streamerbot/streamerbot.service';
+import { app } from './app';
 
 const server = Bun.serve({
   port: env.PORT,

@@ -1,8 +1,8 @@
 import { logger } from '@core/logger/logger';
-import { createBunWebSocket } from 'hono/bun';
 import type { ServerWebSocket } from 'bun';
+import { createBunWebSocket } from 'hono/bun';
 import { nanoid } from 'nanoid';
-import { wsHub, type ClientType } from './websocket.hub';
+import { type ClientType, wsHub } from './websocket.hub';
 
 export const { upgradeWebSocket, websocket } = createBunWebSocket<ServerWebSocket>();
 

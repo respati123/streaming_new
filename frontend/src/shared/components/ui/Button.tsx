@@ -28,8 +28,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         'bg-zinc-100 text-zinc-900 hover:bg-zinc-200 focus-visible:ring-zinc-400 border border-zinc-200',
       outline:
         'border border-zinc-300 bg-white text-zinc-800 hover:bg-zinc-50 focus-visible:ring-zinc-950 shadow-xs',
-      ghost:
-        'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-950 focus-visible:ring-zinc-400',
+      ghost: 'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-950 focus-visible:ring-zinc-400',
       danger:
         'bg-rose-600 text-white hover:bg-rose-700 focus-visible:ring-rose-500 shadow-tactile border border-rose-700',
     };

@@ -4,11 +4,7 @@ import { ThemeToggle } from '@shared/components/ui/ThemeToggle';
 import { useTranslation } from '@shared/hooks/useTranslation';
 import { useAuthStore } from '@shared/stores/auth.store';
 import type { NavLinkItem } from '@shared/types/layout.types';
-import {
-  RiBookOpenLine,
-  RiBroadcastFill,
-  RiInboxLine,
-} from 'react-icons/ri';
+import { RiBookOpenLine, RiBroadcastFill, RiInboxLine } from 'react-icons/ri';
 import { Link, useLocation } from 'react-router-dom';
 
 export function Navbar() {
@@ -74,9 +70,7 @@ export function Navbar() {
           {isAuthenticated && user ? (
             <div className="flex items-center gap-3 ml-1">
               <div className="hidden sm:flex flex-col text-right font-sans">
-                <span className="text-xs font-bold text-zinc-950">
-                  {user.name}
-                </span>
+                <span className="text-xs font-bold text-zinc-950">{user.name}</span>
                 <span className="text-[10px] font-mono text-zinc-400">{user.email}</span>
               </div>
               <img

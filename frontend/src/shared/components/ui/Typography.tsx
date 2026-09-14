@@ -1,5 +1,4 @@
 import { cn } from '@core/utils/cn';
-import React, { forwardRef } from 'react';
 import type {
   CodeProps,
   FontWeight,
@@ -10,6 +9,8 @@ import type {
   TextProps,
   TextVariant,
 } from '@shared/types/typography.types';
+import type React from 'react';
+import { forwardRef } from 'react';
 
 const colorStyles: Record<TextColor, string> = {
   default: 'text-zinc-950',
@@ -69,15 +70,16 @@ export const Heading = forwardRef(
       children,
       ...props
     }: HeadingProps<E>,
-    ref: React.Ref<any>
+    ref: React.Ref<Element>
   ) => {
     // Default semantic element based on level or variant
     const Component = as || level || 'h1';
-    const computedVariant: HeadingVariant = variant || (level === 'h1' ? 'title-lg' : level === 'h2' ? 'title-md' : 'title-sm');
+    const computedVariant: HeadingVariant =
+      variant || (level === 'h1' ? 'title-lg' : level === 'h2' ? 'title-md' : 'title-sm');
 
     return (
       <Component
-        ref={ref}
+        ref={ref as never}
         className={cn(
           headingVariantStyles[computedVariant],
           colorStyles[color],
@@ -92,7 +94,7 @@ export const Heading = forwardRef(
     );
   }
 ) as <E extends React.ElementType = 'h1'>(
-  props: HeadingProps<E> & { ref?: React.Ref<any> }
+  props: HeadingProps<E> & { ref?: React.Ref<Element> }
 ) => React.ReactElement;
 
 /**
@@ -111,7 +113,7 @@ export const Text = forwardRef(
       children,
       ...props
     }: TextProps<E>,
-    ref: React.Ref<any>
+    ref: React.Ref<Element>
   ) => {
     const Component = as || (variant === 'meta' || variant === 'mono-sm' ? 'span' : 'p');
     // Default color strategy based on variant
@@ -120,7 +122,7 @@ export const Text = forwardRef(
 
     return (
       <Component
-        ref={ref}
+        ref={ref as never}
         className={cn(
           textVariantStyles[variant],
           colorStyles[resolvedColor],
@@ -135,7 +137,7 @@ export const Text = forwardRef(
     );
   }
 ) as <E extends React.ElementType = 'p'>(
-  props: TextProps<E> & { ref?: React.Ref<any> }
+  props: TextProps<E> & { ref?: React.Ref<Element> }
 ) => React.ReactElement;
 
 /**
@@ -151,7 +153,7 @@ export const Code = forwardRef<HTMLElement, CodeProps>(
             'p-3.5 bg-zinc-900 text-zinc-100 border border-zinc-800 rounded-xl text-xs font-mono overflow-x-auto leading-relaxed',
             className
           )}
-          {...(props as any)}
+          {...(props as React.HTMLAttributes<HTMLPreElement>)}
         >
           <code>{children}</code>
         </pre>
@@ -187,7 +189,9 @@ export const Kbd = forwardRef<HTMLElement, KbdProps>(
         ref={ref}
         className={cn(
           'inline-flex items-center justify-center font-mono font-bold rounded bg-zinc-100 text-zinc-800 border border-zinc-300 border-b-2 border-b-zinc-400 shadow-xs select-none',
-          size === 'sm' ? 'px-1.5 py-0.2 text-[10px] min-w-[18px]' : 'px-2 py-0.5 text-xs min-w-[22px]',
+          size === 'sm'
+            ? 'px-1.5 py-0.2 text-[10px] min-w-[18px]'
+            : 'px-2 py-0.5 text-xs min-w-[22px]',
           className
         )}
         {...props}

@@ -60,7 +60,10 @@ export class StreamSocketClient {
   }
 
   public connect(): void {
-    if (this.ws && (this.ws.readyState === WebSocket.OPEN || this.ws.readyState === WebSocket.CONNECTING)) {
+    if (
+      this.ws &&
+      (this.ws.readyState === WebSocket.OPEN || this.ws.readyState === WebSocket.CONNECTING)
+    ) {
       return;
     }
 
@@ -135,7 +138,10 @@ export class StreamSocketClient {
     }
   }
 
-  public on<T = any>(event: SocketEventType | string, listener: SocketEventListener<T>): () => void {
+  public on<T = any>(
+    event: SocketEventType | string,
+    listener: SocketEventListener<T>
+  ): () => void {
     if (!this.listeners.has(event)) {
       this.listeners.set(event, new Set());
     }

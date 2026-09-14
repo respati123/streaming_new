@@ -2,15 +2,10 @@ import { formatCurrency, formatDate } from '@core/utils/formatters';
 import { Badge } from '@shared/components/ui/Badge';
 import { useTranslation } from '@shared/hooks/useTranslation';
 import type { BadgeVariant } from '@shared/types/badge.types';
-import {
-  RiArrowRightUpLine,
-  RiDeleteBinLine,
-  RiInbox2Line,
-  RiStarFill,
-} from 'react-icons/ri';
+import { RiArrowRightUpLine, RiDeleteBinLine, RiInbox2Line, RiStarFill } from 'react-icons/ri';
 import { Link } from 'react-router-dom';
-import type { ProductCardProps } from '../types/product-component.types';
 import type { ProductCategory } from '../types/product.types';
+import type { ProductCardProps } from '../types/product-component.types';
 
 export function ProductCard({ product, onDelete }: ProductCardProps) {
   const { t, language } = useTranslation();

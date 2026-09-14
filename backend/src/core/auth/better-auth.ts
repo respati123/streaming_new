@@ -1,10 +1,9 @@
-import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from '@better-auth/drizzle-adapter';
-import { dash } from '@better-auth/infra';
+import { env } from '@core/config/env';
 import { db } from '@core/database';
 import * as schema from '@core/database/schema';
-import { env } from '@core/config/env';
 import { pointsService } from '@modules/points/points.service';
+import { betterAuth } from 'better-auth';
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -26,9 +25,6 @@ export const auth = betterAuth({
     env.FRONTEND_URL,
     env.BETTER_AUTH_URL,
   ],
-  plugins: [
-    dash(),
-  ],
   socialProviders: {
     google: {
       clientId: env.GOOGLE_CLIENT_ID || 'dummy-google-client-id.apps.googleusercontent.com',
@@ -36,12 +32,7 @@ export const auth = betterAuth({
       redirectURI: env.GOOGLE_REDIRECT_URI,
       prompt: 'select_account consent',
       accessType: 'offline',
-      scope: [
-        'openid',
-        'email',
-        'profile',
-        'https://www.googleapis.com/auth/youtube.readonly',
-      ],
+      scope: ['openid', 'email', 'profile', 'https://www.googleapis.com/auth/youtube.readonly'],
       async getUserInfo(tokens) {
         const accessToken = tokens.accessToken;
         let youtubeChannelId: string | null = null;
@@ -57,9 +48,12 @@ export const auth = betterAuth({
 
         // 2. Fetch YouTube Channel Details
         try {
-          const ytRes = await fetch('https://www.googleapis.com/youtube/v3/channels?part=snippet&mine=true', {
-            headers: { Authorization: `Bearer ${accessToken}` },
-          });
+          const ytRes = await fetch(
+            'https://www.googleapis.com/youtube/v3/channels?part=snippet&mine=true',
+            {
+              headers: { Authorization: `Bearer ${accessToken}` },
+            }
+          );
           if (ytRes.ok) {
             const ytData = await ytRes.json();
             if (ytData.items && ytData.items.length > 0) {
@@ -67,7 +61,10 @@ export const auth = betterAuth({
               youtubeChannelId = channel.id;
               youtubeChannelTitle = channel.snippet?.title || null;
               youtubeHandle = channel.snippet?.customUrl || null;
-              youtubeAvatar = channel.snippet?.thumbnails?.high?.url || channel.snippet?.thumbnails?.default?.url || null;
+              youtubeAvatar =
+                channel.snippet?.thumbnails?.high?.url ||
+                channel.snippet?.thumbnails?.default?.url ||
+                null;
             }
           }
         } catch (e) {

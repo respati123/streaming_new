@@ -94,4 +94,3 @@ export interface ActionItem {
   color: string;
   isEnabled: boolean;
 }
-

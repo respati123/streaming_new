@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import { useSession, signIn, signOut } from '@core/auth/authClient';
+import { signIn, signOut, useSession } from '@core/auth/authClient';
 import { overlaySocket } from '@core/ws/socketClient';
+import { useState } from 'react';
 import {
   RiChat1Line,
   RiCoinLine,
@@ -28,7 +28,9 @@ export default function UserPortalPage() {
   // Donation Form States
   const [donorAmount, setDonorAmount] = useState(25000);
   const [donorMessage, setDonorMessage] = useState('Semangat live-nya bang! GGWP 🔥⚡');
-  const [selectedTemplate, setSelectedTemplate] = useState<'electric-lightning' | 'fire-glass'>('electric-lightning');
+  const [selectedTemplate, setSelectedTemplate] = useState<'electric-lightning' | 'fire-glass'>(
+    'electric-lightning'
+  );
   const [donationSentNotice, setDonationSentNotice] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
@@ -46,9 +48,10 @@ export default function UserPortalPage() {
         setLoginError(res.error.message || 'Gagal memulai autentikasi Google');
         setIsSubmitting(false);
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Google Sign In failed:', error);
-      setLoginError(error?.message || 'Gagal menghubungi server Better Auth');
+      const msg = error instanceof Error ? error.message : 'Gagal menghubungi server Better Auth';
+      setLoginError(msg);
       setIsSubmitting(false);
     }
   };
@@ -73,15 +76,15 @@ export default function UserPortalPage() {
     e.preventDefault();
     if (!chatInput.trim()) return;
 
-    const userObj = session?.user as any;
-    const displayName = userObj?.youtubeHandle || userObj?.name || 'Google Viewer';
-    const avatarUrl = userObj?.image || null;
+    const userObj = session?.user as Record<string, unknown> | undefined;
+    const displayName = (userObj?.youtubeHandle as string) || userObj?.name || 'Google Viewer';
+    const avatarUrl = (userObj?.image as string) || null;
 
     overlaySocket.send('chat:send', {
-      userId: userObj?.id,
+      userId: userObj?.id as string,
       message: chatInput.trim(),
       username: displayName,
-      youtubeHandle: userObj?.youtubeHandle,
+      youtubeHandle: userObj?.youtubeHandle as string,
       userAvatarUrl: avatarUrl,
       isOwner: false,
       isModerator: false,
@@ -99,12 +102,12 @@ export default function UserPortalPage() {
     e.preventDefault();
     if (donorAmount <= 0) return;
 
-    const userObj = session?.user as any;
-    const donorName = userObj?.youtubeHandle || userObj?.name || 'Google Supporter';
+    const userObj = session?.user as Record<string, unknown> | undefined;
+    const donorName = (userObj?.youtubeHandle as string) || userObj?.name || 'Google Supporter';
 
     overlaySocket.send('alert:trigger', {
       id: `don_${Date.now()}`,
-      userId: userObj?.id,
+      userId: userObj?.id as string,
       donorName: donorName,
       amount: donorAmount,
       currency: 'Rp',
@@ -141,7 +144,9 @@ export default function UserPortalPage() {
                   BETTER AUTH
                 </span>
               </div>
-              <p className="text-[11px] text-zinc-400 font-mono">Panel Interaksi Penonton & Google Login</p>
+              <p className="text-[11px] text-zinc-400 font-mono">
+                Panel Interaksi Penonton & Google Login
+              </p>
             </div>
           </div>
 
@@ -175,11 +180,10 @@ export default function UserPortalPage() {
                 <RiUser3Fill className="text-3xl text-cyan-400" />
               </div>
 
-              <h2 className="text-2xl font-black tracking-tight text-white mb-2">
-                Login Penonton
-              </h2>
+              <h2 className="text-2xl font-black tracking-tight text-white mb-2">Login Penonton</h2>
               <p className="text-sm text-zinc-400 leading-relaxed mb-8">
-                Masuk menggunakan akun <strong>Google</strong> melalui <strong>Better Auth</strong> untuk berinteraksi di live stream dengan nama dan foto profil asli Anda.
+                Masuk menggunakan akun <strong>Google</strong> melalui <strong>Better Auth</strong>{' '}
+                untuk berinteraksi di live stream dengan nama dan foto profil asli Anda.
               </p>
 
               {/* Google Sign In Button */}
@@ -236,12 +240,15 @@ export default function UserPortalPage() {
                 <div>
                   <div className="flex items-center gap-2.5 flex-wrap">
                     <h1 className="text-2xl font-black text-white tracking-tight">
-                      {(session.user as any)?.youtubeChannelTitle || session.user.name}
+                      {((session.user as Record<string, unknown>)?.youtubeChannelTitle as string) ||
+                        session.user.name}
                     </h1>
-                    {(session.user as any)?.youtubeHandle && (
+                    {Boolean((session.user as Record<string, unknown>)?.youtubeHandle) && (
                       <span className="px-2.5 py-0.5 rounded-full bg-red-600/20 text-red-300 border border-red-500/40 text-xs font-mono font-bold flex items-center gap-1 shadow-xs">
                         <RiYoutubeFill className="text-red-500" />
-                        <span>{(session.user as any)?.youtubeHandle}</span>
+                        <span>
+                          {(session.user as Record<string, unknown>)?.youtubeHandle as string}
+                        </span>
                       </span>
                     )}
                     <span className="px-2.5 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-400/30 text-xs font-mono font-bold flex items-center gap-1">
@@ -250,7 +257,10 @@ export default function UserPortalPage() {
                     </span>
                     <span className="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/30 text-xs font-mono font-bold flex items-center gap-1">
                       <RiVipCrownFill className="text-amber-400" />
-                      <span className="uppercase font-mono">Tier: {(session.user as any)?.tier || 'Bronze'}</span>
+                      <span className="uppercase font-mono">
+                        Tier:{' '}
+                        {((session.user as Record<string, unknown>)?.tier as string) || 'Bronze'}
+                      </span>
                     </span>
                   </div>
 
@@ -259,13 +269,25 @@ export default function UserPortalPage() {
                   <div className="flex items-center gap-4 mt-2 text-xs font-mono">
                     <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-zinc-800/80 border border-zinc-700/80 text-amber-300 font-bold">
                       <RiSparklingFill className="text-amber-400" />
-                      <span>{Number((session.user as any)?.points || 0).toLocaleString('id-ID')} Loyalty PTS</span>
+                      <span>
+                        {Number((session.user as any)?.points || 0).toLocaleString('id-ID')} Loyalty
+                        PTS
+                      </span>
                     </div>
                     <span className="text-zinc-500">
-                      Chats: <strong className="text-zinc-300">{(session.user as any)?.totalChatCount || 0}</strong>
+                      Chats:{' '}
+                      <strong className="text-zinc-300">
+                        {(session.user as any)?.totalChatCount || 0}
+                      </strong>
                     </span>
                     <span className="text-zinc-500">
-                      Total Sawer: <strong className="text-emerald-400">Rp {Number((session.user as any)?.totalDonationAmount || 0).toLocaleString('id-ID')}</strong>
+                      Total Sawer:{' '}
+                      <strong className="text-emerald-400">
+                        Rp{' '}
+                        {Number((session.user as any)?.totalDonationAmount || 0).toLocaleString(
+                          'id-ID'
+                        )}
+                      </strong>
                     </span>
                   </div>
                 </div>
@@ -294,7 +316,9 @@ export default function UserPortalPage() {
                       </div>
                       <div>
                         <h3 className="font-bold text-base text-white">Kirim Live Chat</h3>
-                        <p className="text-xs text-zinc-400">Pesan langsung muncul di OBS Overlay</p>
+                        <p className="text-xs text-zinc-400">
+                          Pesan langsung muncul di OBS Overlay
+                        </p>
                       </div>
                     </div>
 
@@ -305,10 +329,14 @@ export default function UserPortalPage() {
 
                   <form onSubmit={handleSendChat} className="space-y-4">
                     <div>
-                      <label className="block text-xs font-semibold text-zinc-400 mb-1.5">
+                      <label
+                        htmlFor="portal-chat-input"
+                        className="block text-xs font-semibold text-zinc-400 mb-1.5"
+                      >
                         Pesan Chat Penonton
                       </label>
                       <textarea
+                        id="portal-chat-input"
                         rows={3}
                         value={chatInput}
                         onChange={(e) => setChatInput(e.target.value)}
@@ -350,8 +378,12 @@ export default function UserPortalPage() {
                         <RiCoinLine className="text-lg" />
                       </div>
                       <div>
-                        <h3 className="font-bold text-base text-white">Dukung Streamer (Tip Alert)</h3>
-                        <p className="text-xs text-zinc-400">Trigger alert VFX di layar live stream</p>
+                        <h3 className="font-bold text-base text-white">
+                          Dukung Streamer (Tip Alert)
+                        </h3>
+                        <p className="text-xs text-zinc-400">
+                          Trigger alert VFX di layar live stream
+                        </p>
                       </div>
                     </div>
 
@@ -362,7 +394,10 @@ export default function UserPortalPage() {
 
                   <form onSubmit={handleSendDonation} className="space-y-4">
                     <div>
-                      <label className="block text-xs font-semibold text-zinc-400 mb-1.5">
+                      <label
+                        htmlFor="portal-amount-input"
+                        className="block text-xs font-semibold text-zinc-400 mb-1.5"
+                      >
                         Nominal Dukungan (Rp)
                       </label>
                       <div className="grid grid-cols-4 gap-2 mb-2">
@@ -382,6 +417,7 @@ export default function UserPortalPage() {
                         ))}
                       </div>
                       <input
+                        id="portal-amount-input"
                         type="number"
                         value={donorAmount}
                         onChange={(e) => setDonorAmount(Number(e.target.value))}
@@ -390,10 +426,14 @@ export default function UserPortalPage() {
                     </div>
 
                     <div>
-                      <label className="block text-xs font-semibold text-zinc-400 mb-1.5">
+                      <label
+                        htmlFor="portal-message-input"
+                        className="block text-xs font-semibold text-zinc-400 mb-1.5"
+                      >
                         Pesan Dukungan
                       </label>
                       <input
+                        id="portal-message-input"
                         type="text"
                         value={donorMessage}
                         onChange={(e) => setDonorMessage(e.target.value)}
@@ -404,9 +444,9 @@ export default function UserPortalPage() {
 
                     {/* Choose Alert VFX Frame Variant */}
                     <div>
-                      <label className="block text-xs font-semibold text-zinc-400 mb-1.5">
+                      <div className="block text-xs font-semibold text-zinc-400 mb-1.5">
                         Pilih Efek Animasi Alert Layar
-                      </label>
+                      </div>
                       <div className="grid grid-cols-2 gap-2">
                         <button
                           type="button"
@@ -421,7 +461,9 @@ export default function UserPortalPage() {
                             <RiFlashlightFill className="text-cyan-400" />
                             <span>⚡ Electric VFX</span>
                           </div>
-                          <p className="text-[11px] text-zinc-500 mt-1">Sambaran petir fraktal dinamis</p>
+                          <p className="text-[11px] text-zinc-500 mt-1">
+                            Sambaran petir fraktal dinamis
+                          </p>
                         </button>
 
                         <button
@@ -437,7 +479,9 @@ export default function UserPortalPage() {
                             <RiFireFill className="text-orange-400" />
                             <span>🔥 Inferno Flame</span>
                           </div>
-                          <p className="text-[11px] text-zinc-500 mt-1">Lidah api & bara melayang</p>
+                          <p className="text-[11px] text-zinc-500 mt-1">
+                            Lidah api & bara melayang
+                          </p>
                         </button>
                       </div>
                     </div>

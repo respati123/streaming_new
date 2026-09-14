@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   RiBroadcastFill,
   RiCloseLine,
@@ -8,9 +8,9 @@ import {
   RiStopFill,
   RiVideoAddFill,
 } from 'react-icons/ri';
-import type { StreamSession, StreamerbotStatus } from '../types/dashboard.types';
+import type { StreamerbotStatus, StreamSession } from '../types/dashboard.types';
 
-interface StreamControlHeaderProps {
+export interface StreamControlHeaderProps {
   activeStream: StreamSession | null;
   botStatus: StreamerbotStatus | null;
   onStartStream: (title: string) => Promise<void>;
@@ -19,14 +19,14 @@ interface StreamControlHeaderProps {
   isSSEActive: boolean;
 }
 
-export const StreamControlHeader: React.FC<StreamControlHeaderProps> = ({
+export function StreamControlHeader({
   activeStream,
   botStatus,
   onStartStream,
   onEndStream,
   onReconnectBot,
   isSSEActive,
-}) => {
+}: StreamControlHeaderProps) {
   const [newTitle, setNewTitle] = useState('');
   const [showStartModal, setShowStartModal] = useState(false);
   const [isActionLoading, setIsActionLoading] = useState(false);
@@ -49,7 +49,7 @@ export const StreamControlHeader: React.FC<StreamControlHeaderProps> = ({
 
   const handleEndClick = async () => {
     if (!activeStream) return;
-    if (window.confirm('Are you sure you want to end the current live stream session?')) {
+    if (window.confirm('Yakin ingin mengakhiri sesi live stream saat ini?')) {
       setIsActionLoading(true);
       try {
         await onEndStream(activeStream.id);
@@ -60,23 +60,21 @@ export const StreamControlHeader: React.FC<StreamControlHeaderProps> = ({
   };
 
   return (
-    <header className="px-5 py-3.5 border-b border-zinc-200 bg-white/95 backdrop-blur-md sticky top-0 z-30 shadow-xs font-sans">
+    <header className="px-5 py-3 border-b border-[#272733] bg-[#131318]/95 backdrop-blur-md sticky top-0 z-30 font-sans text-[#F4F4F6]">
       <div className="flex flex-wrap items-center justify-between gap-4 max-w-[1920px] mx-auto">
-        
-        {/* Left: Stream Identity & Status */}
         <div className="flex items-center gap-3.5">
           <div
             className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-mono font-bold tracking-wider uppercase transition-colors ${
               isLive
-                ? 'bg-rose-50 border-rose-200 text-rose-700 shadow-sm'
-                : 'bg-zinc-100 border-zinc-200 text-zinc-600'
+                ? 'bg-rose-950/80 border-rose-600/50 text-rose-300 shadow-sm'
+                : 'bg-[#16161D] border-[#272733] text-[#A0A0AC]'
             }`}
           >
             <span
               className={`w-2.5 h-2.5 rounded-full ${
                 isLive
-                  ? 'bg-rose-600 animate-pulse shadow-[0_0_8px_rgba(225,29,72,0.7)]'
-                  : 'bg-zinc-400'
+                  ? 'bg-rose-500 animate-pulse shadow-[0_0_8px_rgba(244,63,94,0.8)]'
+                  : 'bg-zinc-600'
               }`}
             />
             <span>{isLive ? 'ON AIR' : 'STANDBY'}</span>
@@ -84,31 +82,30 @@ export const StreamControlHeader: React.FC<StreamControlHeaderProps> = ({
 
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-sm font-extrabold text-zinc-950 tracking-tight">
-                {activeStream ? activeStream.title : 'No Active Stream Session'}
+              <h1 className="text-sm font-bold text-white tracking-tight">
+                {activeStream ? activeStream.title : 'Tidak Ada Sesi Live Aktif'}
               </h1>
               {activeStream && (
-                <span className="text-[11px] font-mono font-semibold text-zinc-500 bg-zinc-100 px-2 py-0.5 rounded border border-zinc-200">
+                <span className="text-[11px] font-mono font-semibold text-cyan-400 bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-800/40">
                   ID: {activeStream.id.slice(0, 8)}
                 </span>
               )}
             </div>
-            <p className="text-[11px] text-zinc-500 font-mono mt-0.5">
+            <p className="text-[11px] text-[#A0A0AC] font-mono mt-0.5">
               {activeStream
-                ? `Started at ${new Date(activeStream.startedAt).toLocaleTimeString('id-ID')} • Live YouTube Telemetry Active`
-                : 'Initialize a stream session to enable real-time chat archiving and engagement tracking'}
+                ? `Dimulai pukul ${new Date(activeStream.startedAt).toLocaleTimeString('id-ID')} • Live YouTube Gateway Terhubung`
+                : 'Inisialisasi sesi siaran untuk mengaktifkan perekaman chat & engagement realtime'}
             </p>
           </div>
         </div>
 
-        {/* Center: Streamer.bot WebSocket Status Badge */}
-        <div className="flex items-center gap-3 bg-zinc-50 px-3.5 py-1.5 rounded-xl border border-zinc-200">
+        <div className="flex items-center gap-3 bg-[#16161D] px-3.5 py-1.5 rounded-xl border border-[#272733]">
           <div className="flex items-center gap-2.5">
             <div
               className={`p-1.5 rounded-lg border ${
                 isBotConnected
-                  ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                  : 'bg-amber-50 text-amber-700 border-amber-200'
+                  ? 'bg-emerald-950/80 text-emerald-400 border-emerald-500/40'
+                  : 'bg-amber-950/80 text-amber-400 border-amber-500/40'
               }`}
             >
               {isBotConnected ? (
@@ -118,19 +115,19 @@ export const StreamControlHeader: React.FC<StreamControlHeaderProps> = ({
               )}
             </div>
             <div className="text-xs">
-              <div className="font-bold text-zinc-900 flex items-center gap-1.5">
+              <div className="font-bold text-white flex items-center gap-1.5">
                 <span>Streamer.bot:</span>
                 <span
                   className={`font-mono font-bold tracking-tight ${
-                    isBotConnected ? 'text-emerald-700' : 'text-amber-700'
+                    isBotConnected ? 'text-emerald-400' : 'text-amber-400'
                   }`}
                 >
                   {botStatus?.status || 'DISCONNECTED'}
                 </span>
               </div>
-              <div className="text-[10px] text-zinc-500 font-mono">
-                {botStatus?.host || '127.0.0.1'}:{botStatus?.port || 8080} • WS Real-time:{' '}
-                <span className={isSSEActive ? 'text-emerald-700 font-bold' : 'text-zinc-400'}>
+              <div className="text-[10px] text-[#A0A0AC] font-mono">
+                {botStatus?.host || '127.0.0.1'}:{botStatus?.port || 8080} • WS Telemetry:{' '}
+                <span className={isSSEActive ? 'text-emerald-400 font-bold' : 'text-zinc-500'}>
                   {isSSEActive ? 'CONNECTED' : 'CONNECTING'}
                 </span>
               </div>
@@ -141,66 +138,65 @@ export const StreamControlHeader: React.FC<StreamControlHeaderProps> = ({
             type="button"
             onClick={onReconnectBot}
             title="Reconnect to Streamer.bot"
-            className="p-1.5 text-zinc-600 hover:text-zinc-950 bg-white hover:bg-zinc-100 rounded-lg border border-zinc-200/80 shadow-xs transition-all active:scale-95"
+            className="p-1.5 text-[#A0A0AC] hover:text-white bg-[#1A1A22] hover:bg-[#272733] rounded-lg border border-[#272733] transition-all"
             aria-label="Reconnect to Streamer.bot"
           >
             <RiRefreshLine className="text-sm" />
           </button>
         </div>
 
-        {/* Right: Session Control Buttons */}
         <div className="flex items-center gap-2">
           {isLive ? (
             <button
               type="button"
               onClick={handleEndClick}
               disabled={isActionLoading}
-              className="studio-btn flex items-center gap-2 px-3.5 py-2 text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 hover:bg-rose-100 shadow-xs active:scale-[0.98]"
+              className="flex items-center gap-2 px-3.5 py-2 text-xs font-bold text-rose-200 bg-rose-950 hover:bg-rose-900 border border-rose-700/60 rounded-xl transition-all"
             >
-              <RiStopFill className="text-rose-600 text-sm" />
-              <span>End Broadcast Session</span>
+              <RiStopFill className="text-rose-400 text-sm" />
+              <span>Akhiri Sesi Siaran</span>
             </button>
           ) : (
             <button
               type="button"
               onClick={() => setShowStartModal(true)}
-              className="studio-btn flex items-center gap-2 px-4 py-2 text-xs font-bold text-white bg-zinc-950 hover:bg-zinc-900 border border-zinc-800 shadow-tactile active:scale-[0.98]"
+              className="flex items-center gap-2 px-4 py-2 text-xs font-bold text-white bg-cyan-600 hover:bg-cyan-500 border border-cyan-400/40 rounded-xl shadow-lg shadow-cyan-950/50 transition-all"
             >
               <RiVideoAddFill className="text-base" />
-              <span>Start New Stream</span>
+              <span>Mulai Sesi Stream Baru</span>
             </button>
           )}
         </div>
       </div>
 
-      {/* Start Stream Modal Dialog */}
       {showStartModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div
-            className="fixed inset-0 bg-zinc-950/50 backdrop-blur-xs transition-opacity"
+          <button
+            type="button"
+            aria-label="Tutup modal dialog"
+            className="fixed inset-0 bg-black/70 backdrop-blur-xs transition-opacity cursor-default w-full h-full border-none"
             onClick={() => setShowStartModal(false)}
-            aria-hidden="true"
           />
-          <div className="relative w-full max-w-md bg-white rounded-2xl p-6 border border-zinc-200 shadow-2xl z-10 animate-in fade-in zoom-in-95 duration-150">
-            <div className="flex items-center justify-between pb-3 border-b border-zinc-100">
+          <div className="relative w-full max-w-md bg-[#131318] rounded-2xl p-6 border border-[#272733] shadow-2xl z-10 animate-in fade-in zoom-in-95 duration-150 text-[#F4F4F6]">
+            <div className="flex items-center justify-between pb-3 border-b border-[#272733]">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-zinc-950 flex items-center justify-center text-white">
-                  <RiBroadcastFill className="text-rose-500 text-base" />
+                <div className="w-8 h-8 rounded-xl bg-cyan-950 border border-cyan-800 flex items-center justify-center text-cyan-400">
+                  <RiBroadcastFill className="text-base" />
                 </div>
                 <div>
-                  <h2 className="text-sm font-extrabold text-zinc-950 tracking-tight">
-                    Start Broadcast Session
+                  <h2 className="text-sm font-bold text-white tracking-tight">
+                    Mulai Sesi Siaran Baru
                   </h2>
-                  <p className="text-[11px] text-zinc-500 font-mono">
-                    Track YouTube live chat and viewer activity
+                  <p className="text-[11px] text-[#A0A0AC] font-mono">
+                    Catat riwayat penonton dan trigger aksi live
                   </p>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={() => setShowStartModal(false)}
-                className="p-1.5 text-zinc-400 hover:text-zinc-700 rounded-lg hover:bg-zinc-100"
-                aria-label="Close dialog"
+                className="p-1.5 text-[#A0A0AC] hover:text-white rounded-lg hover:bg-[#1A1A22]"
+                aria-label="Tutup dialog"
               >
                 <RiCloseLine className="text-lg" />
               </button>
@@ -208,16 +204,20 @@ export const StreamControlHeader: React.FC<StreamControlHeaderProps> = ({
 
             <form onSubmit={handleStartSubmit} className="mt-4 space-y-4">
               <div>
-                <label className="block text-xs font-bold text-zinc-800 mb-1.5">
-                  Stream Title / Topic
+                <label
+                  htmlFor="stream-title-input"
+                  className="block text-xs font-bold text-zinc-300 mb-1.5"
+                >
+                  Judul Siaran / Topik
                 </label>
                 <input
+                  id="stream-title-input"
                   type="text"
                   required
-                  placeholder="e.g. Competitive Ranked Match + Live Q&A Discussion"
+                  placeholder="Contoh: Ranked Mythic Push + Diskusi Live"
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
-                  className="w-full px-3.5 py-2.5 text-xs bg-zinc-50 border border-zinc-300 rounded-xl focus:outline-none focus:bg-white focus:ring-2 focus:ring-zinc-950 focus:border-zinc-950 font-sans"
+                  className="w-full px-3.5 py-2.5 text-xs bg-[#16161D] border border-[#272733] rounded-xl focus:outline-none focus:border-cyan-400 font-sans text-white"
                 />
               </div>
 
@@ -225,16 +225,16 @@ export const StreamControlHeader: React.FC<StreamControlHeaderProps> = ({
                 <button
                   type="button"
                   onClick={() => setShowStartModal(false)}
-                  className="studio-btn px-4 py-2 text-xs font-semibold text-zinc-700 bg-zinc-100 hover:bg-zinc-200 border border-zinc-200"
+                  className="px-4 py-2 text-xs font-semibold text-[#A0A0AC] hover:text-white bg-[#1A1A22] hover:bg-[#272733] border border-[#272733] rounded-xl"
                 >
-                  Cancel
+                  Batal
                 </button>
                 <button
                   type="submit"
                   disabled={isActionLoading || !newTitle.trim()}
-                  className="studio-btn px-5 py-2 text-xs font-bold text-white bg-zinc-950 hover:bg-zinc-900 border border-zinc-800 shadow-tactile disabled:opacity-50"
+                  className="px-5 py-2 text-xs font-bold text-white bg-cyan-600 hover:bg-cyan-500 border border-cyan-400/40 rounded-xl shadow-lg shadow-cyan-950/50 disabled:opacity-50"
                 >
-                  {isActionLoading ? 'Starting Session...' : 'Go Live Now'}
+                  {isActionLoading ? 'Memulai Sesi...' : 'Mulai Siaran Sekarang'}
                 </button>
               </div>
             </form>
@@ -243,4 +243,4 @@ export const StreamControlHeader: React.FC<StreamControlHeaderProps> = ({
       )}
     </header>
   );
-};
+}

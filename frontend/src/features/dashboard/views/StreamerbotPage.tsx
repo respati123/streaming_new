@@ -14,8 +14,10 @@ import { dashboardService } from '../services/dashboardService';
 export default function StreamerbotPage() {
   const queryClient = useQueryClient();
   const [customActionName, setCustomActionName] = useState('Alert_Donation');
-  const [customArgs, setCustomArgs] = useState('{\n  "donorName": "Budi_Santoso",\n  "amount": 50000,\n  "message": "Testing Streamer.bot Action"\n}');
-  const [executionResult, setExecutionResult] = useState<any | null>(null);
+  const [customArgs, setCustomArgs] = useState(
+    '{\n  "donorName": "Budi_Santoso",\n  "amount": 50000,\n  "message": "Testing Streamer.bot Action"\n}'
+  );
+  const [executionResult, setExecutionResult] = useState<Record<string, unknown> | null>(null);
 
   // Real-time WebSocket connection state from backend
   const { botStatus: status } = useDashboardRealtime();
@@ -34,7 +36,7 @@ export default function StreamerbotPage() {
   });
 
   const triggerActionMutation = useMutation({
-    mutationFn: (variables: { action: string; args?: Record<string, any> }) =>
+    mutationFn: (variables: { action: string; args?: Record<string, unknown> }) =>
       dashboardService.triggerAction(variables.action, variables.args),
     onSuccess: (data) => {
       setExecutionResult({
@@ -43,11 +45,12 @@ export default function StreamerbotPage() {
         data,
       });
     },
-    onError: (err: any) => {
+    onError: (err: unknown) => {
+      const msg = err instanceof Error ? err.message : 'Execution failed';
       setExecutionResult({
         success: false,
         timestamp: new Date().toISOString(),
-        error: err.message || 'Execution failed',
+        error: msg,
       });
     },
   });
@@ -60,7 +63,7 @@ export default function StreamerbotPage() {
         action: customActionName,
         args: parsedArgs,
       });
-    } catch (err) {
+    } catch (_err) {
       alert('Invalid JSON in Arguments field!');
     }
   };
@@ -79,7 +82,8 @@ export default function StreamerbotPage() {
             <span>Streamer.bot Hardware & WebSocket Gateway</span>
           </h1>
           <p className="text-xs text-zinc-500 font-mono mt-1">
-            Manage local Windows desktop automation connection at {status?.host || '127.0.0.1'}:{status?.port || 8080}
+            Manage local Windows desktop automation connection at {status?.host || '127.0.0.1'}:
+            {status?.port || 8080}
           </p>
         </div>
 
@@ -89,8 +93,12 @@ export default function StreamerbotPage() {
           disabled={reconnectMutation.isPending}
           className="studio-btn px-4 py-2 text-xs font-bold text-zinc-900 bg-white hover:bg-zinc-50 border border-zinc-300 shadow-xs flex items-center gap-2 active:scale-95 disabled:opacity-50 font-sans"
         >
-          <RiRefreshLine className={`text-sm ${reconnectMutation.isPending ? 'animate-spin' : ''}`} />
-          <span>{reconnectMutation.isPending ? 'Reconnecting Gateway...' : 'Reconnect WebSocket'}</span>
+          <RiRefreshLine
+            className={`text-sm ${reconnectMutation.isPending ? 'animate-spin' : ''}`}
+          />
+          <span>
+            {reconnectMutation.isPending ? 'Reconnecting Gateway...' : 'Reconnect WebSocket'}
+          </span>
         </button>
       </div>
 
@@ -112,13 +120,18 @@ export default function StreamerbotPage() {
           <div className="text-lg font-extrabold font-mono text-zinc-950 flex items-center gap-2">
             <span
               className={`w-2.5 h-2.5 rounded-full ${
-                isConnected ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)]' : 'bg-amber-500'
+                isConnected
+                  ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)]'
+                  : 'bg-amber-500'
               }`}
             />
             {status?.status || 'DISCONNECTED'}
           </div>
           <div className="text-[11px] text-zinc-400 font-mono mt-1">
-            Last connected: {status?.lastConnectedAt ? new Date(status.lastConnectedAt).toLocaleTimeString('id-ID') : 'Never in current run'}
+            Last connected:{' '}
+            {status?.lastConnectedAt
+              ? new Date(status.lastConnectedAt).toLocaleTimeString('id-ID')
+              : 'Never in current run'}
           </div>
         </div>
 
@@ -159,10 +172,14 @@ export default function StreamerbotPage() {
 
           <form onSubmit={handleCustomTrigger} className="space-y-3.5">
             <div>
-              <label className="block text-xs font-bold text-zinc-800 mb-1.5 font-sans">
+              <label
+                htmlFor="action-name-input"
+                className="block text-xs font-bold text-zinc-800 mb-1.5 font-sans"
+              >
                 Action Name or UUID
               </label>
               <input
+                id="action-name-input"
                 type="text"
                 required
                 value={customActionName}
@@ -172,10 +189,14 @@ export default function StreamerbotPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-zinc-800 mb-1.5 font-sans">
+              <label
+                htmlFor="action-args-input"
+                className="block text-xs font-bold text-zinc-800 mb-1.5 font-sans"
+              >
                 Arguments Payload (JSON)
               </label>
               <textarea
+                id="action-args-input"
                 rows={6}
                 value={customArgs}
                 onChange={(e) => setCustomArgs(e.target.value)}
@@ -189,7 +210,9 @@ export default function StreamerbotPage() {
               className="studio-btn w-full py-2.5 px-4 text-xs font-bold text-white bg-zinc-950 hover:bg-zinc-900 border border-zinc-800 shadow-tactile flex items-center justify-center gap-2 active:scale-[0.98] disabled:opacity-50 font-sans"
             >
               <RiPlayFill className="text-sm" />
-              <span>{triggerActionMutation.isPending ? 'Executing Action...' : 'Trigger Action Now'}</span>
+              <span>
+                {triggerActionMutation.isPending ? 'Executing Action...' : 'Trigger Action Now'}
+              </span>
             </button>
           </form>
         </div>
@@ -216,7 +239,8 @@ export default function StreamerbotPage() {
           </div>
 
           <div className="text-[11px] text-zinc-400 font-mono pt-4 border-t border-zinc-100">
-            Tip: In Streamer.bot, configure actions in the Actions tab with sub-actions like Sound Player, OBS Scene Switch, or Chat Broadcast.
+            Tip: In Streamer.bot, configure actions in the Actions tab with sub-actions like Sound
+            Player, OBS Scene Switch, or Chat Broadcast.
           </div>
         </div>
       </div>

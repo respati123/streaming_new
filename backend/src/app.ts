@@ -1,3 +1,4 @@
+import { auth } from '@core/auth/better-auth';
 import { env } from '@core/config/env';
 import { ErrorCode } from '@core/constants/error-codes.constant';
 import { checkDatabaseHealth } from '@core/database';
@@ -11,12 +12,11 @@ import { rateLimiter } from '@core/middlewares/rate-limit.middleware';
 import { requestIdMiddleware } from '@core/middlewares/request-id.middleware';
 import type { AppEnvironment } from '@core/types/context.types';
 import { sendSuccess } from '@core/utils/response.util';
+import { wsHub } from '@core/ws/websocket.hub';
+import { handleWebSocket } from '@core/ws/websocket.server';
 import { authController } from '@modules/auth/auth.controller';
 import { streamerbotController } from '@modules/streamerbot/streamerbot.controller';
 import { streamsController } from '@modules/streams/streams.controller';
-import { handleWebSocket } from '@core/ws/websocket.server';
-import { wsHub } from '@core/ws/websocket.hub';
-import { auth } from '@core/auth/better-auth';
 import { apiReference } from '@scalar/hono-api-reference';
 import { Hono } from 'hono';
 import { secureHeaders } from 'hono/secure-headers';
@@ -154,7 +154,9 @@ export function createApp() {
   apiRouter.route('/streamerbot', streamerbotController);
   apiRouter.route('/streams', streamsController);
 
-  apiRouter.get('/ws/stats', (c) => sendSuccess(c, wsHub.getStats(), 'WebSocket stats retrieved successfully'));
+  apiRouter.get('/ws/stats', (c) =>
+    sendSuccess(c, wsHub.getStats(), 'WebSocket stats retrieved successfully')
+  );
 
   app.route(env.API_PREFIX, apiRouter);
 

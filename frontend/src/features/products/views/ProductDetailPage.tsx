@@ -95,7 +95,9 @@ export default function ProductDetailPage() {
                 <RiStarFill className="text-amber-500 text-xs" />
                 <span>{t('products.detail.rating', { rating: product.rating.toFixed(1) })}</span>
               </div>
-              <span className="text-xs font-mono text-zinc-400">• {t('products.detail.verified')}</span>
+              <span className="text-xs font-mono text-zinc-400">
+                • {t('products.detail.verified')}
+              </span>
             </div>
 
             <h1 className="text-2xl sm:text-3xl font-extrabold text-zinc-950 tracking-tight">

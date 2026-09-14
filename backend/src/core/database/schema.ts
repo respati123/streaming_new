@@ -227,7 +227,9 @@ export const streamSettings = pgTable('stream_settings', {
   youtubeChannelUrl: text('youtube_channel_url').default('https://youtube.com/@respati_stream'),
   tiktokHandle: varchar('tiktok_handle', { length: 255 }).default('@respati'),
   overlayTheme: varchar('overlay_theme', { length: 50 }).notNull().default('dark_esports'),
-  alertMinAmount: numeric('alert_min_amount', { precision: 12, scale: 2 }).notNull().default('10000'),
+  alertMinAmount: numeric('alert_min_amount', { precision: 12, scale: 2 })
+    .notNull()
+    .default('10000'),
   alertSoundEnabled: boolean('alert_sound_enabled').notNull().default(true),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
 });

@@ -28,7 +28,12 @@ class WebSocketHub {
   /**
    * Register new WebSocket client
    */
-  public registerClient(id: string, ws: WSContext, type: ClientType = 'unknown', ip?: string): void {
+  public registerClient(
+    id: string,
+    ws: WSContext,
+    type: ClientType = 'unknown',
+    ip?: string
+  ): void {
     const client: WSClientInfo = {
       id,
       type,
@@ -38,7 +43,9 @@ class WebSocketHub {
     };
     this.clients.set(id, client);
 
-    logger.info(`🔌 [WebSocketHub] Client connected: ${id} (${type}) [Total: ${this.clients.size}]`);
+    logger.info(
+      `🔌 [WebSocketHub] Client connected: ${id} (${type}) [Total: ${this.clients.size}]`
+    );
 
     // Send welcome / initial status snapshot
     this.sendTo(id, 'system:welcome', {
@@ -74,7 +81,8 @@ class WebSocketHub {
       if (targetType && client.type !== targetType) continue;
 
       try {
-        if (client.ws.readyState === 1) { // OPEN
+        if (client.ws.readyState === 1) {
+          // OPEN
           client.ws.send(payload);
         }
       } catch (err) {
@@ -111,7 +119,8 @@ class WebSocketHub {
    */
   public async handleMessage(clientId: string, rawMessage: string | ArrayBuffer): Promise<void> {
     try {
-      const text = typeof rawMessage === 'string' ? rawMessage : new TextDecoder().decode(rawMessage);
+      const text =
+        typeof rawMessage === 'string' ? rawMessage : new TextDecoder().decode(rawMessage);
       const parsed: WSEventMessage = JSON.parse(text);
 
       switch (parsed.event) {
@@ -189,7 +198,11 @@ class WebSocketHub {
 
           // Award loyalty points for donation (+1 PTS per Rp 100)
           if (alertData.userId && alertData.amount) {
-            await pointsService.awardDonationPoints(alertData.userId, Number(alertData.amount), alertData.id);
+            await pointsService.awardDonationPoints(
+              alertData.userId,
+              Number(alertData.amount),
+              alertData.id
+            );
           }
 
           await streamerbotService.triggerDonationAlert(alertData);
@@ -201,7 +214,11 @@ class WebSocketHub {
           logger.debug(`[WebSocketHub] Unhandled event: ${parsed.event}`, parsed.data);
       }
     } catch (err) {
-      logger.error(`[WebSocketHub] Error parsing client message from ${clientId}`, {}, err as Error);
+      logger.error(
+        `[WebSocketHub] Error parsing client message from ${clientId}`,
+        {},
+        err as Error
+      );
     }
   }
 

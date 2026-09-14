@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
   RiGroupLine,
   RiSearchLine,
@@ -9,12 +9,12 @@ import {
 } from 'react-icons/ri';
 import type { Chatter } from '../types/dashboard.types';
 
-interface ChattersListProps {
+export interface ChattersListProps {
   chatters: Chatter[];
   isLoading: boolean;
 }
 
-export const ChattersList: React.FC<ChattersListProps> = ({ chatters, isLoading }) => {
+export function ChattersList({ chatters, isLoading }: ChattersListProps) {
   const [search, setSearch] = useState('');
 
   const filteredChatters = useMemo(() => {
@@ -23,112 +23,107 @@ export const ChattersList: React.FC<ChattersListProps> = ({ chatters, isLoading 
     return chatters.filter(
       (c) =>
         c.username.toLowerCase().includes(q) ||
-        (c.youtubeChannelId && c.youtubeChannelId.toLowerCase().includes(q))
+        Boolean(c.youtubeChannelId?.toLowerCase().includes(q))
     );
   }, [chatters, search]);
 
   return (
-    <div className="studio-card flex flex-col h-full bg-white overflow-hidden border border-zinc-200/90 shadow-tactile rounded-xl font-sans">
-      {/* Panel Header */}
-      <div className="p-3.5 border-b border-zinc-200 bg-zinc-50/70 flex items-center justify-between">
+    <div className="flex flex-col h-full bg-[#131318] overflow-hidden border border-[#272733] shadow-xl rounded-2xl font-sans text-[#F4F4F6]">
+      <div className="p-3.5 border-b border-[#272733] bg-[#16161D] flex items-center justify-between">
         <div className="flex items-center gap-2.5">
-          <div className="p-1 rounded-lg bg-zinc-100 border border-zinc-200 text-zinc-700">
+          <div className="p-1.5 rounded-lg bg-cyan-950/60 border border-cyan-800/50 text-cyan-400">
             <RiGroupLine className="text-base" />
           </div>
           <div>
-            <h2 className="text-xs font-bold text-zinc-950 tracking-tight uppercase font-mono">
-              Audience & Chatters
+            <h2 className="text-xs font-bold text-white tracking-tight uppercase font-mono">
+              Audience & Chatters Roster
             </h2>
           </div>
         </div>
-        <span className="text-[11px] font-mono font-bold px-2 py-0.5 rounded-md bg-white border border-zinc-200 text-zinc-800 shadow-xs">
+        <span className="text-[11px] font-mono font-bold px-2 py-0.5 rounded-md bg-[#16161D] border border-[#272733] text-cyan-300">
           {chatters.length} Live
         </span>
       </div>
 
-      {/* Search Filter */}
-      <div className="p-2.5 border-b border-zinc-200/70 bg-white">
+      <div className="p-2.5 border-b border-[#272733] bg-[#131318]">
         <div className="relative">
-          <RiSearchLine className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 text-xs" />
+          <RiSearchLine className="absolute left-3 top-1/2 -translate-y-1/2 text-[#A0A0AC] text-xs" />
           <input
             type="text"
-            placeholder="Search handle or ID..."
+            placeholder="Cari nama atau handle..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-8 pr-3 py-1.5 text-xs bg-zinc-50 border border-zinc-200 rounded-lg focus:outline-none focus:bg-white focus:ring-1 focus:ring-zinc-950 font-sans placeholder:text-zinc-400"
+            className="w-full pl-8 pr-3 py-1.5 text-xs bg-[#16161D] border border-[#272733] rounded-lg focus:outline-none focus:border-cyan-400 font-sans text-white placeholder:text-[#A0A0AC]"
           />
         </div>
       </div>
 
-      {/* Chatters List Container */}
-      <div className="flex-1 overflow-y-auto divide-y divide-zinc-100 p-1">
+      <div className="flex-1 overflow-y-auto divide-y divide-[#1E1E28] p-1">
         {isLoading ? (
-          <div className="p-8 text-center text-xs text-zinc-400 font-mono flex flex-col items-center gap-2">
-            <div className="w-5 h-5 border-2 border-zinc-300 border-t-zinc-900 rounded-full animate-spin" />
-            <span>Loading stream chatters...</span>
+          <div className="p-8 text-center text-xs text-[#A0A0AC] font-mono flex flex-col items-center gap-2">
+            <div className="w-5 h-5 border-2 border-cyan-500/30 border-t-cyan-400 rounded-full animate-spin" />
+            <span>Memuat data penonton...</span>
           </div>
         ) : filteredChatters.length === 0 ? (
-          <div className="p-8 text-center text-xs text-zinc-400 flex flex-col items-center justify-center h-full">
-            <div className="w-10 h-10 rounded-full bg-zinc-100 flex items-center justify-center text-zinc-400 mb-2 border border-zinc-200">
-              <RiUserLine className="text-xl" />
+          <div className="p-8 text-center text-xs text-[#A0A0AC] flex flex-col items-center justify-center h-full">
+            <div className="w-10 h-10 rounded-xl bg-[#16161D] flex items-center justify-center text-[#A0A0AC] mb-2 border border-[#272733]">
+              <RiUserLine className="text-xl text-cyan-400" />
             </div>
-            <p className="font-semibold text-zinc-700">No chatters recorded</p>
-            <p className="text-[11px] text-zinc-400 mt-1 max-w-[200px]">
-              Chatters from YouTube stream will appear here in real-time
+            <p className="font-semibold text-white">Belum ada penonton terdata</p>
+            <p className="text-[11px] text-[#A0A0AC] mt-1 max-w-[200px]">
+              Chatters dari YouTube live akan muncul di sini secara otomatis
             </p>
           </div>
         ) : (
-          filteredChatters.map((chatter, idx) => (
+          filteredChatters.map((chatter) => (
             <div
-              key={`${chatter.username}-${idx}`}
-              className="p-2.5 hover:bg-zinc-50/80 rounded-lg transition-colors flex items-center justify-between gap-3 group"
+              key={chatter.userId ? `${chatter.userId}-${chatter.username}` : chatter.username}
+              className="p-2.5 hover:bg-[#16161D]/70 rounded-xl transition-colors flex items-center justify-between gap-3 group"
             >
               <div className="flex items-center gap-2.5 min-w-0">
                 {chatter.userAvatarUrl ? (
                   <img
                     src={chatter.userAvatarUrl}
                     alt={chatter.username}
-                    className="w-7 h-7 rounded-full object-cover border border-zinc-200 shrink-0"
+                    className="w-7 h-7 rounded-full object-cover border border-[#272733] shrink-0"
                   />
                 ) : (
-                  <div className="w-7 h-7 rounded-full bg-zinc-100 border border-zinc-200 flex items-center justify-center font-bold text-[11px] text-zinc-700 shrink-0 font-mono">
+                  <div className="w-7 h-7 rounded-full bg-[#1A1A22] border border-[#272733] flex items-center justify-center font-bold text-[11px] text-cyan-400 shrink-0 font-mono">
                     {chatter.username.charAt(0).toUpperCase()}
                   </div>
                 )}
 
                 <div className="min-w-0">
                   <div className="flex items-center gap-1.5">
-                    <span className="text-xs font-semibold text-zinc-950 truncate">
+                    <span className="text-xs font-semibold text-white truncate">
                       {chatter.username}
                     </span>
 
-                    {/* Role Badges */}
                     {chatter.isOwner && (
-                      <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-amber-50 text-amber-800 border border-amber-200 font-mono flex items-center gap-0.5">
-                        <RiVipCrownFill className="text-[10px]" /> HOST
+                      <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-rose-950/80 text-rose-300 border border-rose-600/50 font-mono flex items-center gap-0.5">
+                        <RiVipCrownFill className="text-[10px] text-rose-400" /> HOST
                       </span>
                     )}
                     {chatter.isModerator && (
-                      <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 font-mono flex items-center gap-0.5">
-                        <RiShieldCheckFill className="text-[10px]" /> MOD
+                      <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-indigo-950/80 text-indigo-300 border border-indigo-600/50 font-mono flex items-center gap-0.5">
+                        <RiShieldCheckFill className="text-[10px] text-indigo-400" /> MOD
                       </span>
                     )}
                     {chatter.isSponsor && (
-                      <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-rose-50 text-rose-800 border border-rose-200 font-mono flex items-center gap-0.5">
-                        <RiStarFill className="text-[10px]" /> MEMBER
+                      <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-emerald-950/80 text-emerald-300 border border-emerald-600/50 font-mono flex items-center gap-0.5">
+                        <RiStarFill className="text-[10px] text-emerald-400" /> MEMBER
                       </span>
                     )}
                   </div>
 
-                  <p className="text-[10px] text-zinc-400 font-mono">
-                    Active: {new Date(chatter.lastMessageAt).toLocaleTimeString('id-ID')}
+                  <p className="text-[10px] text-[#A0A0AC] font-mono">
+                    Aktif: {new Date(chatter.lastMessageAt).toLocaleTimeString('id-ID')}
                   </p>
                 </div>
               </div>
 
-              {/* Message Count Metric */}
               <div className="shrink-0 text-right">
-                <span className="font-mono text-[11px] font-bold text-zinc-700 bg-zinc-100/80 px-2 py-0.5 rounded-md border border-zinc-200">
+                <span className="font-mono text-[11px] font-bold text-cyan-400 bg-[#16161D] px-2 py-0.5 rounded-md border border-[#272733]">
                   {chatter.messageCount} msg
                 </span>
               </div>
@@ -138,4 +133,4 @@ export const ChattersList: React.FC<ChattersListProps> = ({ chatters, isLoading 
       </div>
     </div>
   );
-};
+}
