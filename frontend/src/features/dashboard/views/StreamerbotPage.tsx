@@ -17,7 +17,7 @@ export default function StreamerbotPage() {
   const [customArgs, setCustomArgs] = useState(
     '{\n  "donorName": "Budi_Santoso",\n  "amount": 50000,\n  "message": "Testing Streamer.bot Action"\n}'
   );
-  const [executionResult, setExecutionResult] = useState<any | null>(null);
+  const [executionResult, setExecutionResult] = useState<Record<string, unknown> | null>(null);
 
   // Real-time WebSocket connection state from backend
   const { botStatus: status } = useDashboardRealtime();
@@ -36,7 +36,7 @@ export default function StreamerbotPage() {
   });
 
   const triggerActionMutation = useMutation({
-    mutationFn: (variables: { action: string; args?: Record<string, any> }) =>
+    mutationFn: (variables: { action: string; args?: Record<string, unknown> }) =>
       dashboardService.triggerAction(variables.action, variables.args),
     onSuccess: (data) => {
       setExecutionResult({
@@ -45,11 +45,12 @@ export default function StreamerbotPage() {
         data,
       });
     },
-    onError: (err: any) => {
+    onError: (err: unknown) => {
+      const msg = err instanceof Error ? err.message : 'Execution failed';
       setExecutionResult({
         success: false,
         timestamp: new Date().toISOString(),
-        error: err.message || 'Execution failed',
+        error: msg,
       });
     },
   });
@@ -172,13 +173,13 @@ export default function StreamerbotPage() {
           <form onSubmit={handleCustomTrigger} className="space-y-3.5">
             <div>
               <label
-                htmlFor="custom-action-name"
+                htmlFor="action-name-input"
                 className="block text-xs font-bold text-zinc-800 mb-1.5 font-sans"
               >
                 Action Name or UUID
               </label>
               <input
-                id="custom-action-name"
+                id="action-name-input"
                 type="text"
                 required
                 value={customActionName}
@@ -188,11 +189,14 @@ export default function StreamerbotPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-zinc-800 mb-1.5 font-sans">
+              <label
+                htmlFor="action-args-input"
+                className="block text-xs font-bold text-zinc-800 mb-1.5 font-sans"
+              >
                 Arguments Payload (JSON)
               </label>
-              id="custom-action-args"
               <textarea
+                id="action-args-input"
                 rows={6}
                 value={customArgs}
                 onChange={(e) => setCustomArgs(e.target.value)}

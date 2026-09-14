@@ -130,7 +130,7 @@ export default function UserPortalPage() {
       errorCorrectionLevel: 'M',
       color: { dark: '#18181b', light: '#ffffff' },
     })
-      .then((url) => {
+      .then((url: string) => {
         if (!disposed) setQrImageUrl(url);
       })
       .catch(() => {

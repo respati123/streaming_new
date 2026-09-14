@@ -169,20 +169,36 @@ export default function OverlayPage() {
   useEffect(() => {
     if (initialChats.length > 0 && messages.length === 0) {
       const mappedChats: ChatOverlayMsg[] = [...initialChats].reverse().map((msg: any) => {
+        let parsedParts = msg.parts;
+        if (typeof parsedParts === 'string') {
+          try {
+            parsedParts = JSON.parse(parsedParts);
+          } catch {
+            parsedParts = [];
+          }
+        }
+        let parsedEmotes = msg.emotes;
+        if (typeof parsedEmotes === 'string') {
+          try {
+            parsedEmotes = JSON.parse(parsedEmotes);
+          } catch {
+            parsedEmotes = [];
+          }
+        }
         const prompt = getChatAiPrompt(msg.message || '');
         return {
-          id: msg.id,
+          id: msg.id || String(Math.random()),
           username: msg.user?.name || msg.username || 'Anonymous',
           youtubeHandle: msg.user?.youtubeHandle || null,
-          message: prompt || msg.message,
+          message: prompt || msg.message || '',
           isChatAiCommand: Boolean(prompt || msg.isChatAiCommand),
-          emotes: typeof msg.emotes === 'string' ? JSON.parse(msg.emotes) : msg.emotes || [],
-          parts: typeof msg.parts === 'string' ? JSON.parse(msg.parts) : msg.parts || [],
+          emotes: Array.isArray(parsedEmotes) ? (parsedEmotes as ChatEmote[]) : [],
+          parts: Array.isArray(parsedParts) ? (parsedParts as ChatPart[]) : [],
           avatarUrl: msg.user?.image || msg.userAvatarUrl || null,
-          isOwner: msg.isOwner || msg.user?.role === 'streamer' || msg.user?.role === 'owner',
-          isModerator: msg.isModerator || msg.user?.role === 'moderator',
-          isSponsor: msg.isSponsor || msg.user?.role === 'member' || msg.user?.role === 'sponsor',
-          isVerified: msg.isVerified || false,
+          isOwner: Boolean(msg.isOwner || msg.user?.role === 'streamer' || msg.user?.role === 'owner'),
+          isModerator: Boolean(msg.isModerator || msg.user?.role === 'moderator'),
+          isSponsor: Boolean(msg.isSponsor || msg.user?.role === 'member' || msg.user?.role === 'sponsor'),
+          isVerified: Boolean(msg.isVerified),
           tier: msg.user?.tier || msg.tier || 'bronze',
           timestamp: msg.publishedAt || new Date().toISOString(),
         };
@@ -195,39 +211,47 @@ export default function OverlayPage() {
   useEffect(() => {
     overlaySocket.connect();
 
-    const unsubChat = overlaySocket.on('chat:message', (payload: any) => {
+    const unsubChat = overlaySocket.on('chat:message', (rawPayload: unknown) => {
+      const payload = rawPayload as Record<string, unknown> | null;
       if (!payload) return;
-      const chatAiPrompt = payload.chatAiPrompt || getChatAiPrompt(payload.message || '');
+      const chatAiPrompt =
+        (payload.chatAiPrompt as string) || getChatAiPrompt(String(payload.message || ''));
       const newMsg: ChatOverlayMsg = {
-        id: payload.id || Date.now().toString(),
-        username: payload.user || payload.username || 'Anonymous',
-        youtubeHandle: payload.youtubeHandle || null,
-        message: chatAiPrompt || payload.message || '',
+        id: (payload.id as string) || Date.now().toString(),
+        username: (payload.user as string) || (payload.username as string) || 'Anonymous',
+        youtubeHandle: (payload.youtubeHandle as string) || null,
+        message: (chatAiPrompt as string) || (payload.message as string) || '',
         isChatAiCommand: Boolean(payload.isChatAiCommand || chatAiPrompt),
-        emotes: payload.emotes || [],
-        parts: payload.parts || [],
-        avatarUrl: payload.avatarUrl || payload.userAvatarUrl || null,
-        isOwner: payload.isOwner || payload.role === 'streamer' || payload.role === 'owner',
-        isModerator: payload.isModerator || payload.role === 'moderator',
-        isSponsor: payload.isSponsor || payload.role === 'member' || payload.role === 'sponsor',
-        isVerified: payload.isVerified || false,
-        tier: payload.tier || 'bronze',
-        timestamp: payload.timestamp || payload.publishedAt || new Date().toISOString(),
+        emotes: (payload.emotes as ChatEmote[]) || [],
+        parts: (payload.parts as ChatPart[]) || [],
+        avatarUrl: (payload.avatarUrl as string) || (payload.userAvatarUrl as string) || null,
+        isOwner: Boolean(
+          payload.isOwner || payload.role === 'streamer' || payload.role === 'owner'
+        ),
+        isModerator: Boolean(payload.isModerator || payload.role === 'moderator'),
+        isSponsor: Boolean(payload.role === 'member' || payload.role === 'sponsor'),
+        isVerified: Boolean(payload.isVerified),
+        tier: (payload.tier as string) || 'bronze',
+        timestamp:
+          (payload.timestamp as string) ||
+          (payload.publishedAt as string) ||
+          new Date().toISOString(),
       };
 
       setMessages((prev) => [...prev.slice(-12), newMsg]);
     });
 
-    const unsubAlert = overlaySocket.on('donation:alert', (payload: any) => {
+    const unsubAlert = overlaySocket.on('donation:alert', (rawPayload: unknown) => {
+      const payload = rawPayload as Record<string, unknown> | null;
       if (!payload) return;
       triggerAlert({
-        donorName: payload.donorName || 'Generous Supporter',
+        donorName: (payload.donorName as string) || 'Generous Supporter',
         amount: Number(payload.amount) || 10000,
-        currency: payload.currency || 'Rp',
-        message: payload.message || undefined,
-        gifUrl: payload.gifUrl || undefined,
-        template: payload.template || undefined,
-        durationMs: payload.durationMs || 8000,
+        currency: (payload.currency as string) || 'Rp',
+        message: (payload.message as string) || undefined,
+        gifUrl: (payload.gifUrl as string) || undefined,
+        template: (payload.template as AlertLayoutTemplate) || undefined,
+        durationMs: (payload.durationMs as number) || 8000,
       });
       // Refresh summary to update ticker metrics
       refetchSummary();
@@ -502,14 +526,14 @@ export default function OverlayPage() {
       {(widgetFilter === 'all' || widgetFilter === 'chat') && <NpcDialogueOverlay />}
 
       {(widgetFilter === 'all' || widgetFilter === 'chat') && (
-        <div className="absolute left-4 bottom-10 w-[420px] max-w-[calc(100vw-2rem)] max-h-[34vh] z-20 flex flex-col justify-end pointer-events-none space-y-2 overflow-hidden bg-transparent">
-          {messages.slice(-4).map((msg) => (
+        <div className="absolute left-4 bottom-4 w-[430px] max-w-[90vw] z-20 flex flex-col justify-end pointer-events-none space-y-2 overflow-hidden bg-transparent">
+          {messages.slice(-7).map((msg) => (
             <div
               key={msg.id}
-              className={`chat-bubble-enter rounded-xl p-2.5 text-sm backdrop-blur-sm shadow-md pointer-events-none flex items-start gap-2.5 will-change-transform ${
+              className={`chat-bubble-enter rounded-2xl p-2.5 text-sm backdrop-blur-md shadow-lg pointer-events-auto flex items-start gap-2.5 will-change-transform ${
                 msg.isChatAiCommand
-                  ? 'chat-ai-command-bubble bg-violet-950/70 border border-violet-300/55 shadow-[0_8px_24px_rgba(76,29,149,0.35)]'
-                  : 'bg-black/55 border border-white/12'
+                  ? 'chat-ai-command-bubble bg-violet-950/75 border border-violet-300/50 shadow-[0_8px_24px_rgba(76,29,149,0.35)]'
+                  : 'bg-black/35 border border-white/15'
               }`}
             >
               {/* Viewer Avatar */}
@@ -517,10 +541,10 @@ export default function OverlayPage() {
                 <img
                   src={msg.avatarUrl}
                   alt={msg.username}
-                  className="w-7 h-7 rounded-full object-cover border border-white/30 shrink-0 mt-0.5 shadow-sm"
+                  className="w-7 h-7 rounded-full object-cover border border-cyan-400/60 shrink-0 mt-0.5 shadow-sm"
                 />
               ) : (
-                <div className="w-7 h-7 rounded-full bg-black/50 border border-white/20 flex items-center justify-center shrink-0 mt-0.5 text-[11px] font-black text-zinc-200 shadow-sm">
+                <div className="w-7 h-7 rounded-full bg-black/50 border border-white/20 flex items-center justify-center shrink-0 mt-0.5 text-xs font-black text-zinc-200 shadow-sm">
                   {msg.username.charAt(0).toUpperCase()}
                 </div>
               )}
@@ -566,7 +590,7 @@ export default function OverlayPage() {
                         <RiShieldCheckFill className="text-[10px]" /> GOOGLE
                       </span>
                     )}
-                    <span className="font-black font-sans text-white truncate text-sm drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">
+                    <span className="font-black font-sans text-white truncate text-[13px] drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">
                       {msg.username}
                     </span>
                   </div>
@@ -585,8 +609,8 @@ export default function OverlayPage() {
                   parts={msg.isChatAiCommand ? undefined : msg.parts}
                   className={`${
                     msg.isChatAiCommand ? 'text-violet-50' : 'text-zinc-100'
-                  } text-sm leading-snug font-medium break-words whitespace-pre-wrap drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]`}
-                  emoteSizeClassName="inline-block h-5 w-5 mx-0.5 object-contain align-middle -mt-0.5 drop-shadow-sm"
+                  } text-[13px] leading-snug font-medium break-words drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)] select-text`}
+                  emoteSizeClassName="inline-block h-[22px] w-[22px] mx-0.5 object-contain align-middle -mt-0.5 drop-shadow-sm"
                 />
               </div>
             </div>

@@ -245,13 +245,45 @@ export class StreamsService {
    * Get message history for a stream session
    */
   async getStreamChats(streamId: string, limit = 100) {
-    return await db.query.chatMessages.findMany({
+    const rawChats = await db.query.chatMessages.findMany({
       where: eq(chatMessages.streamId, streamId),
       with: {
         user: true,
       },
       orderBy: [desc(chatMessages.publishedAt)],
       limit,
+    });
+
+    return rawChats.map((chat) => {
+      let parsedEmotes: unknown[] = [];
+      let parsedParts: unknown[] = [];
+
+      if (chat.emotes) {
+        try {
+          parsedEmotes = typeof chat.emotes === 'string' ? JSON.parse(chat.emotes) : chat.emotes;
+        } catch {
+          parsedEmotes = [];
+        }
+      }
+
+      if (chat.parts) {
+        try {
+          parsedParts = typeof chat.parts === 'string' ? JSON.parse(chat.parts) : chat.parts;
+        } catch {
+          parsedParts = [];
+        }
+      }
+
+      return {
+        ...chat,
+        username: chat.user?.name || 'Anonymous',
+        youtubeChannelId: chat.user?.youtubeChannelId || null,
+        userAvatarUrl: chat.user?.image || null,
+        tier: chat.user?.tier || 'bronze',
+        points: chat.user?.points || 0,
+        emotes: Array.isArray(parsedEmotes) ? parsedEmotes : [],
+        parts: Array.isArray(parsedParts) ? parsedParts : [],
+      };
     });
   }
 

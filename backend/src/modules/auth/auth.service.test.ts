@@ -30,6 +30,7 @@ describe('AuthService Unit Tests', () => {
         mockUsers.push(user);
         return user;
       },
+      saveRefreshToken: async () => {},
     };
 
     const service = new AuthService(mockRepo as AuthRepository);
@@ -67,6 +68,7 @@ describe('AuthService Unit Tests', () => {
 
     const mockRepo: Partial<AuthRepository> = {
       findByEmail: async (email) => (email === existingUser.email ? existingUser : undefined),
+      saveRefreshToken: async () => {},
     };
 
     const service = new AuthService(mockRepo as AuthRepository);

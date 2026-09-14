@@ -19,29 +19,59 @@ export interface ChatPart {
 
 interface EmoteMessageRendererProps {
   message: string;
-  emotes?: ChatEmote[] | null;
-  parts?: ChatPart[] | null;
+  emotes?: ChatEmote[] | string | unknown[] | null;
+  parts?: ChatPart[] | string | unknown[] | null;
   className?: string;
   emoteSizeClassName?: string;
 }
 
 export const EmoteMessageRenderer: React.FC<EmoteMessageRendererProps> = ({
-  message,
+  message = '',
   emotes,
   parts,
   className = 'text-zinc-100 text-[11px] leading-snug font-sans break-words select-text',
   emoteSizeClassName = 'inline-block h-[20px] w-[20px] mx-0.5 object-contain align-middle -mt-0.5 drop-shadow-sm',
 }) => {
-  // 1. If Streamer.bot provided rich 'parts', render parts directly
-  if (parts && parts.length > 0) {
+  const safeMessage = typeof message === 'string' ? message : String(message ?? '');
+
+  // 1. Safely resolve 'parts' (handles stringified JSON, non-array, null, etc.)
+  let safeParts: ChatPart[] = [];
+  if (Array.isArray(parts)) {
+    safeParts = parts as ChatPart[];
+  } else if (typeof parts === 'string' && parts.trim().startsWith('[')) {
+    try {
+      const parsed = JSON.parse(parts);
+      if (Array.isArray(parsed)) safeParts = parsed as ChatPart[];
+    } catch {
+      safeParts = [];
+    }
+  }
+
+  // 2. Safely resolve 'emotes' (handles stringified JSON, non-array, null, etc.)
+  let safeEmotes: ChatEmote[] = [];
+  if (Array.isArray(emotes)) {
+    safeEmotes = emotes as ChatEmote[];
+  } else if (typeof emotes === 'string' && emotes.trim().startsWith('[')) {
+    try {
+      const parsed = JSON.parse(emotes);
+      if (Array.isArray(parsed)) safeEmotes = parsed as ChatEmote[];
+    } catch {
+      safeEmotes = [];
+    }
+  }
+
+  // If Streamer.bot provided rich 'parts', render parts directly
+  if (safeParts.length > 0) {
     return (
       <p className={className}>
-        {parts.map((part) => {
+        {safeParts.map((part, idx) => {
+          if (!part || typeof part !== 'object') return null;
           const imgSrc = part.image;
+          const keyId = `${part.text || part.emoji || part.image || 'part'}-${part.startIndex ?? idx}`;
           if (imgSrc) {
             return (
               <img
-                key={`part-${part.image || part.text || part.emoji || 'empty'}`}
+                key={keyId}
                 src={imgSrc}
                 alt={part.emoji || part.text || 'emote'}
                 title={part.emoji || part.text || ''}
@@ -51,20 +81,17 @@ export const EmoteMessageRenderer: React.FC<EmoteMessageRendererProps> = ({
               />
             );
           }
-          return (
-            <span key={`part-txt-${part.text || part.emoji || 'empty'}`}>
-              {part.text || part.emoji || ''}
-            </span>
-          );
+          return <span key={keyId}>{part.text || part.emoji || ''}</span>;
         })}
       </p>
     );
   }
 
-  // 2. If 'emotes' array is provided, parse text and replace emote tokens
-  if (emotes && emotes.length > 0) {
+  // If 'emotes' array is provided, parse text and replace emote tokens
+  if (safeEmotes.length > 0) {
     const emoteMap = new Map<string, string>();
-    for (const em of emotes) {
+    for (const em of safeEmotes) {
+      if (!em || typeof em !== 'object') continue;
       const img = em.imageUrl || em.url;
       if (em.name && img) {
         emoteMap.set(em.name, img);
@@ -78,26 +105,30 @@ export const EmoteMessageRenderer: React.FC<EmoteMessageRendererProps> = ({
           .join('|')})`,
         'g'
       );
-      const tokens = message.split(regexPattern);
+      const rawTokens = safeMessage.split(regexPattern);
+      const tokenItems = rawTokens.map((tok, i) => ({
+        id: `tkn-${tok}-${i}`,
+        text: tok,
+      }));
 
       return (
         <p className={className}>
-          {tokens.map((token) => {
-            const emoteImg = emoteMap.get(token);
+          {tokenItems.map((item) => {
+            const emoteImg = emoteMap.get(item.text);
             if (emoteImg) {
               return (
                 <img
-                  key={`token-${token}`}
+                  key={item.id}
                   src={emoteImg}
-                  alt={token}
-                  title={token}
+                  alt={item.text}
+                  title={item.text}
                   className={emoteSizeClassName}
                   loading="lazy"
                   crossOrigin="anonymous"
                 />
               );
             }
-            return <span key={`txt-${token}`}>{token}</span>;
+            return <span key={item.id}>{item.text}</span>;
           })}
         </p>
       );
@@ -105,5 +136,5 @@ export const EmoteMessageRenderer: React.FC<EmoteMessageRendererProps> = ({
   }
 
   // 3. Plain text fallback
-  return <p className={className}>{message}</p>;
+  return <p className={className}>{safeMessage}</p>;
 };

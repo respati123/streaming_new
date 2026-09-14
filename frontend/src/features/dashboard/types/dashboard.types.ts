@@ -94,7 +94,6 @@ export interface ActionItem {
   color: string;
   isEnabled: boolean;
 }
-
 export interface ChatAiInteractionSummary {
   id: string;
   viewerName: string;
@@ -127,3 +126,4 @@ export interface ChatAiProgressEvent extends ChatAiInteractionSummary {
   phase: NonNullable<ChatAiInteractionSummary['phase']>;
   maxAttempts: number;
 }
+

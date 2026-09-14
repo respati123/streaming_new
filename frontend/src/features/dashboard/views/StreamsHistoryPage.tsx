@@ -536,12 +536,8 @@ export default function StreamsHistoryPage() {
                         <div className="mt-1">
                           <EmoteMessageRenderer
                             message={msg.message}
-                            emotes={
-                              typeof msg.emotes === 'string' ? JSON.parse(msg.emotes) : msg.emotes
-                            }
-                            parts={
-                              typeof msg.parts === 'string' ? JSON.parse(msg.parts) : msg.parts
-                            }
+                            emotes={msg.emotes}
+                            parts={msg.parts}
                             className="text-xs text-zinc-800 leading-relaxed font-sans break-words select-text"
                           />
                         </div>

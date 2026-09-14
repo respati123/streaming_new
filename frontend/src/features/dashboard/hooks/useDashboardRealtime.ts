@@ -12,15 +12,13 @@ export function useDashboardRealtime(
 ) {
   const [connectionState, setConnectionState] = useState<ConnectionState>('DISCONNECTED');
   const [botStatus, setBotStatus] = useState<StreamerbotStatus | null>(null);
-  const [lastAlert, setLastAlert] = useState<any | null>(null);
-  const [lastActionResult, setLastActionResult] = useState<any | null>(null);
+  const [lastAlert, setLastAlert] = useState<Record<string, unknown> | null>(null);
+  const [lastActionResult, setLastActionResult] = useState<Record<string, unknown> | null>(null);
 
   useEffect(() => {
-    // 1. Initiate WebSocket Connection
     dashboardSocket.connect();
     setConnectionState(dashboardSocket.getState());
 
-    // 2. Event Listeners
     const unsubState = dashboardSocket.on<ConnectionState>('connection:state', (state) => {
       setConnectionState(state);
     });
@@ -63,11 +61,11 @@ export function useDashboardRealtime(
     );
 
     const unsubAlert = dashboardSocket.on('donation:alert', (data) => {
-      setLastAlert(data);
+      setLastAlert(data as Record<string, unknown>);
     });
 
     const unsubActionResult = dashboardSocket.on('action:result', (data) => {
-      setLastActionResult(data);
+      setLastActionResult(data as Record<string, unknown>);
     });
 
     return () => {
@@ -81,7 +79,6 @@ export function useDashboardRealtime(
     };
   }, [onChatAiProgress, onNewChat]);
 
-  // Direct Sender Helpers
   const sendChatMessage = useCallback((message: string, username = 'Streamer Host') => {
     return dashboardSocket.send('chat:send', {
       message,
@@ -91,7 +88,7 @@ export function useDashboardRealtime(
     });
   }, []);
 
-  const triggerAction = useCallback((action: string, args: Record<string, any> = {}) => {
+  const triggerAction = useCallback((action: string, args: Record<string, unknown> = {}) => {
     return dashboardSocket.send('action:trigger', { action, args });
   }, []);
 
@@ -101,16 +98,14 @@ export function useDashboardRealtime(
         ...alert,
         currency: alert.currency || 'IDR',
         source: 'dashboard_ws',
-        timestamp: new Date().toISOString(),
       });
     },
     []
   );
 
   return {
-    isSocketConnected: connectionState === 'CONNECTED',
-    isSSEConnected: connectionState === 'CONNECTED', // backward compatibility
     connectionState,
+    isSocketConnected: connectionState === 'CONNECTED',
     botStatus,
     lastAlert,
     lastActionResult,

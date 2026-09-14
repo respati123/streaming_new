@@ -70,7 +70,7 @@ export const Heading = forwardRef(
       children,
       ...props
     }: HeadingProps<E>,
-    ref: React.Ref<any>
+    ref: React.Ref<Element>
   ) => {
     // Default semantic element based on level or variant
     const Component = as || level || 'h1';
@@ -79,7 +79,7 @@ export const Heading = forwardRef(
 
     return (
       <Component
-        ref={ref}
+        ref={ref as never}
         className={cn(
           headingVariantStyles[computedVariant],
           colorStyles[color],
@@ -94,7 +94,7 @@ export const Heading = forwardRef(
     );
   }
 ) as <E extends React.ElementType = 'h1'>(
-  props: HeadingProps<E> & { ref?: React.Ref<any> }
+  props: HeadingProps<E> & { ref?: React.Ref<Element> }
 ) => React.ReactElement;
 
 /**
@@ -113,7 +113,7 @@ export const Text = forwardRef(
       children,
       ...props
     }: TextProps<E>,
-    ref: React.Ref<any>
+    ref: React.Ref<Element>
   ) => {
     const Component = as || (variant === 'meta' || variant === 'mono-sm' ? 'span' : 'p');
     // Default color strategy based on variant
@@ -122,7 +122,7 @@ export const Text = forwardRef(
 
     return (
       <Component
-        ref={ref}
+        ref={ref as never}
         className={cn(
           textVariantStyles[variant],
           colorStyles[resolvedColor],
@@ -137,7 +137,7 @@ export const Text = forwardRef(
     );
   }
 ) as <E extends React.ElementType = 'p'>(
-  props: TextProps<E> & { ref?: React.Ref<any> }
+  props: TextProps<E> & { ref?: React.Ref<Element> }
 ) => React.ReactElement;
 
 /**
@@ -153,7 +153,7 @@ export const Code = forwardRef<HTMLElement, CodeProps>(
             'p-3.5 bg-zinc-900 text-zinc-100 border border-zinc-800 rounded-xl text-xs font-mono overflow-x-auto leading-relaxed',
             className
           )}
-          {...(props as any)}
+          {...(props as React.HTMLAttributes<HTMLPreElement>)}
         >
           <code>{children}</code>
         </pre>

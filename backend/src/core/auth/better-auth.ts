@@ -1,5 +1,4 @@
 import { drizzleAdapter } from '@better-auth/drizzle-adapter';
-import { dash } from '@better-auth/infra';
 import { env } from '@core/config/env';
 import { db } from '@core/database';
 import * as schema from '@core/database/schema';
@@ -26,7 +25,6 @@ export const auth = betterAuth({
     env.FRONTEND_URL,
     env.BETTER_AUTH_URL,
   ],
-  plugins: [dash()],
   socialProviders: {
     google: {
       clientId: env.GOOGLE_CLIENT_ID || 'dummy-google-client-id.apps.googleusercontent.com',

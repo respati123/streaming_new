@@ -1,3 +1,4 @@
+import { env } from '@core/config/env';
 import { describe, expect, it } from 'bun:test';
 import { StreamerbotService } from './streamerbot.service';
 
@@ -7,8 +8,8 @@ describe('StreamerbotService Unit Tests', () => {
     const status = service.getStatus();
 
     expect(status.status).toBe('DISCONNECTED');
-    expect(status.host).toBe('127.0.0.1');
-    expect(status.port).toBe(8086);
+    expect(status.host).toBe(env.STREAMERBOT_HOST || '127.0.0.1');
+    expect(status.port).toBe(env.STREAMERBOT_PORT || 8086);
     expect(status.lastConnectedAt).toBeNull();
   });
 

@@ -10,7 +10,6 @@ import type {
 } from '../types/dashboard.types';
 
 export const dashboardService = {
-  // Streams
   async getActiveStream(): Promise<StreamSession> {
     const res = await apiClient.get<{ data: StreamSession }>('/streams/active');
     return res.data.data;
@@ -34,14 +33,14 @@ export const dashboardService = {
     return res.data.data;
   },
 
-  async getStreamChats(streamId: string = 'active', limit: number = 20): Promise<ChatMessage[]> {
+  async getStreamChats(streamId = 'active', limit = 20): Promise<ChatMessage[]> {
     const res = await apiClient.get<{ data: ChatMessage[] }>(
       `/streams/${streamId}/chats?limit=${limit}`
     );
     return res.data.data;
   },
 
-  async getChatAiInteractions(limit: number = 10): Promise<ChatAiInteractionSummary[]> {
+  async getChatAiInteractions(limit = 10): Promise<ChatAiInteractionSummary[]> {
     const res = await apiClient.get<{ data: ChatAiInteractionSummary[] }>(
       `/ai/interactions?limit=${limit}`
     );
@@ -68,7 +67,6 @@ export const dashboardService = {
     return res.data;
   },
 
-  // Streamer.bot
   async getStreamerbotStatus(): Promise<StreamerbotStatus> {
     const res = await apiClient.get<{ data: StreamerbotStatus }>('/streamerbot/status');
     return res.data.data;
@@ -79,14 +77,14 @@ export const dashboardService = {
     return res.data.data;
   },
 
-  async getActions(): Promise<{ liveActions: any[]; savedDeckActions: ActionItem[] }> {
+  async getActions(): Promise<{ liveActions: unknown[]; savedDeckActions: ActionItem[] }> {
     const res = await apiClient.get<{
-      data: { liveActions: any[]; savedDeckActions: ActionItem[] };
+      data: { liveActions: unknown[]; savedDeckActions: ActionItem[] };
     }>('/streamerbot/actions');
     return res.data.data;
   },
 
-  async triggerAction(action: string, args: Record<string, any> = {}) {
+  async triggerAction(action: string, args: Record<string, unknown> = {}) {
     const res = await apiClient.post('/streamerbot/actions/trigger', { action, args });
     return res.data;
   },
