@@ -26,9 +26,54 @@ const envSchema = z.object({
     .default('false'),
   STREAMERBOT_SCHEME: z.string().default('ws'),
   STREAMERBOT_HOST: z.string().default('127.0.0.1'),
-  STREAMERBOT_PORT: z.coerce.number().default(8080),
-  STREAMERBOT_ENDPOINT: z.string().default('/websocket'),
+  STREAMERBOT_PORT: z.coerce.number().default(8086),
+  STREAMERBOT_ENDPOINT: z.string().default('/'),
   STREAMERBOT_PASSWORD: z.string().optional(),
+
+  // AI Integrations
+  ELEVENLABS_ENABLED: z
+    .string()
+    .transform((val) => val === 'true')
+    .default('false'),
+  ELEVENLABS_API_KEY: z.string().optional(),
+  ELEVENLABS_VOICE_ID: z.string().default('JBFqnCBsd6RMkjVDRZzb'),
+  ELEVENLABS_VIEWER_VOICE_ID: z.string().default('JBFqnCBsd6RMkjVDRZzb'),
+  ELEVENLABS_AI_VOICE_ID: z.string().default('JBFqnCBsd6RMkjVDRZzb'),
+  ELEVENLABS_MODEL_ID: z.string().default('eleven_flash_v2_5'),
+  ELEVENLABS_OUTPUT_FORMAT: z.string().default('mp3_44100_128'),
+  ELEVENLABS_OPTIMIZE_STREAMING_LATENCY: z.coerce.number().min(0).max(4).default(3),
+  PI_ENABLED: z
+    .string()
+    .transform((val) => val === 'true')
+    .default('false'),
+  PI_PROVIDER: z.string().default('zai'),
+  PI_MODEL: z.string().default('glm-5.3'),
+  PI_AUTH_PATH: z.string().optional(),
+  PI_WEB_SEARCH_ENABLED: z
+    .string()
+    .transform((val) => val === 'true')
+    .default('false'),
+  PI_WEB_SEARCH_URL: z.string().url().default('https://api.z.ai/api/mcp/web_search_prime/mcp'),
+  PI_MAX_REPLY_CHARS: z.coerce.number().int().min(80).max(300).default(180),
+  PI_SYSTEM_PROMPT: z
+    .string()
+    .default(
+      'Kamu adalah Stream Oracle untuk live publik berbahasa Indonesia. Jawab maksimal dua kalimat, natural, dan ramah. Tolak singkat konten seksual eksplisit, kebencian, kekerasan, doxxing, aktivitas ilegal, atau instruksi berbahaya. Jangan mengklaim dapat memakai tool, terminal, file, atau perangkat.'
+    ),
+  PAKASIR_ENABLED: z
+    .string()
+    .transform((val) => val === 'true')
+    .default('false'),
+  PAKASIR_PROJECT_SLUG: z.string().optional(),
+  PAKASIR_API_KEY: z.string().optional(),
+  REDIS_URL: z.string().default('redis://127.0.0.1:6379'),
+  CHATAI_ENABLED: z
+    .string()
+    .transform((val) => val === 'true')
+    .default('false'),
+  CHATAI_COOLDOWN_SECONDS: z.coerce.number().int().min(0).max(300).default(0),
+  CHATAI_AUDIO_DIR: z.string().default('./storage/chatai'),
+  CHATAI_MEDIA_BASE_URL: z.string().url().default('http://localhost:4000'),
 
   // Google OAuth & Better Auth Configuration
   BETTER_AUTH_API_KEY: z.string().optional().default('ba_mrgchyx7eet6z35es2h7f3ag8i2c9va3'),

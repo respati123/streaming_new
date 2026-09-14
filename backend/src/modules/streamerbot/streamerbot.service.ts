@@ -1,8 +1,13 @@
 import { EventEmitter } from 'node:events';
 import { env } from '@core/config/env';
 import { logger } from '@core/logger/logger';
+import { parseChatAiPrompt } from '@modules/ai/chat-ai.command';
 import { StreamerbotClient } from '@streamerbot/client';
-import type { DonationAlertEventData, StreamerbotConnectionStatus } from './streamerbot.types';
+import type {
+  DonationAlertEventData,
+  LiveChatEventData,
+  StreamerbotConnectionStatus,
+} from './streamerbot.types';
 
 export class StreamerbotService extends EventEmitter {
   private client: StreamerbotClient | null = null;
@@ -18,8 +23,8 @@ export class StreamerbotService extends EventEmitter {
     super();
     let rawHost = env.STREAMERBOT_HOST;
     let scheme = env.STREAMERBOT_SCHEME || 'ws';
-    let port = env.STREAMERBOT_PORT || 8080;
-    let endpoint = env.STREAMERBOT_ENDPOINT || '/websocket';
+    let port = env.STREAMERBOT_PORT || 8086;
+    let endpoint = env.STREAMERBOT_ENDPOINT || '/';
 
     // Auto-detect and parse full URLs (such as ngrok HTTPS/WSS URLs)
     if (rawHost.includes('://')) {
@@ -30,14 +35,14 @@ export class StreamerbotService extends EventEmitter {
             ? 'wss'
             : 'ws';
         rawHost = parsedUrl.hostname;
-        port = parsedUrl.port ? Number(parsedUrl.port) : scheme === 'wss' ? 443 : 8080;
+        port = parsedUrl.port ? Number(parsedUrl.port) : scheme === 'wss' ? 443 : 8086;
         if (parsedUrl.pathname && parsedUrl.pathname !== '/') {
           endpoint = parsedUrl.pathname;
         }
       } catch {}
     } else if (rawHost.includes('ngrok')) {
       scheme = 'wss';
-      if (port === 8080) port = 443;
+      if (port === 8086) port = 443;
     }
 
     this.host = rawHost;
@@ -208,7 +213,7 @@ export class StreamerbotService extends EventEmitter {
         const { pointsService } = await import('@modules/points/points.service');
         const userProfile = await pointsService.getUserProfile(result.user.id);
 
-        this.emit('chat:message', {
+        this.publishChatMessage({
           id: result.message.id,
           streamId: result.stream.id,
           user: result.user.name,
@@ -324,6 +329,27 @@ export class StreamerbotService extends EventEmitter {
     });
 
     return result.success;
+  }
+
+  public publishChatMessage(data: LiveChatEventData): void {
+    const prompt = parseChatAiPrompt(data.message);
+    if (!prompt) {
+      this.emit('chat:message', data);
+      return;
+    }
+
+    this.emit('chat:message', {
+      ...data,
+      isChatAiCommand: true,
+      chatAiPrompt: prompt,
+    });
+
+    logger.info('[ChatAi] Command received', {
+      chatId: data.id,
+      streamId: data.streamId,
+      userId: data.userId,
+    });
+    this.emit('chatai:request', { ...data, prompt });
   }
 
   /**

@@ -119,8 +119,7 @@ streamsController.post('/test-chat', zValidator('json', incomingChatMessageSchem
   const body = c.req.valid('json');
   const result = await streamsService.ingestChatMessage(body);
 
-  // Emit live event to SSE for real-time frontend update
-  streamerbotService.emit('chat:message', {
+  streamerbotService.publishChatMessage({
     id: result.message.id,
     streamId: result.stream.id,
     user: result.user.name,
@@ -131,6 +130,7 @@ streamsController.post('/test-chat', zValidator('json', incomingChatMessageSchem
     isOwner: result.message.isOwner,
     isModerator: result.message.isModerator,
     isSponsor: result.message.isSponsor,
+    isVerified: result.message.isVerified,
     timestamp: result.message.publishedAt,
   });
 

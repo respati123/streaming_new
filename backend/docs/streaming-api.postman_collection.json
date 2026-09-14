@@ -1,0 +1,186 @@
+{
+  "info": {
+    "name": "Streaming Backend",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:4000"
+    },
+    {
+      "key": "audioFile",
+      "value": "replace-with-a-chatai-audio-key.mp3"
+    },
+    {
+      "key": "orderId",
+      "value": "replace-with-qris-order-id"
+    }
+  ],
+  "item": [
+    {
+      "name": "List recent ChatAI interactions",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/v1/ai/interactions?limit=10"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('returns interaction history', () => { pm.response.to.have.status(200); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "ChatAI interactions missing route",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/v1/ai/interactions/missing"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('returns not found', () => { pm.response.to.have.status(404); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Get ChatAI audio",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/media/chatai/{{audioFile}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('returns MP3', () => {", 
+              "  pm.response.to.have.status(200);",
+              "  pm.expect(pm.response.headers.get('Content-Type')).to.include('audio/mpeg');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reject invalid ChatAI audio key",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/media/chatai/not-an-audio-file.mp3"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('returns not found', () => { pm.response.to.have.status(404); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Create Pakasir QRIS donation",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"amount\": 10000,\n  \"donorName\": \"Test Viewer\",\n  \"message\": \"Semangat live!\",\n  \"template\": \"fire-glass\"\n}"
+        },
+        "url": "{{baseUrl}}/api/v1/donations/qris"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('creates QRIS transaction', () => {",
+              "  pm.response.to.have.status(201);",
+              "  const json = pm.response.json();",
+              "  pm.expect(json.data.orderId).to.be.a('string');",
+              "  pm.collectionVariables.set('orderId', json.data.orderId);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reject invalid Pakasir QRIS donation",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"amount\": 1000,\n  \"donorName\": \"Test Viewer\"\n}"
+        },
+        "url": "{{baseUrl}}/api/v1/donations/qris"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('rejects amount below minimum', () => { pm.response.to.have.status(400); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Get Pakasir QRIS donation status",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/v1/donations/qris/{{orderId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('returns QRIS status', () => { pm.response.to.have.status(200); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reject unknown Pakasir QRIS donation",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/v1/donations/qris/unknown-order-id"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('returns unknown transaction', () => { pm.response.to.have.status(404); });"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

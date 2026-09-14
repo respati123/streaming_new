@@ -1,6 +1,7 @@
 import { apiClient } from '@core/http/api-client';
 import type {
   ActionItem,
+  ChatAiInteractionSummary,
   ChatMessage,
   Chatter,
   OverlaySummary,
@@ -35,6 +36,13 @@ export const dashboardService = {
   async getStreamChats(streamId = 'active', limit = 20): Promise<ChatMessage[]> {
     const res = await apiClient.get<{ data: ChatMessage[] }>(
       `/streams/${streamId}/chats?limit=${limit}`
+    );
+    return res.data.data;
+  },
+
+  async getChatAiInteractions(limit = 10): Promise<ChatAiInteractionSummary[]> {
+    const res = await apiClient.get<{ data: ChatAiInteractionSummary[] }>(
+      `/ai/interactions?limit=${limit}`
     );
     return res.data.data;
   },

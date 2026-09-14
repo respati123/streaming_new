@@ -1,6 +1,7 @@
 import { signIn, signOut, useSession } from '@core/auth/authClient';
 import { overlaySocket } from '@core/ws/socketClient';
-import { useState } from 'react';
+import QRCode from 'qrcode';
+import { useEffect, useState } from 'react';
 import {
   RiChat1Line,
   RiCoinLine,
@@ -19,6 +20,20 @@ import {
   RiYoutubeFill,
 } from 'react-icons/ri';
 import { Link } from 'react-router-dom';
+import { type DonationPaymentStatus, donationService } from '../services/donationService';
+
+interface ViewerProfile {
+  id?: string;
+  name?: string;
+  email?: string;
+  image?: string | null;
+  youtubeHandle?: string | null;
+  youtubeChannelTitle?: string | null;
+  tier?: string | null;
+  points?: number;
+  totalChatCount?: number;
+  totalDonationAmount?: number;
+}
 
 export default function UserPortalPage() {
   const { data: session, isPending } = useSession();
@@ -31,9 +46,13 @@ export default function UserPortalPage() {
   const [selectedTemplate, setSelectedTemplate] = useState<'electric-lightning' | 'fire-glass'>(
     'electric-lightning'
   );
-  const [donationSentNotice, setDonationSentNotice] = useState(false);
+  const [donationPayment, setDonationPayment] = useState<DonationPaymentStatus | null>(null);
+  const [qrImageUrl, setQrImageUrl] = useState<string | null>(null);
+  const [paymentError, setPaymentError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
+  const viewerProfile = session?.user as ViewerProfile | undefined;
+  const pendingOrderId = donationPayment?.status === 'pending' ? donationPayment.orderId : null;
 
   // Handle Google OAuth Sign In
   const handleGoogleLogin = async () => {
@@ -42,7 +61,7 @@ export default function UserPortalPage() {
       setLoginError(null);
       const res = await signIn.social({
         provider: 'google',
-        callbackURL: window.location.origin + '/user',
+        callbackURL: `${window.location.origin}/user`,
       });
       if (res?.error) {
         setLoginError(res.error.message || 'Gagal memulai autentikasi Google');
@@ -50,8 +69,9 @@ export default function UserPortalPage() {
       }
     } catch (error: unknown) {
       console.error('Google Sign In failed:', error);
-      const msg = error instanceof Error ? error.message : 'Gagal menghubungi server Better Auth';
-      setLoginError(msg);
+      setLoginError(
+        error instanceof Error ? error.message : 'Gagal menghubungi server Better Auth'
+      );
       setIsSubmitting(false);
     }
   };
@@ -76,15 +96,15 @@ export default function UserPortalPage() {
     e.preventDefault();
     if (!chatInput.trim()) return;
 
-    const userObj = session?.user as Record<string, unknown> | undefined;
-    const displayName = (userObj?.youtubeHandle as string) || userObj?.name || 'Google Viewer';
-    const avatarUrl = (userObj?.image as string) || null;
+    const userObj = viewerProfile;
+    const displayName = userObj?.youtubeHandle || userObj?.name || 'Google Viewer';
+    const avatarUrl = userObj?.image || null;
 
     overlaySocket.send('chat:send', {
-      userId: userObj?.id as string,
+      userId: userObj?.id,
       message: chatInput.trim(),
       username: displayName,
-      youtubeHandle: userObj?.youtubeHandle as string,
+      youtubeHandle: userObj?.youtubeHandle,
       userAvatarUrl: avatarUrl,
       isOwner: false,
       isModerator: false,
@@ -97,27 +117,82 @@ export default function UserPortalPage() {
     setTimeout(() => setChatSentNotice(false), 3000);
   };
 
-  // Handle Triggering Live Donation Alert
-  const handleSendDonation = (e: React.FormEvent) => {
+  useEffect(() => {
+    if (!donationPayment?.qrString) {
+      setQrImageUrl(null);
+      return;
+    }
+
+    let disposed = false;
+    QRCode.toDataURL(donationPayment.qrString, {
+      width: 280,
+      margin: 2,
+      errorCorrectionLevel: 'M',
+      color: { dark: '#18181b', light: '#ffffff' },
+    })
+      .then((url: string) => {
+        if (!disposed) setQrImageUrl(url);
+      })
+      .catch(() => {
+        if (!disposed)
+          setPaymentError('QRIS gagal ditampilkan. Gunakan tombol halaman pembayaran.');
+      });
+
+    return () => {
+      disposed = true;
+    };
+  }, [donationPayment?.qrString]);
+
+  useEffect(() => {
+    if (!pendingOrderId) return;
+    let disposed = false;
+    let timer: number | undefined;
+
+    const poll = async () => {
+      try {
+        const next = await donationService.getPaymentStatus(pendingOrderId);
+        if (disposed) return;
+        setDonationPayment(next);
+        if (next.status === 'pending') timer = window.setTimeout(poll, 3000);
+      } catch (error) {
+        if (!disposed) {
+          setPaymentError(error instanceof Error ? error.message : 'Gagal mengecek status QRIS.');
+          timer = window.setTimeout(poll, 5000);
+        }
+      }
+    };
+
+    timer = window.setTimeout(poll, 3000);
+    return () => {
+      disposed = true;
+      if (timer) window.clearTimeout(timer);
+    };
+  }, [pendingOrderId]);
+
+  // Create a real QRIS transaction; the donation alert is emitted after payment confirmation.
+  const handleSendDonation = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (donorAmount <= 0) return;
+    if (donorAmount < 5000 || isSubmitting) return;
 
-    const userObj = session?.user as Record<string, unknown> | undefined;
-    const donorName = (userObj?.youtubeHandle as string) || userObj?.name || 'Google Supporter';
-
-    overlaySocket.send('alert:trigger', {
-      id: `don_${Date.now()}`,
-      userId: userObj?.id as string,
-      donorName: donorName,
-      amount: donorAmount,
-      currency: 'Rp',
-      message: donorMessage,
-      template: selectedTemplate,
-      durationSec: 8,
-    });
-
-    setDonationSentNotice(true);
-    setTimeout(() => setDonationSentNotice(false), 4000);
+    const userObj = viewerProfile;
+    const donorName = userObj?.youtubeHandle || userObj?.name || 'Google Supporter';
+    setIsSubmitting(true);
+    setPaymentError(null);
+    setDonationPayment(null);
+    try {
+      const payment = await donationService.createQrPayment({
+        amount: donorAmount,
+        donorName,
+        donorEmail: userObj?.email || undefined,
+        message: donorMessage,
+        template: selectedTemplate,
+      });
+      setDonationPayment(payment);
+    } catch (error) {
+      setPaymentError(error instanceof Error ? error.message : 'Gagal membuat transaksi QRIS.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -240,15 +315,12 @@ export default function UserPortalPage() {
                 <div>
                   <div className="flex items-center gap-2.5 flex-wrap">
                     <h1 className="text-2xl font-black text-white tracking-tight">
-                      {((session.user as Record<string, unknown>)?.youtubeChannelTitle as string) ||
-                        session.user.name}
+                      {viewerProfile?.youtubeChannelTitle || session.user.name}
                     </h1>
-                    {Boolean((session.user as Record<string, unknown>)?.youtubeHandle) && (
+                    {viewerProfile?.youtubeHandle && (
                       <span className="px-2.5 py-0.5 rounded-full bg-red-600/20 text-red-300 border border-red-500/40 text-xs font-mono font-bold flex items-center gap-1 shadow-xs">
                         <RiYoutubeFill className="text-red-500" />
-                        <span>
-                          {(session.user as Record<string, unknown>)?.youtubeHandle as string}
-                        </span>
+                        <span>{viewerProfile.youtubeHandle}</span>
                       </span>
                     )}
                     <span className="px-2.5 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-400/30 text-xs font-mono font-bold flex items-center gap-1">
@@ -258,8 +330,7 @@ export default function UserPortalPage() {
                     <span className="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/30 text-xs font-mono font-bold flex items-center gap-1">
                       <RiVipCrownFill className="text-amber-400" />
                       <span className="uppercase font-mono">
-                        Tier:{' '}
-                        {((session.user as Record<string, unknown>)?.tier as string) || 'Bronze'}
+                        Tier: {viewerProfile?.tier || 'Bronze'}
                       </span>
                     </span>
                   </div>
@@ -270,23 +341,19 @@ export default function UserPortalPage() {
                     <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-zinc-800/80 border border-zinc-700/80 text-amber-300 font-bold">
                       <RiSparklingFill className="text-amber-400" />
                       <span>
-                        {Number((session.user as any)?.points || 0).toLocaleString('id-ID')} Loyalty
-                        PTS
+                        {Number(viewerProfile?.points || 0).toLocaleString('id-ID')} Loyalty PTS
                       </span>
                     </div>
                     <span className="text-zinc-500">
                       Chats:{' '}
                       <strong className="text-zinc-300">
-                        {(session.user as any)?.totalChatCount || 0}
+                        {viewerProfile?.totalChatCount || 0}
                       </strong>
                     </span>
                     <span className="text-zinc-500">
                       Total Sawer:{' '}
                       <strong className="text-emerald-400">
-                        Rp{' '}
-                        {Number((session.user as any)?.totalDonationAmount || 0).toLocaleString(
-                          'id-ID'
-                        )}
+                        Rp {Number(viewerProfile?.totalDonationAmount || 0).toLocaleString('id-ID')}
                       </strong>
                     </span>
                   </div>
@@ -330,13 +397,13 @@ export default function UserPortalPage() {
                   <form onSubmit={handleSendChat} className="space-y-4">
                     <div>
                       <label
-                        htmlFor="portal-chat-input"
+                        htmlFor="chat-input"
                         className="block text-xs font-semibold text-zinc-400 mb-1.5"
                       >
                         Pesan Chat Penonton
                       </label>
+                      id="chat-input"
                       <textarea
-                        id="portal-chat-input"
                         rows={3}
                         value={chatInput}
                         onChange={(e) => setChatInput(e.target.value)}
@@ -395,7 +462,7 @@ export default function UserPortalPage() {
                   <form onSubmit={handleSendDonation} className="space-y-4">
                     <div>
                       <label
-                        htmlFor="portal-amount-input"
+                        htmlFor="donor-amount"
                         className="block text-xs font-semibold text-zinc-400 mb-1.5"
                       >
                         Nominal Dukungan (Rp)
@@ -417,7 +484,7 @@ export default function UserPortalPage() {
                         ))}
                       </div>
                       <input
-                        id="portal-amount-input"
+                        id="donor-amount"
                         type="number"
                         value={donorAmount}
                         onChange={(e) => setDonorAmount(Number(e.target.value))}
@@ -427,13 +494,13 @@ export default function UserPortalPage() {
 
                     <div>
                       <label
-                        htmlFor="portal-message-input"
+                        htmlFor="donor-message"
                         className="block text-xs font-semibold text-zinc-400 mb-1.5"
                       >
                         Pesan Dukungan
                       </label>
                       <input
-                        id="portal-message-input"
+                        id="donor-message"
                         type="text"
                         value={donorMessage}
                         onChange={(e) => setDonorMessage(e.target.value)}
@@ -444,9 +511,9 @@ export default function UserPortalPage() {
 
                     {/* Choose Alert VFX Frame Variant */}
                     <div>
-                      <div className="block text-xs font-semibold text-zinc-400 mb-1.5">
+                      <span className="block text-xs font-semibold text-zinc-400 mb-1.5">
                         Pilih Efek Animasi Alert Layar
-                      </div>
+                      </span>
                       <div className="grid grid-cols-2 gap-2">
                         <button
                           type="button"
@@ -488,16 +555,64 @@ export default function UserPortalPage() {
 
                     <button
                       type="submit"
-                      className="w-full py-3 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-400 hover:to-amber-400 text-zinc-950 font-black text-sm tracking-wide transition-all shadow-lg shadow-orange-500/20 flex items-center justify-center gap-2 cursor-pointer"
+                      disabled={isSubmitting || donationPayment?.status === 'pending'}
+                      className="w-full py-3 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-400 hover:to-amber-400 disabled:opacity-50 disabled:pointer-events-none text-zinc-950 font-black text-sm tracking-wide transition-all shadow-lg shadow-orange-500/20 flex items-center justify-center gap-2 cursor-pointer"
                     >
                       <RiHeart3Fill className="text-base text-red-950" />
-                      <span>Kirim Dukungan & Munculkan Alert</span>
+                      <span>{isSubmitting ? 'Menyiapkan QRIS...' : 'Buat Pembayaran QRIS'}</span>
                     </button>
 
-                    {donationSentNotice && (
-                      <div className="p-3 rounded-xl bg-orange-950/60 border border-orange-500/40 text-orange-300 text-xs font-semibold flex items-center gap-2 animate-in fade-in">
-                        <RiSparklingFill className="text-base text-orange-400 shrink-0" />
-                        <span>Alert donasi berhasil ditembakkan ke layar live streamer!</span>
+                    {donationPayment && (
+                      <div className="rounded-2xl border border-orange-500/30 bg-zinc-950/80 p-4 text-center">
+                        {donationPayment.status === 'pending' && (
+                          <>
+                            <p className="text-sm font-bold text-orange-200">
+                              Scan QRIS untuk membayar
+                            </p>
+                            <p className="mt-1 text-xs text-zinc-400">
+                              Total bayar: Rp{' '}
+                              {Number(
+                                donationPayment.totalPayment || donationPayment.amount
+                              ).toLocaleString('id-ID')}
+                            </p>
+                            {qrImageUrl ? (
+                              <img
+                                src={qrImageUrl}
+                                alt="QRIS pembayaran donasi"
+                                className="mx-auto mt-3 h-56 w-56 rounded-xl bg-white p-2"
+                              />
+                            ) : (
+                              <p className="mt-4 text-xs text-zinc-500">Menyiapkan QR code...</p>
+                            )}
+                            <a
+                              href={donationPayment.paymentUrl}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="mt-3 inline-flex text-xs font-bold text-cyan-300 underline underline-offset-4 hover:text-cyan-200"
+                            >
+                              Buka halaman pembayaran
+                            </a>
+                            <p className="mt-3 text-[11px] text-zinc-500">
+                              Halaman ini otomatis mengecek pembayaran setiap beberapa detik.
+                            </p>
+                          </>
+                        )}
+                        {donationPayment.status === 'completed' && (
+                          <p className="flex items-center justify-center gap-2 text-sm font-bold text-emerald-300">
+                            <RiShieldCheckFill /> Pembayaran berhasil, alert sedang ditampilkan.
+                          </p>
+                        )}
+                        {['canceled', 'expired', 'failed'].includes(donationPayment.status) && (
+                          <p className="text-sm font-bold text-red-300">
+                            Pembayaran {donationPayment.status}. Silakan buat transaksi baru.
+                          </p>
+                        )}
+                      </div>
+                    )}
+
+                    {paymentError && (
+                      <div className="rounded-xl border border-red-500/40 bg-red-950/60 p-3 text-xs font-semibold text-red-300">
+                        {paymentError}
                       </div>
                     )}
                   </form>

@@ -200,6 +200,45 @@ export const chatMessages = pgTable(
   ]
 );
 
+export const aiInteractions = pgTable(
+  'ai_interactions',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    chatMessageId: uuid('chat_message_id')
+      .notNull()
+      .unique()
+      .references(() => chatMessages.id, { onDelete: 'cascade' }),
+    streamId: uuid('stream_id')
+      .notNull()
+      .references(() => streamSessions.id, { onDelete: 'cascade' }),
+    userId: text('user_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    viewerName: varchar('viewer_name', { length: 255 }).notNull(),
+    viewerAvatarUrl: text('viewer_avatar_url'),
+    prompt: text('prompt').notNull(),
+    answer: text('answer'),
+    mood: varchar('mood', { length: 32 }).notNull().default('neutral'),
+    questionAudioKey: varchar('question_audio_key', { length: 255 }),
+    answerAudioKey: varchar('answer_audio_key', { length: 255 }),
+    status: varchar('status', { length: 32 }).notNull().default('queued'),
+    attempts: integer('attempts').notNull().default(0),
+    error: text('error'),
+    readyAt: timestamp('ready_at', { withTimezone: true }),
+    playingAt: timestamp('playing_at', { withTimezone: true }),
+    completedAt: timestamp('completed_at', { withTimezone: true }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .notNull()
+      .defaultNow()
+      .$onUpdate(() => new Date()),
+  },
+  (table) => [
+    index('idx_ai_interactions_status_created').on(table.status, table.createdAt),
+    index('idx_ai_interactions_user_created').on(table.userId, table.createdAt),
+  ]
+);
+
 /**
  * YouTube Custom Emotes & Badges Asset Cache
  */
@@ -262,8 +301,15 @@ export const donations = pgTable(
     amount: numeric('amount', { precision: 12, scale: 2 }).notNull(),
     currency: varchar('currency', { length: 10 }).notNull().default('IDR'),
     message: text('message'),
-    status: varchar('status', { length: 50 }).notNull().default('completed'), // 'pending' | 'completed' | 'failed'
+    status: varchar('status', { length: 50 }).notNull().default('completed'), // 'pending' | 'completed' | 'failed' | 'canceled' | 'expired'
     paymentMethod: varchar('payment_method', { length: 50 }).notNull().default('sandbox_qris'), // 'sandbox_qris' | 'qris' | 'manual'
+    paymentOrderId: varchar('payment_order_id', { length: 100 }).unique(),
+    paymentFee: numeric('payment_fee', { precision: 12, scale: 2 }),
+    paymentTotal: numeric('payment_total', { precision: 12, scale: 2 }),
+    paymentNumber: text('payment_number'),
+    paymentExpiredAt: timestamp('payment_expired_at', { withTimezone: true }),
+    paymentCompletedAt: timestamp('payment_completed_at', { withTimezone: true }),
+    alertTemplate: varchar('alert_template', { length: 32 }),
     streamerbotTriggered: boolean('streamerbot_triggered').notNull().default(false),
     streamerbotTriggeredAt: timestamp('streamerbot_triggered_at', { withTimezone: true }),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
@@ -301,11 +347,13 @@ export const userStreamRelations = relations(user, ({ many }) => ({
   donations: many(donations),
   chatMessages: many(chatMessages),
   pointTransactions: many(pointTransactions),
+  aiInteractions: many(aiInteractions),
 }));
 
 export const streamSessionsRelations = relations(streamSessions, ({ many }) => ({
   chatMessages: many(chatMessages),
   donations: many(donations),
+  aiInteractions: many(aiInteractions),
 }));
 
 export const chatMessagesRelations = relations(chatMessages, ({ one }) => ({
@@ -315,6 +363,22 @@ export const chatMessagesRelations = relations(chatMessages, ({ one }) => ({
   }),
   user: one(user, {
     fields: [chatMessages.userId],
+    references: [user.id],
+  }),
+  aiInteraction: one(aiInteractions),
+}));
+
+export const aiInteractionsRelations = relations(aiInteractions, ({ one }) => ({
+  chatMessage: one(chatMessages, {
+    fields: [aiInteractions.chatMessageId],
+    references: [chatMessages.id],
+  }),
+  streamSession: one(streamSessions, {
+    fields: [aiInteractions.streamId],
+    references: [streamSessions.id],
+  }),
+  user: one(user, {
+    fields: [aiInteractions.userId],
     references: [user.id],
   }),
 }));
@@ -339,6 +403,8 @@ export type StreamSessionTable = typeof streamSessions.$inferSelect;
 export type NewStreamSessionTable = typeof streamSessions.$inferInsert;
 export type ChatMessageTable = typeof chatMessages.$inferSelect;
 export type NewChatMessageTable = typeof chatMessages.$inferInsert;
+export type AiInteractionTable = typeof aiInteractions.$inferSelect;
+export type NewAiInteractionTable = typeof aiInteractions.$inferInsert;
 export type StreamSettingsTable = typeof streamSettings.$inferSelect;
 export type NewStreamSettingsTable = typeof streamSettings.$inferInsert;
 export type StreamGoalTable = typeof streamGoals.$inferSelect;

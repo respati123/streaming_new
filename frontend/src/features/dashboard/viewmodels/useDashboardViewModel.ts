@@ -4,6 +4,8 @@ import { useDashboardRealtime } from '../hooks/useDashboardRealtime';
 import { dashboardService } from '../services/dashboardService';
 import type {
   ActionItem,
+  ChatAiInteractionSummary,
+  ChatAiProgressEvent,
   ChatMessage,
   Chatter,
   StreamerbotStatus,
@@ -105,10 +107,47 @@ export function useDashboardViewModel() {
     queryFn: dashboardService.getActions,
   });
 
+  const { data: chatAiInteractions = [], isLoading: isChatAiLoading } = useQuery<
+    ChatAiInteractionSummary[]
+  >({
+    queryKey: ['chat-ai-interactions'],
+    queryFn: () => dashboardService.getChatAiInteractions(10),
+  });
+
   const handleNewLiveChat = useCallback(
     (msg: ChatMessage) => {
       dispatch({ type: 'APPEND_MESSAGE', payload: msg });
       queryClient.invalidateQueries({ queryKey: ['stream-chatters'] });
+    },
+    [queryClient]
+  );
+
+  const handleChatAiProgress = useCallback(
+    (progress: ChatAiProgressEvent) => {
+      queryClient.setQueryData<ChatAiInteractionSummary[]>(
+        ['chat-ai-interactions'],
+        (current = []) => {
+          const updated: ChatAiInteractionSummary = {
+            id: progress.interactionId,
+            viewerName: progress.viewerName,
+            viewerAvatarUrl: progress.viewerAvatarUrl,
+            prompt: progress.prompt,
+            answer: progress.answer,
+            mood: progress.mood,
+            status: progress.status,
+            phase: progress.phase,
+            error: progress.error,
+            attempts: progress.attempts,
+            createdAt: progress.createdAt,
+            questionAudioUrl: progress.questionAudioUrl,
+            answerAudioUrl: progress.answerAudioUrl,
+          };
+          return [updated, ...current.filter((interaction) => interaction.id !== updated.id)].slice(
+            0,
+            10
+          );
+        }
+      );
     },
     [queryClient]
   );
@@ -119,7 +158,7 @@ export function useDashboardViewModel() {
     sendChatMessage,
     triggerAction,
     triggerTestAlert,
-  } = useDashboardRealtime(handleNewLiveChat);
+  } = useDashboardRealtime(handleNewLiveChat, handleChatAiProgress);
 
   const startStreamMutation = useMutation({
     mutationFn: (title: string) => dashboardService.startStream(title),
@@ -207,6 +246,8 @@ export function useDashboardViewModel() {
       liveMessages: state.liveMessages,
       isChatsLoading,
       actions: actionsData?.savedDeckActions || [],
+      chatAiInteractions,
+      isChatAiLoading,
       botStatus: (liveBotStatus as StreamerbotStatus) || null,
       isSocketConnected,
     },

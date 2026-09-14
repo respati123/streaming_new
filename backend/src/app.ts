@@ -14,7 +14,10 @@ import type { AppEnvironment } from '@core/types/context.types';
 import { sendSuccess } from '@core/utils/response.util';
 import { wsHub } from '@core/ws/websocket.hub';
 import { handleWebSocket } from '@core/ws/websocket.server';
+import { aiController } from '@modules/ai/ai.controller';
+import { getChatAiAudioFile } from '@modules/ai/chat-ai.audio';
 import { authController } from '@modules/auth/auth.controller';
+import { donationsController } from '@modules/donations/donations.controller';
 import { streamerbotController } from '@modules/streamerbot/streamerbot.controller';
 import { streamsController } from '@modules/streams/streams.controller';
 import { apiReference } from '@scalar/hono-api-reference';
@@ -26,6 +29,10 @@ export function createApp() {
 
   app.use('*', requestIdMiddleware);
   app.use('*', i18nMiddleware);
+  app.use('/media/chatai/*', async (c, next) => {
+    await next();
+    c.header('Cross-Origin-Resource-Policy', 'cross-origin');
+  });
   app.use('*', secureHeaders());
   app.use('*', corsMiddleware);
   app.use('*', requestLoggerMiddleware);
@@ -84,6 +91,18 @@ export function createApp() {
       isHealthy ? 'success.healthCheck' : 'errors.databaseUnavailable',
       statusCode
     );
+  });
+
+  app.get('/media/chatai/:file', async (c) => {
+    const audio = await getChatAiAudioFile(c.req.param('file'));
+    if (!audio) return c.notFound();
+    return new Response(audio, {
+      headers: {
+        'Cache-Control': 'public, max-age=86400',
+        'Content-Type': 'audio/mpeg',
+        'Cross-Origin-Resource-Policy': 'cross-origin',
+      },
+    });
   });
 
   app.get(
@@ -151,6 +170,8 @@ export function createApp() {
 
   const apiRouter = new Hono<AppEnvironment>();
   apiRouter.route('/auth', authController);
+  apiRouter.route('/ai', aiController);
+  apiRouter.route('/donations', donationsController);
   apiRouter.route('/streamerbot', streamerbotController);
   apiRouter.route('/streams', streamsController);
 

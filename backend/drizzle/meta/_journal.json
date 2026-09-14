@@ -8,6 +8,27 @@
       "when": 1787904478350,
       "tag": "0000_closed_reptil",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1788920622995,
+      "tag": "0001_chatai_interactions",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1788920622996,
+      "tag": "0002_chatai_mood",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1789011002672,
+      "tag": "0003_pakasir_qris",
+      "breakpoints": true
     }
   ]
 }

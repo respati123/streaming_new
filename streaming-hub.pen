@@ -1,0 +1,53 @@
+{
+  "version": "2.17",
+  "children": [],
+  "themes": {
+    "Mode": [
+      "Dark",
+      "Light"
+    ]
+  },
+  "variables": {
+    "bg": {
+      "type": "color",
+      "value": "#FAFAFA"
+    },
+    "surface": {
+      "type": "color",
+      "value": "#FFFFFF"
+    },
+    "ink": {
+      "type": "color",
+      "value": "#09090B"
+    },
+    "muted": {
+      "type": "color",
+      "value": "#71717A"
+    },
+    "line": {
+      "type": "color",
+      "value": "#E4E4E7"
+    },
+    "cyan": {
+      "type": "color",
+      "value": "#0891B2"
+    },
+    "orange": {
+      "type": "color",
+      "value": "#F97316"
+    },
+    "emerald": {
+      "type": "color",
+      "value": "#059669"
+    },
+    "rose": {
+      "type": "color",
+      "value": "#E11D48"
+    },
+    "font": {
+      "type": "string",
+      "value": "Poppins"
+    }
+  },
+  "fileToken": "e3aebeae-52d7-4cdd-b2e3-0436e50619ca"
+}

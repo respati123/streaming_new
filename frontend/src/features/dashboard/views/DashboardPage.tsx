@@ -1,4 +1,5 @@
 import { ActionDeckPad } from '../components/ActionDeckPad';
+import { ChatAiHistoryPanel } from '../components/ChatAiHistoryPanel';
 import { ChattersList } from '../components/ChattersList';
 import { LiveChatConsole } from '../components/LiveChatConsole';
 import { StreamControlHeader } from '../components/StreamControlHeader';
@@ -31,12 +32,18 @@ export default function DashboardPage() {
           />
         </section>
 
-        <section className="lg:col-span-4 h-[580px] lg:h-[calc(100dvh-5.5rem)] min-h-[440px]">
-          <ActionDeckPad
-            actions={states.actions}
-            onTriggerAction={handlers.handleTriggerAction}
-            onTriggerTestAlert={handlers.handleTriggerTestAlert}
-            isBotConnected={states.botStatus?.status === 'CONNECTED'}
+        <section className="lg:col-span-4 flex h-[580px] min-h-[440px] flex-col gap-4 lg:h-[calc(100dvh-5.5rem)]">
+          <div className="min-h-0 flex-1">
+            <ActionDeckPad
+              actions={states.actions}
+              onTriggerAction={handlers.handleTriggerAction}
+              onTriggerTestAlert={handlers.handleTriggerTestAlert}
+              isBotConnected={states.botStatus?.status === 'CONNECTED'}
+            />
+          </div>
+          <ChatAiHistoryPanel
+            interactions={states.chatAiInteractions}
+            isLoading={states.isChatAiLoading}
           />
         </section>
       </main>

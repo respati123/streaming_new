@@ -21,15 +21,17 @@ import {
 import { useSearchParams } from 'react-router-dom';
 import { ElectricLightningFrame } from '../components/ElectricLightningFrame';
 import { FireFlameFrame } from '../components/FireFlameFrame';
+import { NpcDialogueOverlay } from '../components/NpcDialogueOverlay';
 import { type AlertLayoutTemplate, DONATION_GIF_PRESETS } from '../constants/overlayGifs';
 import { dashboardService } from '../services/dashboardService';
-import type { ChatMessage, OverlaySummary } from '../types/dashboard.types';
+import type { OverlaySummary } from '../types/dashboard.types';
 
 interface ChatOverlayMsg {
   id: string;
   username: string;
   youtubeHandle?: string | null;
   message: string;
+  isChatAiCommand?: boolean;
   emotes?: ChatEmote[];
   parts?: ChatPart[];
   avatarUrl?: string | null;
@@ -50,6 +52,11 @@ interface AlertToast {
   gifUrl?: string | null;
   template?: AlertLayoutTemplate;
   durationMs: number;
+}
+
+function getChatAiPrompt(message: string): string | null {
+  const match = message.trim().match(/^!chatai\s+(.+)$/i);
+  return match?.[1]?.trim() || null;
 }
 
 /**
@@ -161,7 +168,7 @@ export default function OverlayPage() {
   // Populate initial chat history on overlay load
   useEffect(() => {
     if (initialChats.length > 0 && messages.length === 0) {
-      const mappedChats: ChatOverlayMsg[] = [...initialChats].reverse().map((msg: ChatMessage) => {
+      const mappedChats: ChatOverlayMsg[] = [...initialChats].reverse().map((msg: any) => {
         let parsedParts = msg.parts;
         if (typeof parsedParts === 'string') {
           try {
@@ -178,19 +185,21 @@ export default function OverlayPage() {
             parsedEmotes = [];
           }
         }
+        const prompt = getChatAiPrompt(msg.message || '');
         return {
           id: msg.id || String(Math.random()),
-          username: msg.username || 'Anonymous',
-          youtubeHandle: null,
-          message: msg.message || '',
+          username: msg.user?.name || msg.username || 'Anonymous',
+          youtubeHandle: msg.user?.youtubeHandle || null,
+          message: prompt || msg.message || '',
+          isChatAiCommand: Boolean(prompt || msg.isChatAiCommand),
           emotes: Array.isArray(parsedEmotes) ? (parsedEmotes as ChatEmote[]) : [],
           parts: Array.isArray(parsedParts) ? (parsedParts as ChatPart[]) : [],
-          avatarUrl: msg.userAvatarUrl || null,
-          isOwner: Boolean(msg.isOwner),
-          isModerator: Boolean(msg.isModerator),
-          isSponsor: Boolean(msg.isSponsor),
+          avatarUrl: msg.user?.image || msg.userAvatarUrl || null,
+          isOwner: Boolean(msg.isOwner || msg.user?.role === 'streamer' || msg.user?.role === 'owner'),
+          isModerator: Boolean(msg.isModerator || msg.user?.role === 'moderator'),
+          isSponsor: Boolean(msg.isSponsor || msg.user?.role === 'member' || msg.user?.role === 'sponsor'),
           isVerified: Boolean(msg.isVerified),
-          tier: msg.tier || 'bronze',
+          tier: msg.user?.tier || msg.tier || 'bronze',
           timestamp: msg.publishedAt || new Date().toISOString(),
         };
       });
@@ -205,11 +214,14 @@ export default function OverlayPage() {
     const unsubChat = overlaySocket.on('chat:message', (rawPayload: unknown) => {
       const payload = rawPayload as Record<string, unknown> | null;
       if (!payload) return;
+      const chatAiPrompt =
+        (payload.chatAiPrompt as string) || getChatAiPrompt(String(payload.message || ''));
       const newMsg: ChatOverlayMsg = {
         id: (payload.id as string) || Date.now().toString(),
         username: (payload.user as string) || (payload.username as string) || 'Anonymous',
         youtubeHandle: (payload.youtubeHandle as string) || null,
-        message: (payload.message as string) || '',
+        message: (chatAiPrompt as string) || (payload.message as string) || '',
+        isChatAiCommand: Boolean(payload.isChatAiCommand || chatAiPrompt),
         emotes: (payload.emotes as ChatEmote[]) || [],
         parts: (payload.parts as ChatPart[]) || [],
         avatarUrl: (payload.avatarUrl as string) || (payload.userAvatarUrl as string) || null,
@@ -255,13 +267,17 @@ export default function OverlayPage() {
   const streamerHandle = summary?.settings?.streamerHandle || '@respati_stream';
 
   return (
-    <div className="w-full h-full min-h-screen overflow-hidden bg-transparent relative font-sans select-none pointer-events-none">
+    <div className="fixed inset-0 overflow-hidden bg-transparent font-sans select-none pointer-events-none">
       {/* ─── 00. FULLSCREEN GAME WALLPAPER BACKGROUND ─────────────────────────── */}
       {showWallpaper && (
         <div className="fixed inset-0 w-full h-full z-0 overflow-hidden select-none pointer-events-none">
-          <img
-            src="/wallpaper_live.webp"
-            alt="Live Game Wallpaper"
+          <video
+            src="/wallpaper_dota.mp4"
+            poster="/wallpaper_live.webp"
+            autoPlay
+            loop
+            muted
+            playsInline
             className="w-full h-full object-cover"
           />
         </div>
@@ -507,12 +523,18 @@ export default function OverlayPage() {
       )}
 
       {/* ─── 03. LIVE CHAT OVERLAY (Translucent Frosted Glass Card Boxes) ───────── */}
+      {(widgetFilter === 'all' || widgetFilter === 'chat') && <NpcDialogueOverlay />}
+
       {(widgetFilter === 'all' || widgetFilter === 'chat') && (
         <div className="absolute left-4 bottom-4 w-[430px] max-w-[90vw] z-20 flex flex-col justify-end pointer-events-none space-y-2 overflow-hidden bg-transparent">
           {messages.slice(-7).map((msg) => (
             <div
               key={msg.id}
-              className="chat-bubble-enter bg-black/35 border border-white/15 rounded-2xl p-2.5 text-sm backdrop-blur-md shadow-lg pointer-events-auto flex items-start gap-2.5 will-change-transform"
+              className={`chat-bubble-enter rounded-2xl p-2.5 text-sm backdrop-blur-md shadow-lg pointer-events-auto flex items-start gap-2.5 will-change-transform ${
+                msg.isChatAiCommand
+                  ? 'chat-ai-command-bubble bg-violet-950/75 border border-violet-300/50 shadow-[0_8px_24px_rgba(76,29,149,0.35)]'
+                  : 'bg-black/35 border border-white/15'
+              }`}
             >
               {/* Viewer Avatar */}
               {msg.avatarUrl ? (
@@ -530,6 +552,11 @@ export default function OverlayPage() {
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between gap-1.5 mb-0.5">
                   <div className="flex items-center gap-1.5 flex-wrap min-w-0">
+                    {msg.isChatAiCommand && (
+                      <span className="inline-flex items-center gap-1 rounded-md border border-violet-200/35 bg-violet-300/15 px-1.5 py-0.5 text-[9px] font-black tracking-wide text-violet-100">
+                        <RiSparklingFill className="text-[9px]" /> AI CHAT
+                      </span>
+                    )}
                     {msg.isOwner && (
                       <span className="px-1.5 py-0.2 rounded text-[9px] font-black bg-amber-500/30 text-amber-300 border border-amber-500/50 font-mono flex items-center gap-0.5 shadow-xs">
                         <RiVipCrownFill className="text-[10px]" /> HOST
@@ -578,10 +605,12 @@ export default function OverlayPage() {
 
                 <EmoteMessageRenderer
                   message={msg.message}
-                  emotes={msg.emotes}
-                  parts={msg.parts}
-                  className="text-zinc-100 text-[13px] leading-snug font-medium break-words drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)] select-text"
-                  emoteSizeClassName="inline-block h-[24px] w-[24px] mx-0.5 object-contain align-middle -mt-0.5 drop-shadow-sm"
+                  emotes={msg.isChatAiCommand ? undefined : msg.emotes}
+                  parts={msg.isChatAiCommand ? undefined : msg.parts}
+                  className={`${
+                    msg.isChatAiCommand ? 'text-violet-50' : 'text-zinc-100'
+                  } text-[13px] leading-snug font-medium break-words drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)] select-text`}
+                  emoteSizeClassName="inline-block h-[22px] w-[22px] mx-0.5 object-contain align-middle -mt-0.5 drop-shadow-sm"
                 />
               </div>
             </div>

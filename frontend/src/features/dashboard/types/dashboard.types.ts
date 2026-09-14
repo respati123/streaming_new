@@ -94,3 +94,36 @@ export interface ActionItem {
   color: string;
   isEnabled: boolean;
 }
+export interface ChatAiInteractionSummary {
+  id: string;
+  viewerName: string;
+  viewerAvatarUrl?: string | null;
+  prompt: string;
+  answer?: string | null;
+  mood: 'neutral' | 'excited' | 'empathetic' | 'serious' | 'funny';
+  status: 'queued' | 'processing' | 'ready' | 'playing' | 'completed' | 'rejected' | 'failed';
+  phase?:
+    | 'queued'
+    | 'pi'
+    | 'question-audio'
+    | 'answer-audio'
+    | 'ready'
+    | 'waiting-overlay'
+    | 'playing'
+    | 'completed'
+    | 'retrying'
+    | 'failed'
+    | 'rejected';
+  error?: string | null;
+  attempts: number;
+  createdAt: string;
+  questionAudioUrl?: string | null;
+  answerAudioUrl?: string | null;
+}
+
+export interface ChatAiProgressEvent extends ChatAiInteractionSummary {
+  interactionId: string;
+  phase: NonNullable<ChatAiInteractionSummary['phase']>;
+  maxAttempts: number;
+}
+
