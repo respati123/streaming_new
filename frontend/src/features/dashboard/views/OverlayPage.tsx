@@ -153,21 +153,25 @@ export default function OverlayPage() {
 
   // 2. Fetch Initial 15-20 Messages for the currently Live Stream Session
   const { data: initialChats = [] } = useQuery({
-    queryKey: ['overlay-initial-chats'],
+    queryKey: ['overlay-initial-chats', summary?.activeStream?.id],
     queryFn: async () => {
       try {
-        const chats = await dashboardService.getStreamChats('active', 20);
+        if (!summary?.activeStream?.id || summary?.activeStream?.status !== 'live') {
+          return [];
+        }
+        const chats = await dashboardService.getStreamChats(summary.activeStream.id, 20);
         return chats;
       } catch {
         return [];
       }
     },
+    enabled: summary?.activeStream?.status === 'live',
     staleTime: Infinity,
   });
 
-  // Populate initial chat history on overlay load
+  // Populate initial chat history on overlay load (only if stream is active & live)
   useEffect(() => {
-    if (initialChats.length > 0 && messages.length === 0) {
+    if (summary?.activeStream?.status === 'live' && initialChats.length > 0 && messages.length === 0) {
       const mappedChats: ChatOverlayMsg[] = [...initialChats].reverse().map((msg: any) => {
         let parsedParts = msg.parts;
         if (typeof parsedParts === 'string') {
@@ -205,11 +209,20 @@ export default function OverlayPage() {
       });
       setMessages(mappedChats.slice(-15));
     }
-  }, [initialChats, messages.length]);
+  }, [summary?.activeStream?.status, initialChats, messages.length]);
 
   // 3. Real-time WebSocket Listeners
   useEffect(() => {
     overlaySocket.connect();
+
+    const unsubStreamStarted = overlaySocket.on('stream:started', () => {
+      setMessages([]);
+      refetchSummary();
+    });
+
+    const unsubStreamEnded = overlaySocket.on('stream:ended', () => {
+      refetchSummary();
+    });
 
     const unsubChat = overlaySocket.on('chat:message', (rawPayload: unknown) => {
       const payload = rawPayload as Record<string, unknown> | null;
@@ -258,6 +271,8 @@ export default function OverlayPage() {
     });
 
     return () => {
+      unsubStreamStarted();
+      unsubStreamEnded();
       unsubChat();
       unsubAlert();
       if (alertTimerRef.current) clearTimeout(alertTimerRef.current);
@@ -267,7 +282,7 @@ export default function OverlayPage() {
   const streamerHandle = summary?.settings?.streamerHandle || '@respati_stream';
 
   return (
-    <div className="overlay-shell fixed inset-0 overflow-hidden bg-transparent font-sans select-none pointer-events-none">
+    <div className="fixed inset-0 overflow-hidden bg-transparent font-sans select-none pointer-events-none">
       {/* ─── 00. FULLSCREEN GAME WALLPAPER BACKGROUND ─────────────────────────── */}
       {showWallpaper && (
         <div className="fixed inset-0 w-full h-full z-0 overflow-hidden select-none pointer-events-none">

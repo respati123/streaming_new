@@ -3,29 +3,27 @@ import { create } from 'zustand';
 
 const THEME_STORAGE_KEY = 'app_theme_preference';
 
-const getInitialTheme = (): ThemeMode => 'light';
-
-const applyLightThemeToDOM = () => {
+const applyThemeToDOM = () => {
   if (typeof document === 'undefined') return;
   const root = document.documentElement;
   root.classList.remove('dark');
   root.classList.add('light');
 };
 
-const initialTheme = getInitialTheme();
-applyLightThemeToDOM();
+applyThemeToDOM();
 
-export const useThemeStore = create<ThemeState>((set, get) => ({
-  theme: initialTheme,
+export const useThemeStore = create<ThemeState>((set) => ({
+  theme: 'light',
   resolvedTheme: 'light',
 
-  setTheme: () => {
+  setTheme: (_theme: ThemeMode) => {
     localStorage.setItem(THEME_STORAGE_KEY, 'light');
-    applyLightThemeToDOM();
+    applyThemeToDOM();
     set({ theme: 'light', resolvedTheme: 'light' });
   },
 
   toggleTheme: () => {
-    get().setTheme('light');
+    applyThemeToDOM();
+    set({ theme: 'light', resolvedTheme: 'light' });
   },
 }));

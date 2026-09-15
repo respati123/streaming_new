@@ -18,18 +18,19 @@ export default function OverlayStudioPage() {
   const { states, handlers } = useOverlayLabViewModel();
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 max-w-[1720px] w-full mx-auto space-y-6 font-sans text-[#18181B]">
-      <div className="flex flex-wrap items-center justify-between gap-4 bg-[#FFFFFF] p-5 rounded-2xl border border-[#D4D4D8] shadow-lg">
+    <div className="p-4 sm:p-6 lg:p-8 max-w-[1720px] w-full mx-auto space-y-6 font-sans text-slate-800">
+      {/* Header Banner */}
+      <div className="flex flex-wrap items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
         <div className="space-y-1">
           <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-xl bg-zinc-950/60 border border-zinc-800/50 text-zinc-400">
+            <div className="p-2 rounded-xl bg-sky-50 border border-sky-200 text-sky-600">
               <FlaskConical className="w-5 h-5" />
             </div>
             <div>
-              <h1 className="text-base font-bold text-white tracking-tight">
+              <h1 className="text-base font-bold text-slate-900 tracking-tight">
                 Testing Overlay Lab Suite
               </h1>
-              <p className="text-xs text-[#52525B] font-mono">
+              <p className="text-xs text-slate-500 font-mono">
                 Simulator payload interaktif untuk OBS Browser Source Overlay & Streamer.bot Webhook
               </p>
             </div>
@@ -37,25 +38,25 @@ export default function OverlayStudioPage() {
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#F4F4F5] border border-[#D4D4D8] text-xs font-mono text-zinc-300">
-            <span className="text-[#52525B]">OBS URL:</span>
-            <span className="text-zinc-400 font-bold">/overlay</span>
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-mono text-slate-700">
+            <span className="text-slate-400">OBS URL:</span>
+            <span className="text-sky-600 font-bold">/overlay</span>
             <button
               type="button"
               onClick={handlers.handleCopyObsUrl}
-              className="ml-1 p-1 rounded hover:bg-[#D4D4D8] text-[#52525B] hover:text-white transition-colors"
+              className="ml-1 p-1 rounded hover:bg-slate-200 text-slate-500 hover:text-slate-900 transition-colors"
               title="Salin OBS Browser Source URL"
             >
               {states.copiedUrl ? (
-                <Check className="w-3.5 h-3.5 text-emerald-400" />
+                <Check className="w-3.5 h-3.5 text-emerald-600" />
               ) : (
                 <Copy className="w-3.5 h-3.5" />
               )}
             </button>
           </div>
 
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-950/60 border border-emerald-500/40 text-xs font-mono text-emerald-300">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-200 text-xs font-mono text-emerald-700 font-semibold">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
             <span>OBS Stage Live</span>
           </div>
         </div>
@@ -63,14 +64,15 @@ export default function OverlayStudioPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         <div className="lg:col-span-6 space-y-5">
-          <div className="bg-[#FFFFFF] p-1.5 rounded-2xl border border-[#D4D4D8] flex items-center gap-2">
+          {/* Tab Switcher */}
+          <div className="bg-white p-1.5 rounded-2xl border border-slate-200 flex items-center gap-2 shadow-xs">
             <button
               type="button"
               onClick={() => handlers.handleTabSelect('chat')}
               className={`flex-1 py-2.5 px-4 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all ${
                 states.activeTab === 'chat'
-                  ? 'bg-zinc-600 text-white shadow-md shadow-zinc-950/50'
-                  : 'text-[#52525B] hover:text-white hover:bg-[#F4F4F5]'
+                  ? 'bg-sky-600 text-white shadow-sm'
+                  : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'
               }`}
             >
               <MessageSquare className="w-4 h-4" />
@@ -82,8 +84,8 @@ export default function OverlayStudioPage() {
               onClick={() => handlers.handleTabSelect('donation')}
               className={`flex-1 py-2.5 px-4 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all ${
                 states.activeTab === 'donation'
-                  ? 'bg-amber-600 text-white shadow-md shadow-amber-950/50'
-                  : 'text-[#52525B] hover:text-white hover:bg-[#F4F4F5]'
+                  ? 'bg-amber-500 text-white shadow-sm'
+                  : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'
               }`}
             >
               <Gift className="w-4 h-4" />
@@ -93,13 +95,14 @@ export default function OverlayStudioPage() {
 
           {states.activeTab === 'chat' && (
             <div className="space-y-5 animate-in fade-in duration-200">
-              <div className="bg-[#FFFFFF] p-5 rounded-2xl border border-[#D4D4D8] space-y-4 shadow-lg">
-                <div className="flex items-center justify-between">
+              {/* Single Chat Dispatcher */}
+              <div className="bg-white p-5 rounded-2xl border border-slate-200 space-y-4 shadow-sm">
+                <div className="flex items-center justify-between pb-3 border-b border-slate-100">
                   <div className="flex items-center gap-2">
-                    <MessageSquare className="w-4 h-4 text-zinc-400" />
-                    <h2 className="text-sm font-bold text-white">Single Chat Dispatcher</h2>
+                    <MessageSquare className="w-4 h-4 text-sky-600" />
+                    <h2 className="text-sm font-bold text-slate-900">Single Chat Dispatcher</h2>
                   </div>
-                  <span className="text-[11px] font-mono text-[#52525B]">
+                  <span className="text-[11px] font-mono text-slate-400">
                     Case 01 & 02: Single Chat
                   </span>
                 </div>
@@ -109,7 +112,7 @@ export default function OverlayStudioPage() {
                     <div>
                       <label
                         htmlFor="chat-user-input"
-                        className="block text-[11px] font-mono text-[#52525B] mb-1"
+                        className="block text-[11px] font-mono text-slate-500 mb-1 font-semibold"
                       >
                         Username Penonton
                       </label>
@@ -118,14 +121,14 @@ export default function OverlayStudioPage() {
                         type="text"
                         value={states.chatUsername}
                         onChange={(e) => handlers.handleChatUsernameChange(e.target.value)}
-                        className="w-full px-3 py-2 text-xs bg-[#F4F4F5] border border-[#D4D4D8] rounded-lg text-white font-mono focus:outline-none focus:border-zinc-400"
+                        className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-mono focus:outline-none focus:bg-white focus:border-sky-500 focus:ring-1 focus:ring-sky-500/20"
                       />
                     </div>
 
                     <div>
                       <label
                         htmlFor="role-viewer-btn"
-                        className="block text-[11px] font-mono text-[#52525B] mb-1"
+                        className="block text-[11px] font-mono text-slate-500 mb-1 font-semibold"
                       >
                         Badge Role
                       </label>
@@ -136,10 +139,10 @@ export default function OverlayStudioPage() {
                             key={r}
                             type="button"
                             onClick={() => handlers.handleChatRoleChange(r)}
-                            className={`py-2 rounded-lg text-[10px] font-mono uppercase font-bold border transition-colors ${
+                            className={`py-2 rounded-xl text-[10px] font-mono uppercase font-bold border transition-colors ${
                               states.chatRole === r
-                                ? 'bg-zinc-950 border-zinc-500 text-zinc-300'
-                                : 'bg-[#F4F4F5] border-[#D4D4D8] text-[#52525B] hover:text-white'
+                                ? 'bg-sky-50 border-sky-400 text-sky-700 font-extrabold shadow-xs'
+                                : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
                             }`}
                           >
                             {r}
@@ -152,7 +155,7 @@ export default function OverlayStudioPage() {
                   <div>
                     <label
                       htmlFor="chat-msg-input"
-                      className="block text-[11px] font-mono text-[#52525B] mb-1"
+                      className="block text-[11px] font-mono text-slate-500 mb-1 font-semibold"
                     >
                       Pesan Chat
                     </label>
@@ -163,19 +166,19 @@ export default function OverlayStudioPage() {
                       onChange={(e) => handlers.handleChatMessageChange(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && handlers.handleSendSingleChat()}
                       placeholder="Ketik pesan untuk ditampilkan di stage overlay..."
-                      className="w-full px-3 py-2 text-xs bg-[#F4F4F5] border border-[#D4D4D8] rounded-lg text-white font-sans focus:outline-none focus:border-zinc-400"
+                      className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-sans focus:outline-none focus:bg-white focus:border-sky-500 focus:ring-1 focus:ring-sky-500/20"
                     />
                   </div>
 
                   <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
                     <div className="flex items-center gap-1.5">
-                      <span className="text-[11px] text-[#52525B] font-mono">Emote:</span>
+                      <span className="text-[11px] text-slate-500 font-mono">Emote:</span>
                       {[':catJam:', ':hype:', ':pog:', ':fire:'].map((emo) => (
                         <button
                           key={emo}
                           type="button"
                           onClick={() => handlers.handleInsertEmote(emo)}
-                          className="px-2 py-1 rounded bg-[#F4F4F5] hover:bg-[#E4E4E7] border border-[#D4D4D8] text-[11px] font-mono text-zinc-300 transition-colors"
+                          className="px-2 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 border border-slate-200 text-[11px] font-mono text-sky-700 font-semibold transition-colors"
                         >
                           {emo}
                         </button>
@@ -185,7 +188,7 @@ export default function OverlayStudioPage() {
                     <button
                       type="button"
                       onClick={handlers.handleSendSingleChat}
-                      className="px-4 py-2 bg-zinc-600 hover:bg-zinc-500 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-md transition-colors"
+                      className="px-4 py-2 bg-sky-600 hover:bg-sky-500 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm transition-colors"
                     >
                       <Send className="w-3.5 h-3.5" />
                       <span>Kirim Chat ke OBS</span>
@@ -194,15 +197,16 @@ export default function OverlayStudioPage() {
                 </div>
               </div>
 
-              <div className="bg-[#FFFFFF] p-5 rounded-2xl border border-[#D4D4D8] space-y-4 shadow-lg">
-                <div className="flex items-center justify-between">
+              {/* Burst Simulation */}
+              <div className="bg-white p-5 rounded-2xl border border-slate-200 space-y-4 shadow-sm">
+                <div className="flex items-center justify-between pb-3 border-b border-slate-100">
                   <div className="flex items-center gap-2">
-                    <Zap className="w-4 h-4 text-zinc-400" />
-                    <h2 className="text-sm font-bold text-white">
+                    <Zap className="w-4 h-4 text-purple-600" />
+                    <h2 className="text-sm font-bold text-slate-900">
                       Burst Chat Simulation (Stress Test)
                     </h2>
                   </div>
-                  <span className="text-[11px] font-mono text-[#52525B]">
+                  <span className="text-[11px] font-mono text-slate-400">
                     Case 03: Queue Stress Test
                   </span>
                 </div>
@@ -215,13 +219,13 @@ export default function OverlayStudioPage() {
                       onClick={() => handlers.handleSelectBurstPreset(preset)}
                       className={`p-3 rounded-xl border text-left transition-all ${
                         states.selectedBurstPreset.id === preset.id
-                          ? 'bg-zinc-950/30 border-zinc-400/60 shadow-md shadow-zinc-950/40'
-                          : 'bg-[#F4F4F5] border-[#D4D4D8] hover:border-zinc-700'
+                          ? 'bg-purple-50 border-purple-300 shadow-xs'
+                          : 'bg-slate-50 border-slate-200 hover:bg-slate-100'
                       }`}
                     >
-                      <div className="text-xs font-bold text-white">{preset.name}</div>
-                      <div className="text-[10px] text-[#52525B] mt-1">{preset.subtitle}</div>
-                      <div className="text-[10px] font-mono text-zinc-300 mt-2">
+                      <div className="text-xs font-bold text-slate-900">{preset.name}</div>
+                      <div className="text-[10px] text-slate-500 mt-1">{preset.subtitle}</div>
+                      <div className="text-[10px] font-mono text-purple-700 font-bold mt-2">
                         Interval: {preset.delayMs}ms
                       </div>
                     </button>
@@ -229,14 +233,14 @@ export default function OverlayStudioPage() {
                 </div>
 
                 {states.isBurstRunning && (
-                  <div className="space-y-1.5 p-3 rounded-xl bg-[#F4F4F5] border border-[#D4D4D8]">
+                  <div className="space-y-1.5 p-3 rounded-xl bg-purple-50 border border-purple-200">
                     <div className="flex justify-between text-xs font-mono">
-                      <span className="text-zinc-300">Menembakkan antrean chat...</span>
-                      <span className="text-white font-bold">{states.burstProgress}%</span>
+                      <span className="text-purple-800 font-bold">Menembakkan antrean chat...</span>
+                      <span className="text-purple-900 font-extrabold">{states.burstProgress}%</span>
                     </div>
-                    <div className="w-full h-2 rounded-full bg-[#E4E4E7] overflow-hidden">
+                    <div className="w-full h-2 rounded-full bg-purple-200 overflow-hidden">
                       <div
-                        className="h-full bg-zinc-500 transition-all duration-100"
+                        className="h-full bg-purple-600 transition-all duration-100"
                         style={{ width: `${states.burstProgress}%` }}
                       />
                     </div>
@@ -244,14 +248,14 @@ export default function OverlayStudioPage() {
                 )}
 
                 <div className="flex items-center justify-between pt-1">
-                  <span className="text-[11px] text-[#52525B] font-mono">
+                  <span className="text-[11px] text-slate-500 font-mono">
                     Staggered window buffer: {states.selectedBurstPreset.count} chat berturut-turut
                   </span>
                   <button
                     type="button"
                     disabled={states.isBurstRunning}
                     onClick={handlers.handleLaunchBurst}
-                    className="px-4 py-2 bg-zinc-600 hover:bg-zinc-500 disabled:bg-zinc-800 disabled:text-zinc-600 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-md transition-colors"
+                    className="px-4 py-2 bg-purple-600 hover:bg-purple-500 disabled:bg-slate-200 disabled:text-slate-400 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm transition-colors"
                   >
                     <Zap className="w-3.5 h-3.5" />
                     <span>Luncurkan Burst Simulation</span>
@@ -263,13 +267,14 @@ export default function OverlayStudioPage() {
 
           {states.activeTab === 'donation' && (
             <div className="space-y-5 animate-in fade-in duration-200">
-              <div className="bg-[#FFFFFF] p-5 rounded-2xl border border-[#D4D4D8] space-y-4 shadow-lg">
-                <div className="flex items-center justify-between">
+              {/* Donation Simulator */}
+              <div className="bg-white p-5 rounded-2xl border border-slate-200 space-y-4 shadow-sm">
+                <div className="flex items-center justify-between pb-3 border-b border-slate-100">
                   <div className="flex items-center gap-2">
-                    <Gift className="w-4 h-4 text-amber-400" />
-                    <h2 className="text-sm font-bold text-white">Donation Alert Simulator</h2>
+                    <Gift className="w-4 h-4 text-amber-500" />
+                    <h2 className="text-sm font-bold text-slate-900">Donation Alert Simulator</h2>
                   </div>
-                  <span className="text-[11px] font-mono text-[#52525B]">
+                  <span className="text-[11px] font-mono text-slate-400">
                     Case 04 & 05: Saweria Test
                   </span>
                 </div>
@@ -278,7 +283,7 @@ export default function OverlayStudioPage() {
                   <div>
                     <label
                       htmlFor="donor-name-input"
-                      className="block text-[11px] font-mono text-[#52525B] mb-1"
+                      className="block text-[11px] font-mono text-slate-500 mb-1 font-semibold"
                     >
                       Nama Donatur / Sultan
                     </label>
@@ -287,14 +292,14 @@ export default function OverlayStudioPage() {
                       type="text"
                       value={states.donorName}
                       onChange={(e) => handlers.handleDonorNameChange(e.target.value)}
-                      className="w-full px-3 py-2 text-xs bg-[#F4F4F5] border border-[#D4D4D8] rounded-lg text-white font-mono focus:outline-none focus:border-amber-400"
+                      className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-mono focus:outline-none focus:bg-white focus:border-amber-500 focus:ring-1 focus:ring-amber-500/20"
                     />
                   </div>
 
                   <div>
                     <label
                       htmlFor="nom-10k-btn"
-                      className="block text-[11px] font-mono text-[#52525B] mb-1"
+                      className="block text-[11px] font-mono text-slate-500 mb-1 font-semibold"
                     >
                       Pilihan Nominal Saweria
                     </label>
@@ -305,10 +310,10 @@ export default function OverlayStudioPage() {
                           key={nom}
                           type="button"
                           onClick={() => handlers.handleDonationAmountChange(nom)}
-                          className={`py-2 rounded-lg text-xs font-mono font-bold border transition-colors ${
+                          className={`py-2 rounded-xl text-xs font-mono font-bold border transition-colors ${
                             states.donationAmount === nom
-                              ? 'bg-amber-950 border-amber-500 text-amber-300'
-                              : 'bg-[#F4F4F5] border-[#D4D4D8] text-[#52525B] hover:text-white'
+                              ? 'bg-amber-50 border-amber-400 text-amber-800 font-extrabold shadow-xs'
+                              : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
                           }`}
                         >
                           Rp {nom >= 1000000 ? '1M' : `${nom / 1000}k`}
@@ -320,7 +325,7 @@ export default function OverlayStudioPage() {
                   <div>
                     <label
                       htmlFor="don-msg-input"
-                      className="block text-[11px] font-mono text-[#52525B] mb-1"
+                      className="block text-[11px] font-mono text-slate-500 mb-1 font-semibold"
                     >
                       Pesan Donasi (Saweria Tip)
                     </label>
@@ -329,7 +334,7 @@ export default function OverlayStudioPage() {
                       rows={2}
                       value={states.donationMessage}
                       onChange={(e) => handlers.handleDonationMessageChange(e.target.value)}
-                      className="w-full px-3 py-2 text-xs bg-[#F4F4F5] border border-[#D4D4D8] rounded-lg text-white font-sans focus:outline-none focus:border-amber-400"
+                      className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-sans focus:outline-none focus:bg-white focus:border-amber-500 focus:ring-1 focus:ring-amber-500/20"
                     />
                   </div>
 
@@ -337,9 +342,9 @@ export default function OverlayStudioPage() {
                     <button
                       type="button"
                       onClick={handlers.handleOpenConfigModal}
-                      className="px-3 py-2 rounded-xl bg-[#F4F4F5] hover:bg-[#E4E4E7] border border-amber-500/30 hover:border-amber-400 text-xs font-bold text-amber-300 flex items-center gap-2 transition-colors"
+                      className="px-3 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-300 text-xs font-bold text-amber-800 flex items-center gap-2 transition-colors"
                     >
-                      <Sparkles className="w-4 h-4 text-amber-400" />
+                      <Sparkles className="w-4 h-4 text-amber-600" />
                       <span>
                         FX: {states.fxConfig.template} ({states.fxConfig.durationSec}s)
                       </span>
@@ -348,7 +353,7 @@ export default function OverlayStudioPage() {
                     <button
                       type="button"
                       onClick={handlers.handleTriggerDonation}
-                      className="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-md shadow-amber-950/40 transition-colors"
+                      className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm transition-colors"
                     >
                       <Gift className="w-3.5 h-3.5" />
                       <span>Trigger Donation Alert</span>
@@ -357,24 +362,25 @@ export default function OverlayStudioPage() {
                 </div>
               </div>
 
-              <div className="bg-[#FFFFFF] p-5 rounded-2xl border border-[#D4D4D8] space-y-4 shadow-lg">
-                <div className="flex items-center gap-2">
-                  <Volume2 className="w-4 h-4 text-zinc-400" />
-                  <h2 className="text-sm font-bold text-white">TTS Voice Synthesizer Module</h2>
+              {/* TTS Audio Module */}
+              <div className="bg-white p-5 rounded-2xl border border-slate-200 space-y-4 shadow-sm">
+                <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
+                  <Volume2 className="w-4 h-4 text-indigo-600" />
+                  <h2 className="text-sm font-bold text-slate-900">TTS Voice Synthesizer Module</h2>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <label
                       htmlFor="tts-voice-select"
-                      className="block text-[11px] font-mono text-[#52525B] mb-1"
+                      className="block text-[11px] font-mono text-slate-500 mb-1 font-semibold"
                     >
                       Pilihan Suara TTS
                     </label>
                     <select
                       id="tts-voice-select"
                       value={states.ttsVoice}
-                      className="w-full px-3 py-2 text-xs bg-[#F4F4F5] border border-[#D4D4D8] rounded-lg text-white font-mono focus:outline-none focus:border-zinc-400"
+                      className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl text-slate-700 font-mono focus:outline-none"
                       disabled
                     >
                       <option>{states.ttsVoice}</option>
@@ -384,19 +390,19 @@ export default function OverlayStudioPage() {
                   <div>
                     <label
                       htmlFor="tts-volume-input"
-                      className="block text-[11px] font-mono text-[#52525B] mb-1"
+                      className="block text-[11px] font-mono text-slate-500 mb-1 font-semibold"
                     >
                       Volume Audio ({states.ttsVolume}%)
                     </label>
                     <div className="flex items-center gap-2 pt-1.5">
-                      <Volume2 className="w-4 h-4 text-zinc-400" />
+                      <Volume2 className="w-4 h-4 text-indigo-600" />
                       <input
                         id="tts-volume-input"
                         type="range"
                         min={0}
                         max={100}
                         value={states.ttsVolume}
-                        className="w-full accent-zinc-500"
+                        className="w-full accent-indigo-600"
                         readOnly
                       />
                     </div>
@@ -428,3 +434,4 @@ export default function OverlayStudioPage() {
     </div>
   );
 }
+

@@ -286,6 +286,14 @@ class WebSocketHub {
       });
     });
 
+    streamerbotService.on('stream:started', (stream) => {
+      this.broadcast('stream:started', stream);
+    });
+
+    streamerbotService.on('stream:ended', (stream) => {
+      this.broadcast('stream:ended', stream);
+    });
+
     streamerbotService.on('member:new', (data) => {
       this.broadcast('member:new', data);
     });

@@ -38,25 +38,34 @@ export function useDashboardViewModel() {
   const queryClient = useQueryClient();
   const [state, dispatch] = useReducer(reducer, { liveMessages: [] });
 
-  const { data: activeStream } = useQuery<StreamSession>({
+  const { data: activeStream } = useQuery<StreamSession | null>({
     queryKey: ['active-stream'],
     queryFn: dashboardService.getActiveStream,
   });
 
+  const isLive = Boolean(activeStream?.id && activeStream?.status === 'live');
+
   const { data: chatters = [], isLoading: isChattersLoading } = useQuery<Chatter[]>({
     queryKey: ['stream-chatters', activeStream?.id],
-    queryFn: () => (activeStream ? dashboardService.getStreamChatters(activeStream.id) : []),
-    enabled: !!activeStream?.id,
+    queryFn: () => (activeStream?.id ? dashboardService.getStreamChatters(activeStream.id) : []),
+    enabled: isLive,
   });
 
   const { data: initialChats = [], isLoading: isChatsLoading } = useQuery<ChatMessage[]>({
     queryKey: ['stream-chats', activeStream?.id],
-    queryFn: () => (activeStream ? dashboardService.getStreamChats(activeStream.id, 20) : []),
-    enabled: !!activeStream?.id,
+    queryFn: () => (activeStream?.id ? dashboardService.getStreamChats(activeStream.id, 20) : []),
+    enabled: isLive,
     staleTime: Number.POSITIVE_INFINITY,
   });
 
   useEffect(() => {
+    if (!isLive) {
+      if (state.liveMessages.length > 0) {
+        dispatch({ type: 'CLEAR_MESSAGES' });
+      }
+      return;
+    }
+
     if (initialChats.length > 0 && state.liveMessages.length === 0) {
       const mapped: ChatMessage[] = [...initialChats].reverse().map((msg) => {
         let parsedParts = msg.parts;
@@ -97,7 +106,7 @@ export function useDashboardViewModel() {
       });
       dispatch({ type: 'SET_MESSAGES', payload: mapped.slice(-20) });
     }
-  }, [initialChats, state.liveMessages.length]);
+  }, [isLive, initialChats, state.liveMessages.length]);
 
   const { data: actionsData } = useQuery<{
     liveActions: unknown[];
@@ -152,13 +161,35 @@ export function useDashboardViewModel() {
     [queryClient]
   );
 
+  const handleStreamStarted = useCallback(
+    (newStream: StreamSession) => {
+      queryClient.setQueryData(['active-stream'], newStream);
+      dispatch({ type: 'CLEAR_MESSAGES' });
+      queryClient.invalidateQueries({ queryKey: ['stream-chatters', newStream?.id] });
+      queryClient.invalidateQueries({ queryKey: ['stream-chats', newStream?.id] });
+      queryClient.invalidateQueries({ queryKey: ['overlay-summary'] });
+    },
+    [queryClient]
+  );
+
+  const handleStreamEnded = useCallback(() => {
+    queryClient.setQueryData(['active-stream'], null);
+    queryClient.invalidateQueries({ queryKey: ['active-stream'] });
+    queryClient.invalidateQueries({ queryKey: ['overlay-summary'] });
+  }, [queryClient]);
+
   const {
     isSocketConnected,
     botStatus: liveBotStatus,
     sendChatMessage,
     triggerAction,
     triggerTestAlert,
-  } = useDashboardRealtime(handleNewLiveChat, handleChatAiProgress);
+  } = useDashboardRealtime(
+    handleNewLiveChat,
+    handleChatAiProgress,
+    handleStreamStarted,
+    handleStreamEnded
+  );
 
   const startStreamMutation = useMutation({
     mutationFn: (title: string) => dashboardService.startStream(title),

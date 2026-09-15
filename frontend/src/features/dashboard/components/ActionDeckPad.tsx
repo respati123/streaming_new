@@ -60,44 +60,66 @@ export function ActionDeckPad({
     }
   };
 
-  const getIcon = (iconName: string) => {
-    switch (iconName.toLowerCase()) {
-      case 'sparkles':
-      case 'sparkle':
-        return <RiSparklingLine className="text-emerald-400 text-sm" />;
-      case 'volume2':
-      case 'sound':
-      case 'speaker':
-        return <RiVolumeUpLine className="text-amber-400 text-sm" />;
-      case 'gamepad2':
-      case 'game':
-        return <RiGamepadLine className="text-zinc-400 text-sm" />;
-      case 'flame':
-      case 'fire':
-        return <RiFireLine className="text-rose-400 text-sm" />;
-      default:
-        return <RiFlashlightLine className="text-zinc-400 text-sm" />;
+  const getActionColorTheme = (iconName: string, category: string) => {
+    const key = (iconName + ' ' + category).toLowerCase();
+    if (key.includes('sound') || key.includes('volume') || key.includes('speaker')) {
+      return {
+        bg: 'bg-amber-50/70 hover:bg-amber-100/80 border-amber-200/90 text-amber-950',
+        badgeBg: 'bg-amber-100 text-amber-700',
+        icon: <RiVolumeUpLine className="text-amber-600 text-sm" />,
+        categoryText: 'text-amber-700 font-bold',
+      };
     }
+    if (key.includes('flame') || key.includes('fire')) {
+      return {
+        bg: 'bg-rose-50/70 hover:bg-rose-100/80 border-rose-200/90 text-rose-950',
+        badgeBg: 'bg-rose-100 text-rose-700',
+        icon: <RiFireLine className="text-rose-600 text-sm" />,
+        categoryText: 'text-rose-700 font-bold',
+      };
+    }
+    if (key.includes('game') || key.includes('gamepad')) {
+      return {
+        bg: 'bg-sky-50/70 hover:bg-sky-100/80 border-sky-200/90 text-sky-950',
+        badgeBg: 'bg-sky-100 text-sky-700',
+        icon: <RiGamepadLine className="text-sky-600 text-sm" />,
+        categoryText: 'text-sky-700 font-bold',
+      };
+    }
+    if (key.includes('sparkle') || key.includes('loyalty') || key.includes('reward')) {
+      return {
+        bg: 'bg-emerald-50/70 hover:bg-emerald-100/80 border-emerald-200/90 text-emerald-950',
+        badgeBg: 'bg-emerald-100 text-emerald-700',
+        icon: <RiSparklingLine className="text-emerald-600 text-sm" />,
+        categoryText: 'text-emerald-700 font-bold',
+      };
+    }
+    return {
+      bg: 'bg-indigo-50/60 hover:bg-indigo-100/70 border-indigo-200/90 text-indigo-950',
+      badgeBg: 'bg-indigo-100 text-indigo-700',
+      icon: <RiFlashlightLine className="text-indigo-600 text-sm" />,
+      categoryText: 'text-indigo-700 font-bold',
+    };
   };
 
   return (
-    <div className="flex flex-col h-full bg-[#FFFFFF] overflow-hidden border border-[#D4D4D8] shadow-xl rounded-2xl font-sans text-[#18181B]">
-      <div className="p-3.5 border-b border-[#D4D4D8] bg-[#F4F4F5] flex items-center justify-between">
+    <div className="flex flex-col h-full bg-white overflow-hidden border border-slate-200 rounded-2xl shadow-xs font-sans text-slate-900">
+      <div className="p-3.5 border-b border-slate-200 bg-slate-50/80 flex items-center justify-between">
         <div className="flex items-center gap-2.5">
-          <div className="p-1.5 rounded-lg bg-zinc-950/60 border border-zinc-800/50 text-zinc-400">
+          <div className="p-1.5 rounded-lg bg-indigo-50 border border-indigo-200 text-indigo-600 shadow-xs">
             <RiFlashlightLine className="text-base" />
           </div>
           <div>
-            <h2 className="text-xs font-bold text-white tracking-tight uppercase font-mono">
+            <h2 className="text-xs font-bold text-slate-900 tracking-tight uppercase font-mono">
               Action Deck & Macros Pad
             </h2>
           </div>
         </div>
         <span
-          className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-md uppercase tracking-wider ${
+          className={`text-[10px] font-mono font-bold px-2.5 py-1 rounded-md uppercase tracking-wider ${
             isBotConnected
-              ? 'bg-emerald-950/80 text-emerald-400 border border-emerald-500/40'
-              : 'bg-[#E4E4E7] text-[#52525B] border border-[#D4D4D8]'
+              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+              : 'bg-slate-100 text-slate-500 border border-slate-200'
           }`}
         >
           {isBotConnected ? 'GATEWAY READY' : 'BOT OFFLINE'}
@@ -107,45 +129,46 @@ export function ActionDeckPad({
       <div className="p-3.5 flex-1 overflow-y-auto space-y-4">
         <div>
           <div className="flex items-center justify-between mb-2">
-            <h3 className="text-[11px] font-bold text-[#52525B] uppercase font-mono tracking-wider">
+            <h3 className="text-[11px] font-bold text-slate-500 uppercase font-mono tracking-wider">
               Streamer.bot Key Deck
             </h3>
-            <span className="text-[10px] text-zinc-400 font-mono">{actions.length} Keys</span>
+            <span className="text-[10px] text-slate-500 font-mono font-semibold">{actions.length} Keys Configured</span>
           </div>
 
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-2 gap-2.5">
             {actions.length === 0 ? (
-              <div className="col-span-2 p-6 text-center text-xs text-[#52525B] font-mono bg-[#F4F4F5] rounded-xl border border-[#D4D4D8]">
+              <div className="col-span-2 p-6 text-center text-xs text-slate-400 font-mono bg-slate-50 rounded-xl border border-slate-200">
                 Belum ada preset action termuat.
               </div>
             ) : (
               actions.map((act) => {
                 const isTriggered = activeTrigger === act.actionId;
+                const theme = getActionColorTheme(act.icon, act.category);
                 return (
                   <button
                     key={act.id || act.actionId}
                     type="button"
                     onClick={() => handleActionClick(act)}
-                    className={`p-3 text-left flex flex-col justify-between h-20 group relative rounded-xl transition-all border ${
+                    className={`p-3 text-left flex flex-col justify-between h-20 group relative rounded-xl transition-all border shadow-2xs ${theme.bg} ${
                       isTriggered
-                        ? 'bg-zinc-950/60 border-zinc-400 shadow-md ring-1 ring-zinc-400/50'
-                        : 'bg-[#F4F4F5] hover:bg-[#E4E4E7] border-[#D4D4D8]'
+                        ? 'ring-2 ring-indigo-500 shadow-md scale-[0.98]'
+                        : 'hover:shadow-xs'
                     }`}
                   >
                     <div className="flex items-center justify-between w-full">
-                      <div className="p-1 rounded-lg bg-[#E4E4E7] border border-[#D4D4D8]">
-                        {getIcon(act.icon)}
+                      <div className={`p-1 rounded-lg ${theme.badgeBg}`}>
+                        {theme.icon}
                       </div>
-                      <span className="text-[9px] font-mono font-semibold text-[#52525B] uppercase">
+                      <span className={`text-[9px] font-mono uppercase ${theme.categoryText}`}>
                         {act.category}
                       </span>
                     </div>
 
                     <div>
-                      <div className="text-xs font-bold text-white group-hover:text-zinc-300 transition-colors truncate">
+                      <div className="text-xs font-bold text-slate-900 group-hover:text-indigo-600 transition-colors truncate">
                         {act.name}
                       </div>
-                      <div className="text-[10px] text-[#52525B] font-mono truncate">
+                      <div className="text-[10px] text-slate-500 font-mono truncate">
                         ID: {act.actionId}
                       </div>
                     </div>
@@ -156,21 +179,21 @@ export function ActionDeckPad({
           </div>
         </div>
 
-        <div className="pt-3 border-t border-[#D4D4D8]">
-          <h3 className="text-[11px] font-bold text-white uppercase font-mono mb-2.5 flex items-center gap-1.5">
-            <RiNotification3Line className="text-amber-400 text-sm" />
+        <div className="pt-3 border-t border-slate-200">
+          <h3 className="text-[11px] font-bold text-slate-900 uppercase font-mono mb-2.5 flex items-center gap-1.5">
+            <RiNotification3Line className="text-amber-500 text-sm" />
             <span>Simulasi Alert Saweria Cepat</span>
           </h3>
 
           <form
             onSubmit={handleAlertSubmit}
-            className="space-y-2.5 bg-[#F4F4F5] p-3 rounded-xl border border-[#D4D4D8]"
+            className="space-y-2.5 bg-slate-50/80 p-3.5 rounded-xl border border-slate-200"
           >
             <div className="grid grid-cols-2 gap-2">
               <div>
                 <label
                   htmlFor="deck-donor-input"
-                  className="block text-[10px] font-bold text-[#52525B] mb-1 font-sans"
+                  className="block text-[10px] font-bold text-slate-600 mb-1 font-sans"
                 >
                   Nama Donatur
                 </label>
@@ -179,14 +202,14 @@ export function ActionDeckPad({
                   type="text"
                   value={testDonor}
                   onChange={(e) => setTestDonor(e.target.value)}
-                  className="w-full px-2.5 py-1.5 text-xs bg-[#FFFFFF] border border-[#D4D4D8] rounded-lg font-mono focus:outline-none focus:border-zinc-400 font-medium text-white"
+                  className="w-full px-2.5 py-1.5 text-xs bg-white border border-slate-200 rounded-lg font-mono focus:outline-none focus:border-indigo-500 font-medium text-slate-900"
                 />
               </div>
 
               <div>
                 <label
                   htmlFor="deck-amount-input"
-                  className="block text-[10px] font-bold text-[#52525B] mb-1 font-sans"
+                  className="block text-[10px] font-bold text-slate-600 mb-1 font-sans"
                 >
                   Nominal (Rp)
                 </label>
@@ -196,7 +219,7 @@ export function ActionDeckPad({
                   step="5000"
                   value={testAmount}
                   onChange={(e) => setTestAmount(e.target.value)}
-                  className="w-full px-2.5 py-1.5 text-xs bg-[#FFFFFF] border border-[#D4D4D8] rounded-lg font-mono font-bold text-amber-400 focus:outline-none focus:border-zinc-400"
+                  className="w-full px-2.5 py-1.5 text-xs bg-white border border-slate-200 rounded-lg font-mono font-bold text-amber-600 focus:outline-none focus:border-indigo-500"
                 />
               </div>
             </div>
@@ -204,7 +227,7 @@ export function ActionDeckPad({
             <div>
               <label
                 htmlFor="deck-message-input"
-                className="block text-[10px] font-bold text-[#52525B] mb-1 font-sans"
+                className="block text-[10px] font-bold text-slate-600 mb-1 font-sans"
               >
                 Pesan Donasi
               </label>
@@ -213,14 +236,14 @@ export function ActionDeckPad({
                 rows={2}
                 value={testMessage}
                 onChange={(e) => setTestMessage(e.target.value)}
-                className="w-full px-2.5 py-1.5 text-xs bg-[#FFFFFF] border border-[#D4D4D8] rounded-lg focus:outline-none focus:border-zinc-400 font-sans text-white"
+                className="w-full px-2.5 py-1.5 text-xs bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-indigo-500 font-sans text-slate-900"
               />
             </div>
 
             <button
               type="submit"
               disabled={isAlertSending}
-              className="w-full py-2 px-3 text-xs font-bold text-white bg-amber-600 hover:bg-amber-500 rounded-xl shadow-md flex items-center justify-center gap-2 disabled:opacity-50 font-sans transition-colors"
+              className="w-full py-2 px-3 text-xs font-bold text-white bg-amber-500 hover:bg-amber-600 rounded-xl shadow-md shadow-amber-500/20 flex items-center justify-center gap-2 disabled:opacity-50 font-sans transition-colors"
             >
               <RiPlayFill className="text-sm" />
               <span>{isAlertSending ? 'Memancarkan Alert...' : 'Tembakkan Alert Donasi'}</span>

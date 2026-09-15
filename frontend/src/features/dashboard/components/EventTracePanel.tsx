@@ -19,31 +19,31 @@ export function EventTracePanel({ logs, onClearLogs }: EventTracePanelProps) {
     switch (type) {
       case 'ws_send':
         return (
-          <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-zinc-950/80 text-zinc-300 border border-zinc-500/40">
+          <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-cyan-100 text-cyan-800 border border-cyan-200">
             [WS SEND]
           </span>
         );
       case 'audio':
         return (
-          <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-950/80 text-amber-300 border border-amber-500/40">
+          <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-100 text-amber-800 border border-amber-200">
             [WEB AUDIO API]
           </span>
         );
       case 'tts':
         return (
-          <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-zinc-950/80 text-zinc-300 border border-zinc-500/40">
+          <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-indigo-100 text-indigo-800 border border-indigo-200">
             [TTS SYNTHESIS]
           </span>
         );
       case 'burst':
         return (
-          <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-zinc-950/80 text-zinc-300 border border-zinc-500/40">
+          <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-purple-100 text-purple-800 border border-purple-200">
             [BURST QUEUE]
           </span>
         );
       default:
         return (
-          <span className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-zinc-800 text-zinc-300">
+          <span className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-slate-100 text-slate-700 border border-slate-200">
             [EVENT]
           </span>
         );
@@ -51,20 +51,20 @@ export function EventTracePanel({ logs, onClearLogs }: EventTracePanelProps) {
   };
 
   return (
-    <div className="bg-[#FFFFFF] rounded-2xl border border-[#D4D4D8] overflow-hidden shadow-lg flex flex-col font-sans text-[#18181B]">
-      <div className="px-4 py-3 border-b border-[#D4D4D8] bg-[#F4F4F5] flex items-center justify-between gap-3">
+    <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs flex flex-col font-sans text-slate-900">
+      <div className="px-4 py-3 border-b border-slate-200 bg-slate-50/80 flex items-center justify-between gap-3">
         <div className="flex items-center gap-2">
-          <Terminal className="w-4 h-4 text-zinc-400" />
-          <h3 className="text-xs font-bold text-white tracking-tight">
+          <Terminal className="w-4 h-4 text-indigo-600" />
+          <h3 className="text-xs font-bold text-slate-900 tracking-tight">
             Event & WebSocket Dispatch Trace
           </h3>
-          <span className="text-[10px] font-mono text-zinc-400 bg-[#E4E4E7] px-2 py-0.5 rounded border border-[#D4D4D8]">
+          <span className="text-[10px] font-mono text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-200 font-semibold">
             {logs.length} events
           </span>
         </div>
 
         <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1 bg-[#E4E4E7] p-0.5 rounded-lg border border-[#D4D4D8]">
+          <div className="flex items-center gap-1 bg-white p-0.5 rounded-lg border border-slate-200 shadow-2xs">
             {(['all', 'ws_send', 'audio', 'tts'] as const).map((f) => (
               <button
                 key={f}
@@ -72,8 +72,8 @@ export function EventTracePanel({ logs, onClearLogs }: EventTracePanelProps) {
                 onClick={() => setFilter(f)}
                 className={`px-2 py-0.5 rounded text-[10px] font-mono transition-colors ${
                   filter === f
-                    ? 'bg-zinc-600 text-white font-bold'
-                    : 'text-[#52525B] hover:text-white'
+                    ? 'bg-indigo-600 text-white font-bold shadow-2xs'
+                    : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'
                 }`}
               >
                 {f.toUpperCase()}
@@ -84,16 +84,17 @@ export function EventTracePanel({ logs, onClearLogs }: EventTracePanelProps) {
           <button
             type="button"
             onClick={onClearLogs}
-            className="p-1 rounded-lg bg-[#E4E4E7] hover:bg-[#D4D4D8] text-[#52525B] hover:text-white transition-colors"
+            className="p-1 rounded-lg bg-white hover:bg-slate-50 border border-slate-200 text-slate-500 hover:text-rose-600 transition-colors shadow-2xs"
+            title="Clear Event Logs"
           >
             <Trash2 className="w-3.5 h-3.5" />
           </button>
         </div>
       </div>
 
-      <div className="p-3 bg-[#FFFFFF] min-h-[160px] max-h-[220px] overflow-y-auto space-y-1.5 font-mono text-xs select-text">
+      <div className="p-3 bg-slate-950 min-h-[160px] max-h-[220px] overflow-y-auto space-y-1.5 font-mono text-xs select-text">
         {filteredLogs.length === 0 ? (
-          <div className="text-center py-6 text-[#71717A] text-xs">
+          <div className="text-center py-6 text-slate-500 text-xs">
             Belum ada trace event tercatat. Picu chat atau donasi test untuk melihat payload
             dispatch.
           </div>
@@ -101,11 +102,11 @@ export function EventTracePanel({ logs, onClearLogs }: EventTracePanelProps) {
           filteredLogs.map((item) => (
             <div
               key={item.id}
-              className="flex items-start gap-2.5 p-1.5 rounded hover:bg-[#F4F4F5]/80 transition-colors border border-transparent hover:border-[#D4D4D8]"
+              className="flex items-start gap-2.5 p-1.5 rounded hover:bg-slate-900 transition-colors border border-transparent hover:border-slate-800"
             >
-              <span className="text-[11px] text-zinc-400 shrink-0">{item.timestamp}</span>
+              <span className="text-[11px] text-slate-400 shrink-0">{item.timestamp}</span>
               {getTagBadge(item.type)}
-              <span className="text-zinc-200 text-[11px] break-all flex-1">{item.content}</span>
+              <span className="text-slate-200 text-[11px] break-all flex-1">{item.content}</span>
             </div>
           ))
         )}

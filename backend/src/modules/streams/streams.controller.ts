@@ -13,7 +13,7 @@ export const streamsController = new Hono<AppEnvironment>();
  * Get active live stream session details
  */
 streamsController.get('/active', async (c) => {
-  const activeStream = await streamsService.getOrCreateActiveStream();
+  const activeStream = await streamsService.getActiveStream();
   return sendSuccess(c, activeStream, 'Active stream session retrieved');
 });
 
@@ -58,7 +58,10 @@ streamsController.get('/:id/chats', async (c) => {
 
   let targetStreamId = streamId;
   if (streamId === 'active') {
-    const activeStream = await streamsService.getOrCreateActiveStream();
+    const activeStream = await streamsService.getActiveStream();
+    if (!activeStream) {
+      return sendSuccess(c, [], 'No active stream session, returning empty chat list');
+    }
     targetStreamId = activeStream.id;
   }
 

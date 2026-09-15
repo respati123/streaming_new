@@ -13,19 +13,27 @@ import {
   youtubeEmotes,
 } from '@core/database/schema';
 import { logger } from '@core/logger/logger';
-import { desc, eq, sql } from 'drizzle-orm';
+import { and, desc, eq, sql } from 'drizzle-orm';
 import { HTTPException } from 'hono/http-exception';
 import type { IncomingChatMessageDTO, StartStreamDTO } from './streams.types';
 
 export class StreamsService {
   /**
-   * Get or automatically create the currently active live stream session
+   * Get the currently active live stream session, or null if no stream is live
    */
-  async getOrCreateActiveStream(): Promise<StreamSessionTable> {
+  async getActiveStream(): Promise<StreamSessionTable | null> {
     const active = await db.query.streamSessions.findFirst({
       where: eq(streamSessions.status, 'live'),
       orderBy: [desc(streamSessions.startedAt)],
     });
+    return active || null;
+  }
+
+  /**
+   * Get or automatically create the currently active live stream session
+   */
+  async getOrCreateActiveStream(): Promise<StreamSessionTable> {
+    const active = await this.getActiveStream();
 
     if (active) {
       return active;
@@ -327,16 +335,23 @@ export class StreamsService {
    * Get Aggregated Overlay Summary for OBS Top Ticker & Widgets
    */
   async getOverlaySummary() {
-    const [settings, activeStream, goals, latestDonation, topDonation] = await Promise.all([
+    const activeStream = await this.getActiveStream();
+
+    const [settings, goals, latestDonation, topDonation] = await Promise.all([
       this.getStreamSettings(),
-      this.getOrCreateActiveStream(),
       this.getActiveStreamGoals(),
-      db.query.donations.findFirst({
-        orderBy: [desc(donations.createdAt)],
-      }),
-      db.query.donations.findFirst({
-        orderBy: [desc(donations.amount)],
-      }),
+      activeStream
+        ? db.query.donations.findFirst({
+            where: and(eq(donations.streamId, activeStream.id), eq(donations.status, 'completed')),
+            orderBy: [desc(donations.createdAt)],
+          })
+        : null,
+      activeStream
+        ? db.query.donations.findFirst({
+            where: and(eq(donations.streamId, activeStream.id), eq(donations.status, 'completed')),
+            orderBy: [desc(donations.amount)],
+          })
+        : null,
     ]);
 
     return {

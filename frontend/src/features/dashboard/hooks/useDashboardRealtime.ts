@@ -8,7 +8,9 @@ import type {
 
 export function useDashboardRealtime(
   onNewChat?: (msg: ChatMessage) => void,
-  onChatAiProgress?: (progress: ChatAiProgressEvent) => void
+  onChatAiProgress?: (progress: ChatAiProgressEvent) => void,
+  onStreamStarted?: (stream: any) => void,
+  onStreamEnded?: (stream: any) => void
 ) {
   const [connectionState, setConnectionState] = useState<ConnectionState>('DISCONNECTED');
   const [botStatus, setBotStatus] = useState<StreamerbotStatus | null>(null);
@@ -31,6 +33,14 @@ export function useDashboardRealtime(
 
     const unsubStatus = dashboardSocket.on('status:changed', (data) => {
       setBotStatus((prev) => (prev ? { ...prev, status: data.status } : null));
+    });
+
+    const unsubStreamStarted = dashboardSocket.on('stream:started', (stream) => {
+      onStreamStarted?.(stream);
+    });
+
+    const unsubStreamEnded = dashboardSocket.on('stream:ended', (stream) => {
+      onStreamEnded?.(stream);
     });
 
     const unsubChat = dashboardSocket.on('chat:message', (data) => {
@@ -72,12 +82,14 @@ export function useDashboardRealtime(
       unsubState();
       unsubWelcome();
       unsubStatus();
+      unsubStreamStarted();
+      unsubStreamEnded();
       unsubChat();
       unsubChatAiProgress();
       unsubAlert();
       unsubActionResult();
     };
-  }, [onChatAiProgress, onNewChat]);
+  }, [onChatAiProgress, onNewChat, onStreamStarted, onStreamEnded]);
 
   const sendChatMessage = useCallback((message: string, username = 'Streamer Host') => {
     return dashboardSocket.send('chat:send', {

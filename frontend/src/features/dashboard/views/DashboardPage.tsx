@@ -9,7 +9,7 @@ export default function DashboardPage() {
   const { states, handlers } = useDashboardViewModel();
 
   return (
-    <div className="min-h-[100dvh] bg-[#FAFAFA] text-[#18181B] flex flex-col font-sans">
+    <div className="min-h-[100dvh] bg-[#F8FAFC] text-slate-900 flex flex-col font-sans">
       <StreamControlHeader
         activeStream={states.activeStream}
         botStatus={states.botStatus}

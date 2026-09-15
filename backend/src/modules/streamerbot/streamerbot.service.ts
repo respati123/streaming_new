@@ -91,6 +91,11 @@ export class StreamerbotService extends EventEmitter {
         immediate: true,
         subscribe: {
           YouTube: [
+            'BroadcastStarted',
+            'BroadcastEnded',
+            'BroadcastUpdated',
+            'BroadcastMonitoringStarted',
+            'BroadcastMonitoringEnded',
             'SuperChat',
             'SuperSticker',
             'NewSponsor',
@@ -99,7 +104,17 @@ export class StreamerbotService extends EventEmitter {
             'Message',
             'FirstWords',
           ],
-          Twitch: ['Cheer', 'ChatMessage', 'Sub', 'ReSub', 'GiftSub'],
+          Twitch: [
+            'StreamOnline',
+            'StreamOffline',
+            'StreamUpdate',
+            'Cheer',
+            'ChatMessage',
+            'Sub',
+            'ReSub',
+            'GiftSub',
+          ],
+          Obs: ['StreamingStarted', 'StreamingStopped', 'Connected', 'Disconnected'],
           General: ['Custom'],
         },
         onConnect: (info) => {
@@ -111,6 +126,8 @@ export class StreamerbotService extends EventEmitter {
             info,
           });
           this.emit('connected', { host: this.host, port: this.port, info });
+          // Auto sync active YouTube broadcast if available
+          this.syncActiveBroadcastOnConnect();
         },
         onDisconnect: () => {
           this.setStatus('RECONNECTING');
@@ -138,10 +155,116 @@ export class StreamerbotService extends EventEmitter {
   }
 
   /**
+   * On connecting to Streamer.bot, log broadcaster information
+   */
+  private async syncActiveBroadcastOnConnect(): Promise<void> {
+    if (!this.client) return;
+    try {
+      const broadcaster = await this.client.getBroadcaster();
+      if (broadcaster?.platforms?.youtube) {
+        logger.info(
+          `📡 [StreamerbotService] Connected to YouTube Channel: "${broadcaster.platforms.youtube.broadcastUserName}" (ID: ${broadcaster.platforms.youtube.broadcastUserId})`
+        );
+      }
+    } catch (err) {
+      logger.debug('[StreamerbotService] getBroadcaster check skipped/failed', {
+        error: String(err),
+      });
+    }
+  }
+
+  /**
    * Set up typed event listeners for incoming stream events from Streamer.bot
    */
   private setupEventListeners(): void {
     if (!this.client) return;
+
+    // ─── OBS STREAMING LIFECYCLE ───
+    this.client.on('Obs.StreamingStarted', async (event: any) => {
+      logger.info('🔴 [StreamerbotService] OBS Streaming Started event received', event);
+      const data = event?.data || {};
+      const broadcastId = data.id || data.broadcastId || undefined;
+      const title = data.title || `OBS Live Stream - ${new Date().toLocaleDateString('id-ID')}`;
+
+      const { streamsService } = await import('@modules/streams/streams.service');
+      const newSession = await streamsService.startStream({
+        title,
+        youtubeBroadcastId: broadcastId,
+      });
+      this.emit('stream:started', newSession);
+    });
+
+    this.client.on('Obs.StreamingStopped', async (event: any) => {
+      logger.info('⏹️ [StreamerbotService] OBS Streaming Stopped event received', event);
+      const { streamsService } = await import('@modules/streams/streams.service');
+      const activeStream = await streamsService.getActiveStream();
+      if (activeStream) {
+        const ended = await streamsService.endStream(activeStream.id);
+        this.emit('stream:ended', ended);
+      }
+    });
+
+    // ─── YOUTUBE BROADCAST LIFECYCLE ───
+    this.client.on('YouTube.BroadcastStarted', async (event: any) => {
+      logger.info('🔴 [StreamerbotService] YouTube.BroadcastStarted received', event);
+      const data = event.data || {};
+      const broadcastId = data.id || data.broadcastId;
+      const title = data.title || `YouTube Live - ${new Date().toLocaleDateString('id-ID')}`;
+
+      const { streamsService } = await import('@modules/streams/streams.service');
+      const newSession = await streamsService.startStream({
+        title,
+        youtubeBroadcastId: broadcastId,
+      });
+      this.emit('stream:started', newSession);
+    });
+
+    this.client.on('YouTube.BroadcastMonitoringStarted', async (event: any) => {
+      logger.info('📡 [StreamerbotService] YouTube.BroadcastMonitoringStarted received', event);
+      const data = event.data || {};
+      const broadcastId = data.id || data.broadcastId;
+      const title = data.title || `YouTube Live - ${new Date().toLocaleDateString('id-ID')}`;
+
+      const { streamsService } = await import('@modules/streams/streams.service');
+      const active = await streamsService.getActiveStream();
+      if (!active || (broadcastId && active.youtubeBroadcastId !== broadcastId)) {
+        const newSession = await streamsService.startStream({
+          title,
+          youtubeBroadcastId: broadcastId,
+        });
+        this.emit('stream:started', newSession);
+      }
+    });
+
+    this.client.on('YouTube.BroadcastEnded', async (event: any) => {
+      logger.info('⏹️ [StreamerbotService] YouTube.BroadcastEnded received', event);
+      const { streamsService } = await import('@modules/streams/streams.service');
+      const activeStream = await streamsService.getActiveStream();
+      if (activeStream) {
+        const ended = await streamsService.endStream(activeStream.id);
+        this.emit('stream:ended', ended);
+      }
+    });
+
+    // ─── TWITCH STREAM LIFECYCLE ───
+    this.client.on('Twitch.StreamOnline', async (event: any) => {
+      logger.info('🔴 [StreamerbotService] Twitch.StreamOnline received', event);
+      const { streamsService } = await import('@modules/streams/streams.service');
+      const newSession = await streamsService.startStream({
+        title: `Twitch Live Stream - ${new Date().toLocaleDateString('id-ID')}`,
+      });
+      this.emit('stream:started', newSession);
+    });
+
+    this.client.on('Twitch.StreamOffline', async (event: any) => {
+      logger.info('⏹️ [StreamerbotService] Twitch.StreamOffline received', event);
+      const { streamsService } = await import('@modules/streams/streams.service');
+      const activeStream = await streamsService.getActiveStream();
+      if (activeStream) {
+        const ended = await streamsService.endStream(activeStream.id);
+        this.emit('stream:ended', ended);
+      }
+    });
 
     // 1. YouTube SuperChat
     this.client.on('YouTube.SuperChat', (event: any) => {

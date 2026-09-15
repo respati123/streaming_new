@@ -12,11 +12,11 @@ describe('Theme Store (Zustand)', () => {
     expect(useThemeStore.getState().resolvedTheme).toBe('light');
   });
 
-  it('should keep the application on the light theme', () => {
+  it('should switch theme to dark and toggle properly', () => {
     useThemeStore.getState().setTheme('dark');
-    expect(useThemeStore.getState().theme).toBe('light');
-    expect(useThemeStore.getState().resolvedTheme).toBe('light');
-    expect(localStorage.getItem('app_theme_preference')).toBe('light');
+    expect(useThemeStore.getState().theme).toBe('dark');
+    expect(useThemeStore.getState().resolvedTheme).toBe('dark');
+    expect(localStorage.getItem('app_theme_preference')).toBe('dark');
 
     useThemeStore.getState().toggleTheme();
     expect(useThemeStore.getState().theme).toBe('light');
