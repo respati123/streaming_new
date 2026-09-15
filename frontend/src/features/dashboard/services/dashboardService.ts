@@ -4,6 +4,8 @@ import type {
   ChatAiInteractionSummary,
   ChatMessage,
   Chatter,
+  DonationItem,
+  EventsQueueSnapshot,
   OverlaySummary,
   StreamerbotStatus,
   StreamSession,
@@ -87,6 +89,16 @@ export const dashboardService = {
   async triggerAction(action: string, args: Record<string, unknown> = {}) {
     const res = await apiClient.post('/streamerbot/actions/trigger', { action, args });
     return res.data;
+  },
+
+  async getRecentDonations(limit = 20): Promise<DonationItem[]> {
+    const res = await apiClient.get<{ data: DonationItem[] }>(`/donations/recent?limit=${limit}`);
+    return res.data.data;
+  },
+
+  async getEventsQueue(): Promise<EventsQueueSnapshot> {
+    const res = await apiClient.get<{ data: EventsQueueSnapshot }>('/streams/events-queue');
+    return res.data.data;
   },
 
   async triggerTestAlert(payload: {

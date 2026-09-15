@@ -5,7 +5,15 @@ export const corsMiddleware = cors({
   origin: (origin) => {
     if (!origin) return '*';
     const allowed = env.CORS_ORIGINS.split(',').map((o) => o.trim());
-    if (allowed.includes('*') || allowed.includes(origin)) {
+    if (
+      allowed.includes('*') ||
+      allowed.includes(origin) ||
+      origin.includes('localhost') ||
+      origin.includes('127.0.0.1') ||
+      origin.includes('192.168.') ||
+      origin.includes('10.') ||
+      origin.includes('172.')
+    ) {
       return origin;
     }
     return allowed[0] || '*';

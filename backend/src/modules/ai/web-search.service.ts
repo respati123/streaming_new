@@ -79,7 +79,7 @@ export class WebSearchService {
         ...(sessionId ? { 'Mcp-Session-Id': sessionId } : {}),
       },
       body: JSON.stringify(payload),
-      signal: AbortSignal.timeout(8_000),
+      signal: AbortSignal.timeout(5_000),
     });
     const body = await response.text();
     if (!response.ok) throw new Error(`Web search MCP request failed (${response.status})`);

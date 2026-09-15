@@ -5,12 +5,14 @@ import {
   EmoteMessageRenderer,
 } from '@shared/components/ui/EmoteMessageRenderer';
 import { useQuery } from '@tanstack/react-query';
+import QRCode from 'qrcode';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   RiCameraFill,
   RiChat1Line,
   RiCloseLine,
   RiFlashlightFill,
+  RiQrCodeLine,
   RiRefreshLine,
   RiShieldCheckFill,
   RiSparklingFill,
@@ -31,6 +33,7 @@ interface ChatOverlayMsg {
   username: string;
   youtubeHandle?: string | null;
   message: string;
+  aiAnswer?: string | null;
   isChatAiCommand?: boolean;
   emotes?: ChatEmote[];
   parts?: ChatPart[];
@@ -97,14 +100,93 @@ function playChimeAlert() {
 
 export default function OverlayPage() {
   const [searchParams] = useSearchParams();
-  const widgetFilter = searchParams.get('widget') || 'all'; // 'all' | 'alert' | 'chat' | 'ticker' | 'webcam'
+  const widgetFilter = searchParams.get('widget') || 'all'; // 'all' | 'alert' | 'chat' | 'ticker' | 'webcam' | 'qr'
+  const chatPos = searchParams.get('chat_pos') || 'above-minimap'; // 'above-minimap' | 'bottom-left' | 'right-center' | 'bottom-right'
+  const qrPos = searchParams.get('qr_pos') || 'top-right'; // 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left'
   const bgParam = searchParams.get('bg');
-  const showWallpaper = bgParam !== 'none' && bgParam !== 'transparent';
+  // Default is 100% transparent for OBS Studio; only show wallpaper if ?bg=wallpaper or ?bg=video is passed
+  const showWallpaper = bgParam === 'wallpaper' || bgParam === 'video';
   const [messages, setMessages] = useState<ChatOverlayMsg[]>([]);
   const [activeAlert, setActiveAlert] = useState<AlertToast | null>(null);
   const [showWebcamFrame, setShowWebcamFrame] = useState(searchParams.get('webcam') === 'true');
-  const [showPreviewTools, setShowPreviewTools] = useState(false);
+  const [showQrCode, setShowQrCode] = useState(searchParams.get('qr') !== 'false');
+  const [showPreviewTools, setShowPreviewTools] = useState(searchParams.get('tools') === 'true');
+  const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
   const alertTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Determine target User Portal URL for the QR Code
+  // When running on localhost / OBS browser source, default to LAN IP (192.168.100.9) so mobile phones on the same Wi-Fi can scan & connect!
+  const isLocalHost =
+    typeof window !== 'undefined' &&
+    (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+  const targetHost = isLocalHost ? '192.168.100.9' : window.location.hostname;
+  const targetPort = window.location.port ? `:${window.location.port}` : '';
+  const portalUrl =
+    searchParams.get('qr_url') || `${window.location.protocol}//${targetHost}${targetPort}/user`;
+
+  const rawQrBg = searchParams.get('qr_bg') || '09090b';
+  const rawQrColor = searchParams.get('qr_color') || 'ffffff';
+  const qrBg = rawQrBg.startsWith('#') ? rawQrBg : `#${rawQrBg}`;
+  const qrColor = rawQrColor.startsWith('#') ? rawQrColor : `#${rawQrColor}`;
+
+  // Generate QR Code image Data URL on mount
+  useEffect(() => {
+    QRCode.toDataURL(portalUrl, {
+      width: 256,
+      margin: 1,
+      color: {
+        dark: qrColor,
+        light: qrBg,
+      },
+    })
+      .then((url) => setQrDataUrl(url))
+      .catch((err) => console.error('Failed to generate overlay QR Code:', err));
+  }, [portalUrl, qrColor, qrBg]);
+
+  // Position class for Chat Box
+  const getChatPositionClass = () => {
+    switch (chatPos) {
+      case 'bottom-left':
+        return 'left-4 bottom-4';
+      case 'right-center':
+        return 'right-4 bottom-[260px]';
+      case 'bottom-right':
+        return 'right-4 bottom-4';
+      case 'above-minimap':
+      default:
+        // Positioned perfectly above Dota 2 / MOBA minimap (bottom: 275px)
+        return 'left-4 bottom-[275px]';
+    }
+  };
+
+  // Position class for User Portal QR Code Box
+  const getQrPositionClass = () => {
+    switch (qrPos) {
+      case 'top-left':
+        return 'top-4 left-4';
+      case 'bottom-left':
+        return 'bottom-[275px] left-4';
+      case 'bottom-right':
+        return 'bottom-4 right-4';
+      case 'top-right':
+      default:
+        return 'top-4 right-4';
+    }
+  };
+
+  // Ensure 100% transparent background for OBS Browser Source
+  useEffect(() => {
+    const originalHtmlBg = document.documentElement.style.backgroundColor;
+    const originalBodyBg = document.body.style.backgroundColor;
+
+    document.documentElement.style.backgroundColor = 'transparent';
+    document.body.style.backgroundColor = 'transparent';
+
+    return () => {
+      document.documentElement.style.backgroundColor = originalHtmlBg;
+      document.body.style.backgroundColor = originalBodyBg;
+    };
+  }, []);
 
   // 1. Fetch Dynamic Overlay Summary (Settings, Active Stream, Goals, Top Tips)
   const { data: summary, refetch: refetchSummary } = useQuery<OverlaySummary>({
@@ -114,8 +196,8 @@ export default function OverlayPage() {
   });
 
   // 2. Trigger Alert Helper
-  const triggerAlert = useCallback((alert: Omit<AlertToast, 'id'>) => {
-    const alertId = Date.now().toString();
+  const triggerAlert = useCallback((alert: Omit<AlertToast, 'id'> & { id?: string }) => {
+    const alertId = alert.id || Date.now().toString();
     playChimeAlert();
 
     if (alertTimerRef.current) {
@@ -146,9 +228,12 @@ export default function OverlayPage() {
       id: alertId,
     });
 
+    const duration = alert.durationMs || 8000;
     alertTimerRef.current = setTimeout(() => {
+      overlaySocket.send('overlay:alert:finished', { id: alertId });
+      overlaySocket.send('overlay:event:completed', { id: alertId });
       setActiveAlert(null);
-    }, alert.durationMs || 8000);
+    }, duration);
   }, []);
 
   // 2. Fetch Initial 15-20 Messages for the currently Live Stream Session
@@ -172,41 +257,44 @@ export default function OverlayPage() {
   // Populate initial chat history on overlay load (only if stream is active & live)
   useEffect(() => {
     if (summary?.activeStream?.status === 'live' && initialChats.length > 0 && messages.length === 0) {
-      const mappedChats: ChatOverlayMsg[] = [...initialChats].reverse().map((msg: any) => {
-        let parsedParts = msg.parts;
-        if (typeof parsedParts === 'string') {
-          try {
-            parsedParts = JSON.parse(parsedParts);
-          } catch {
-            parsedParts = [];
+      const mappedChats: ChatOverlayMsg[] = [...initialChats]
+        .reverse()
+        .map((msg: any) => {
+          let parsedParts = msg.parts;
+          if (typeof parsedParts === 'string') {
+            try {
+              parsedParts = JSON.parse(parsedParts);
+            } catch {
+              parsedParts = [];
+            }
           }
-        }
-        let parsedEmotes = msg.emotes;
-        if (typeof parsedEmotes === 'string') {
-          try {
-            parsedEmotes = JSON.parse(parsedEmotes);
-          } catch {
-            parsedEmotes = [];
+          let parsedEmotes = msg.emotes;
+          if (typeof parsedEmotes === 'string') {
+            try {
+              parsedEmotes = JSON.parse(parsedEmotes);
+            } catch {
+              parsedEmotes = [];
+            }
           }
-        }
-        const prompt = getChatAiPrompt(msg.message || '');
-        return {
-          id: msg.id || String(Math.random()),
-          username: msg.user?.name || msg.username || 'Anonymous',
-          youtubeHandle: msg.user?.youtubeHandle || null,
-          message: prompt || msg.message || '',
-          isChatAiCommand: Boolean(prompt || msg.isChatAiCommand),
-          emotes: Array.isArray(parsedEmotes) ? (parsedEmotes as ChatEmote[]) : [],
-          parts: Array.isArray(parsedParts) ? (parsedParts as ChatPart[]) : [],
-          avatarUrl: msg.user?.image || msg.userAvatarUrl || null,
-          isOwner: Boolean(msg.isOwner || msg.user?.role === 'streamer' || msg.user?.role === 'owner'),
-          isModerator: Boolean(msg.isModerator || msg.user?.role === 'moderator'),
-          isSponsor: Boolean(msg.isSponsor || msg.user?.role === 'member' || msg.user?.role === 'sponsor'),
-          isVerified: Boolean(msg.isVerified),
-          tier: msg.user?.tier || msg.tier || 'bronze',
-          timestamp: msg.publishedAt || new Date().toISOString(),
-        };
-      });
+          const prompt = getChatAiPrompt(msg.message || '');
+          return {
+            id: msg.id || String(Math.random()),
+            username: msg.user?.name || msg.username || 'Anonymous',
+            youtubeHandle: msg.user?.youtubeHandle || null,
+            message: prompt || msg.message || '',
+            isChatAiCommand: Boolean(prompt || msg.isChatAiCommand),
+            emotes: Array.isArray(parsedEmotes) ? (parsedEmotes as ChatEmote[]) : [],
+            parts: Array.isArray(parsedParts) ? (parsedParts as ChatPart[]) : [],
+            avatarUrl: msg.user?.image || msg.userAvatarUrl || null,
+            isOwner: Boolean(msg.isOwner || msg.user?.role === 'streamer' || msg.user?.role === 'owner'),
+            isModerator: Boolean(msg.isModerator || msg.user?.role === 'moderator'),
+            isSponsor: Boolean(msg.isSponsor || msg.user?.role === 'member' || msg.user?.role === 'sponsor'),
+            isVerified: Boolean(msg.isVerified),
+            tier: msg.user?.tier || msg.tier || 'bronze',
+            timestamp: msg.publishedAt || new Date().toISOString(),
+          };
+        })
+        .filter((msg) => !msg.isChatAiCommand); // Chat AI questions appear when AI dialogue is ready
       setMessages(mappedChats.slice(-15));
     }
   }, [summary?.activeStream?.status, initialChats, messages.length]);
@@ -229,12 +317,18 @@ export default function OverlayPage() {
       if (!payload) return;
       const chatAiPrompt =
         (payload.chatAiPrompt as string) || getChatAiPrompt(String(payload.message || ''));
+      
+      // Ignore raw Chat AI commands; they will be displayed when chatai:ready is received with answer
+      if (payload.isChatAiCommand || chatAiPrompt) {
+        return;
+      }
+
       const newMsg: ChatOverlayMsg = {
         id: (payload.id as string) || Date.now().toString(),
         username: (payload.user as string) || (payload.username as string) || 'Anonymous',
         youtubeHandle: (payload.youtubeHandle as string) || null,
-        message: (chatAiPrompt as string) || (payload.message as string) || '',
-        isChatAiCommand: Boolean(payload.isChatAiCommand || chatAiPrompt),
+        message: (payload.message as string) || '',
+        isChatAiCommand: false,
         emotes: (payload.emotes as ChatEmote[]) || [],
         parts: (payload.parts as ChatPart[]) || [],
         avatarUrl: (payload.avatarUrl as string) || (payload.userAvatarUrl as string) || null,
@@ -254,17 +348,41 @@ export default function OverlayPage() {
       setMessages((prev) => [...prev.slice(-12), newMsg]);
     });
 
+    // Chat AI Q&A Card enters overlay chat list simultaneously when AI is ready & starts playing
+    const unsubChatAiReady = overlaySocket.on('chatai:ready', (rawPayload: unknown) => {
+      const payload = rawPayload as {
+        interactionId?: string;
+        user?: { name?: string; avatarUrl?: string | null };
+        question?: string;
+        answer?: string;
+      } | null;
+      if (!payload || !payload.question) return;
+
+      const chatAiMsg: ChatOverlayMsg = {
+        id: payload.interactionId || Date.now().toString(),
+        username: payload.user?.name || 'Anonymous',
+        message: payload.question,
+        aiAnswer: payload.answer || null,
+        isChatAiCommand: true,
+        avatarUrl: payload.user?.avatarUrl || null,
+        timestamp: new Date().toISOString(),
+      };
+
+      setMessages((prev) => [...prev.slice(-12), chatAiMsg]);
+    });
+
     const unsubAlert = overlaySocket.on('donation:alert', (rawPayload: unknown) => {
       const payload = rawPayload as Record<string, unknown> | null;
       if (!payload) return;
       triggerAlert({
+        id: (payload.id as string) || undefined,
         donorName: (payload.donorName as string) || 'Generous Supporter',
         amount: Number(payload.amount) || 10000,
         currency: (payload.currency as string) || 'Rp',
         message: (payload.message as string) || undefined,
         gifUrl: (payload.gifUrl as string) || undefined,
         template: (payload.template as AlertLayoutTemplate) || undefined,
-        durationMs: (payload.durationMs as number) || 8000,
+        durationMs: (payload.durationMs as number) || (payload.durationSec ? Number(payload.durationSec) * 1000 : 8000),
       });
       // Refresh summary to update ticker metrics
       refetchSummary();
@@ -274,6 +392,7 @@ export default function OverlayPage() {
       unsubStreamStarted();
       unsubStreamEnded();
       unsubChat();
+      unsubChatAiReady();
       unsubAlert();
       if (alertTimerRef.current) clearTimeout(alertTimerRef.current);
     };
@@ -541,14 +660,16 @@ export default function OverlayPage() {
       {(widgetFilter === 'all' || widgetFilter === 'chat') && <NpcDialogueOverlay />}
 
       {(widgetFilter === 'all' || widgetFilter === 'chat') && (
-        <div className="absolute left-4 bottom-4 w-[430px] max-w-[90vw] z-20 flex flex-col justify-end pointer-events-none space-y-2 overflow-hidden bg-transparent">
+        <div
+          className={`absolute ${getChatPositionClass()} w-[420px] max-w-[90vw] z-20 flex flex-col justify-end pointer-events-none space-y-2 overflow-hidden bg-transparent`}
+        >
           {messages.slice(-7).map((msg) => (
             <div
               key={msg.id}
-              className={`chat-bubble-enter rounded-2xl p-2.5 text-sm backdrop-blur-md shadow-lg pointer-events-auto flex items-start gap-2.5 will-change-transform ${
+              className={`chat-bubble-enter rounded-2xl p-2.5 text-sm backdrop-blur-md shadow-2xl pointer-events-auto flex items-start gap-2.5 will-change-transform ${
                 msg.isChatAiCommand
-                  ? 'chat-ai-command-bubble bg-violet-950/75 border border-violet-300/50 shadow-[0_8px_24px_rgba(76,29,149,0.35)]'
-                  : 'bg-black/35 border border-white/15'
+                  ? 'chat-ai-command-bubble bg-violet-950/90 border border-violet-300/60 shadow-[0_8px_24px_rgba(76,29,149,0.5)]'
+                  : 'bg-zinc-950/85 border border-white/20 shadow-[0_8px_24px_rgba(0,0,0,0.7)]'
               }`}
             >
               {/* Viewer Avatar */}
@@ -618,22 +739,81 @@ export default function OverlayPage() {
                   </span>
                 </div>
 
-                <EmoteMessageRenderer
-                  message={msg.message}
-                  emotes={msg.isChatAiCommand ? undefined : msg.emotes}
-                  parts={msg.isChatAiCommand ? undefined : msg.parts}
-                  className={`${
-                    msg.isChatAiCommand ? 'text-violet-50' : 'text-zinc-100'
-                  } text-[13px] leading-snug font-medium break-words drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)] select-text`}
-                  emoteSizeClassName="inline-block h-[22px] w-[22px] mx-0.5 object-contain align-middle -mt-0.5 drop-shadow-sm"
-                />
+                {msg.isChatAiCommand ? (
+                  <div className="space-y-1.5 mt-1 select-text">
+                    {/* Viewer Question (Q) */}
+                    <div className="text-[12px] leading-snug font-medium text-violet-100 break-words flex items-start gap-1.5">
+                      <span className="font-black text-violet-300 font-mono text-[10px] shrink-0 bg-violet-900/80 px-1.5 py-0.5 rounded border border-violet-400/40">
+                        Q:
+                      </span>
+                      <span className="drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">
+                        {msg.message}
+                      </span>
+                    </div>
+
+                    {/* AI Answer (A) */}
+                    {msg.aiAnswer && (
+                      <div className="text-[12px] leading-snug font-medium text-emerald-100 break-words flex items-start gap-1.5 bg-emerald-950/50 p-2 rounded-xl border border-emerald-500/30 shadow-inner">
+                        <span className="font-black text-emerald-400 font-mono text-[10px] shrink-0 flex items-center gap-0.5 bg-emerald-900/60 px-1.5 py-0.5 rounded border border-emerald-400/40">
+                          <RiSparklingFill className="text-[9px]" /> AI:
+                        </span>
+                        <span className="drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">
+                          {msg.aiAnswer}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <EmoteMessageRenderer
+                    message={msg.message}
+                    emotes={msg.emotes}
+                    parts={msg.parts}
+                    className="text-zinc-100 text-[13px] leading-snug font-medium break-words drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)] select-text"
+                    emoteSizeClassName="inline-block h-[22px] w-[22px] mx-0.5 object-contain align-middle -mt-0.5 drop-shadow-sm"
+                  />
+                )}
               </div>
             </div>
           ))}
         </div>
       )}
 
-      {/* ─── 04. 16:9 WEBCAM FRAME BORDER ────────────────────────────────────── */}
+      {/* ─── 04. USER PORTAL QR CODE WIDGET (/user) ───────────────────────── */}
+      {showQrCode && (widgetFilter === 'all' || widgetFilter === 'qr') && qrDataUrl && (
+        <div
+          className={`absolute ${getQrPositionClass()} z-30 pointer-events-auto flex items-center gap-3 bg-zinc-950/85 border border-white/20 rounded-2xl p-2.5 shadow-2xl backdrop-blur-md animate-in fade-in zoom-in-95 duration-200 ring-1 ring-cyan-500/20`}
+        >
+          {/* QR Image with Dark Cyberpunk High Contrast Frame */}
+          <div className="w-[82px] h-[82px] bg-zinc-950 rounded-xl p-1 shadow-md flex items-center justify-center shrink-0 border border-cyan-500/40 shadow-[0_0_15px_rgba(0,240,255,0.25)] overflow-hidden">
+            <img
+              src={qrDataUrl}
+              alt="Scan QR Portal Penonton"
+              className="w-full h-full object-contain rounded-lg"
+            />
+          </div>
+
+          {/* Info Column */}
+          <div className="flex flex-col justify-center min-w-0 pr-1 select-none">
+            <div className="flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
+              <span className="text-[10px] font-mono font-black uppercase text-emerald-400 tracking-wider">
+                PORTAL PENONTON
+              </span>
+            </div>
+            <div className="text-[13px] font-black text-white tracking-tight mt-0.5 drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]">
+              Scan QR via HP 📱
+            </div>
+            <div className="text-[10px] font-mono text-cyan-300 font-bold mt-0.5 truncate max-w-[150px]">
+              {streamerHandle ? `${streamerHandle}` : 'Saweria & Chat VIP'}
+            </div>
+            <div className="text-[9px] font-mono text-zinc-400">
+              Kirim Pesan • Poin • Saweria
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ─── 05. 16:9 WEBCAM FRAME BORDER ────────────────────────────────────── */}
       {(widgetFilter === 'all' || widgetFilter === 'webcam') && showWebcamFrame && (
         <div className="absolute right-3 bottom-3 w-[280px] h-[190px] border-2 border-white/20 bg-transparent rounded-2xl overflow-hidden shadow-2xl flex flex-col justify-between p-2.5 pointer-events-none">
           <div className="flex items-center justify-between text-white">
@@ -655,7 +835,7 @@ export default function OverlayPage() {
         </div>
       )}
 
-      {/* ─── 05. DISCREET PREVIEW / TEST CONTROLS TOOLBAR ──────────────────── */}
+      {/* ─── 06. DISCREET PREVIEW / TEST CONTROLS TOOLBAR ──────────────────── */}
       <div className="fixed bottom-4 right-4 z-50 flex items-center gap-2">
         {showPreviewTools && (
           <div className="bg-zinc-950/90 border border-white/20 backdrop-blur-md rounded-2xl p-3 shadow-2xl flex items-center gap-2 text-xs text-white animate-in slide-in-from-right-4 duration-150">
@@ -708,6 +888,20 @@ export default function OverlayPage() {
               <RiVolumeUpLine className="text-base" />
             </button>
 
+            {/* Toggle QR Code */}
+            <button
+              type="button"
+              onClick={() => setShowQrCode((prev) => !prev)}
+              className={`px-3 py-1.5 rounded-xl font-mono text-[11px] font-semibold border transition-all flex items-center gap-1 ${
+                showQrCode
+                  ? 'bg-emerald-950/90 border-emerald-500/50 text-emerald-300'
+                  : 'bg-zinc-900 border-zinc-800 text-zinc-500'
+              }`}
+            >
+              <RiQrCodeLine className="text-xs" />
+              <span>QR: {showQrCode ? 'ON' : 'OFF'}</span>
+            </button>
+
             {/* Toggle Webcam */}
             <button
               type="button"
@@ -736,7 +930,7 @@ export default function OverlayPage() {
         <button
           type="button"
           onClick={() => setShowPreviewTools((prev) => !prev)}
-          className="p-2.5 rounded-2xl bg-zinc-950/80 border border-white/20 text-white hover:bg-zinc-900 shadow-xl transition-all active:scale-95 backdrop-blur-md"
+          className="p-2.5 rounded-2xl bg-zinc-950/80 border border-white/20 text-white hover:bg-zinc-900 shadow-xl transition-all active:scale-95 backdrop-blur-md opacity-20 hover:opacity-100"
           title="Toggle Overlay Preview Toolbar"
         >
           {showPreviewTools ? (

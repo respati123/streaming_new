@@ -18,6 +18,16 @@ streamsController.get('/active', async (c) => {
 });
 
 /**
+ * GET /api/v1/streams/events-queue
+ * Get realtime event queue snapshot
+ */
+streamsController.get('/events-queue', async (c) => {
+  const { wsHub } = await import('@core/ws/websocket.hub');
+  const snapshot = await wsHub.getEventsQueueSnapshot();
+  return sendSuccess(c, snapshot, 'Events queue snapshot retrieved');
+});
+
+/**
  * POST /api/v1/streams/start
  * Start a new stream session
  */

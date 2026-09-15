@@ -127,3 +127,68 @@ export interface ChatAiProgressEvent extends ChatAiInteractionSummary {
   maxAttempts: number;
 }
 
+export interface DonationItem {
+  id: string;
+  userId?: string | null;
+  streamId?: string | null;
+  donorName: string;
+  donorEmail?: string | null;
+  amount: number | string;
+  currency: string;
+  message?: string | null;
+  status: 'pending' | 'completed' | 'failed' | 'canceled' | 'expired';
+  paymentMethod: string;
+  paymentOrderId?: string | null;
+  alertTemplate?: string | null;
+  streamerbotTriggered: boolean;
+  createdAt: string;
+}
+
+export interface AlertQueueStatus {
+  isPaused: boolean;
+  queue: any[];
+  queueCount: number;
+}
+
+export type StreamEventType = 'donation' | 'chatai' | 'subscriber' | 'member' | 'system';
+export type StreamEventStatus =
+  | 'queued'
+  | 'processing'
+  | 'ready'
+  | 'playing'
+  | 'completed'
+  | 'failed';
+
+export interface UnifiedStreamEvent {
+  id: string;
+  type: StreamEventType;
+  title: string;
+  subtitle?: string;
+  author: {
+    name: string;
+    avatarUrl?: string | null;
+    role?: string;
+  };
+  payload: {
+    amount?: number;
+    currency?: string;
+    message?: string;
+    prompt?: string;
+    answer?: string;
+    mood?: string;
+    template?: string;
+    audioUrl?: string;
+  };
+  status: StreamEventStatus;
+  progressPhase?: string;
+  error?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface EventsQueueSnapshot {
+  isPaused: boolean;
+  activeCount: number;
+  events: UnifiedStreamEvent[];
+}
+

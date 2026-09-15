@@ -3,11 +3,13 @@ import { z } from 'zod';
 export const donationTemplateSchema = z.enum(['electric-lightning', 'fire-glass']);
 
 export const createDonationSchema = z.object({
-  amount: z.coerce.number().int().min(5000).max(10_000_000),
+  amount: z.coerce.number().int().min(5000, 'Minimal donasi adalah Rp 5.000').max(10_000_000),
   donorName: z.string().trim().min(1).max(255).default('Anonymous'),
   donorEmail: z.string().email().max(255).optional().or(z.literal('')),
   message: z.string().trim().max(500).default(''),
   template: donationTemplateSchema.default('fire-glass'),
+  isChatAi: z.boolean().optional(),
+  aiPrompt: z.string().trim().max(500).optional(),
 });
 
 export type CreateDonationDTO = z.infer<typeof createDonationSchema>;

@@ -1,6 +1,7 @@
 import { db } from '@core/database';
-import { type DonationTable, donations } from '@core/database/schema';
+import { type DonationTable, donations, user } from '@core/database/schema';
 import { logger } from '@core/logger/logger';
+import { parseChatAiPrompt } from '@modules/ai/chat-ai.command';
 import { pointsService } from '@modules/points/points.service';
 import { streamerbotService } from '@modules/streamerbot/streamerbot.service';
 import { streamsService } from '@modules/streams/streams.service';
@@ -19,6 +20,13 @@ export class DonationsService {
 
   constructor(private readonly payments: PakasirService = pakasirService) {}
 
+  public async listRecent(limit = 20): Promise<DonationTable[]> {
+    return db.query.donations.findMany({
+      orderBy: (donations, { desc }) => [desc(donations.createdAt)],
+      limit,
+    });
+  }
+
   public async createQrPayment(
     dto: CreateDonationDTO,
     userId?: string
@@ -26,6 +34,17 @@ export class DonationsService {
     this.ensureConfigured();
     const orderId = `DON-${crypto.randomUUID()}`;
     const stream = await streamsService.getOrCreateActiveStream();
+
+    let finalMessage = dto.message || '';
+    if (dto.isChatAi || dto.aiPrompt) {
+      const prompt = dto.aiPrompt || dto.message;
+      if (prompt && !prompt.startsWith('!chatai')) {
+        finalMessage = `!chatai ${prompt.trim()}`;
+      } else if (prompt) {
+        finalMessage = prompt.trim();
+      }
+    }
+
     const [donation] = await db
       .insert(donations)
       .values({
@@ -35,7 +54,7 @@ export class DonationsService {
         donorEmail: dto.donorEmail || null,
         amount: String(dto.amount),
         currency: 'IDR',
-        message: dto.message || null,
+        message: finalMessage || null,
         status: 'pending',
         paymentMethod: 'qris',
         paymentOrderId: orderId,
@@ -135,18 +154,68 @@ export class DonationsService {
           donation.id
         );
       }
-      const triggered = await streamerbotService.triggerDonationAlert({
-        id: donation.id,
-        donorName: donation.donorName,
-        amount: Number(donation.amount),
-        currency: donation.currency,
-        message: donation.message || '',
-        template: donation.alertTemplate as 'electric-lightning' | 'fire-glass' | undefined,
-        source: 'portal_donation',
-        timestamp: new Date().toISOString(),
-      });
-      if (!triggered)
-        logger.warn('[Pakasir] Donation alert emitted locally; Streamer.bot unavailable');
+
+      // 1. If donation includes a Chat AI prompt, trigger Chat AI dialogue & TTS playback!
+      const rawMsg = donation.message || '';
+      const prompt =
+        parseChatAiPrompt(rawMsg) ||
+        (rawMsg.toLowerCase().startsWith('!chatai')
+          ? rawMsg.replace(/^!chatai\s*/i, '').trim()
+          : null);
+
+      if (prompt && donation.streamId) {
+        logger.info('[DonationsService] Triggering Chat AI from donation', {
+          donationId: donation.id,
+          donorName: donation.donorName,
+          prompt,
+        });
+
+        let avatarUrl: string | null = null;
+        if (donation.userId) {
+          const u = await db.query.user.findFirst({ where: eq(user.id, donation.userId) });
+          avatarUrl = u?.image || null;
+        }
+
+        const chatResult = await streamsService.ingestChatMessage({
+          message: `!chatai ${prompt}`,
+          username: donation.donorName,
+          userAvatarUrl: avatarUrl || undefined,
+          isOwner: false,
+          isModerator: false,
+          isSponsor: true,
+          isVerified: true,
+        });
+
+        streamerbotService.publishChatMessage({
+          id: chatResult.message.id,
+          streamId: chatResult.stream.id,
+          user: chatResult.user.name,
+          userId: chatResult.user.id,
+          avatarUrl: chatResult.user.image,
+          role: chatResult.user.role,
+          message: chatResult.message.message,
+          isOwner: false,
+          isModerator: false,
+          isSponsor: true,
+          isVerified: true,
+          timestamp: chatResult.message.publishedAt,
+        });
+      } else {
+        // 2. Emit visual donation alert on stream overlay only for standard tip donations
+        const triggered = await streamerbotService.triggerDonationAlert({
+          id: donation.id,
+          donorName: donation.donorName,
+          amount: Number(donation.amount),
+          currency: donation.currency,
+          message: donation.message || '',
+          template: donation.alertTemplate as 'electric-lightning' | 'fire-glass' | undefined,
+          source: 'portal_donation',
+          timestamp: new Date().toISOString(),
+        });
+        if (!triggered)
+          logger.warn('[Pakasir] Donation alert emitted locally; Streamer.bot unavailable');
+      }
+
       await db
         .update(donations)
         .set({
@@ -158,6 +227,46 @@ export class DonationsService {
     } finally {
       this.completionLocks.delete(donation.id);
     }
+  }
+
+  public async createSimulatedDonation(
+    dto: CreateDonationDTO,
+    userId?: string
+  ): Promise<DonationPaymentStatus> {
+    const orderId = `SIM-${crypto.randomUUID()}`;
+    const stream = await streamsService.getOrCreateActiveStream();
+
+    let finalMessage = dto.message || '';
+    if (dto.isChatAi || dto.aiPrompt) {
+      const prompt = dto.aiPrompt || dto.message;
+      if (prompt && !prompt.startsWith('!chatai')) {
+        finalMessage = `!chatai ${prompt.trim()}`;
+      } else if (prompt) {
+        finalMessage = prompt.trim();
+      }
+    }
+
+    const [donation] = await db
+      .insert(donations)
+      .values({
+        userId: userId || null,
+        streamId: stream.id,
+        donorName: dto.donorName,
+        donorEmail: dto.donorEmail || null,
+        amount: String(dto.amount),
+        currency: 'IDR',
+        message: finalMessage || null,
+        status: 'completed',
+        paymentMethod: 'sandbox_qris',
+        paymentOrderId: orderId,
+        paymentTotal: String(dto.amount),
+        paymentCompletedAt: new Date(),
+        alertTemplate: dto.template,
+      })
+      .returning();
+
+    await this.fulfillCompletedDonation(donation);
+    return this.toPaymentStatus(donation);
   }
 
   private async markFailed(donationId: string): Promise<void> {

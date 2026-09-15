@@ -49,16 +49,17 @@ const envSchema = z.object({
   PI_PROVIDER: z.string().default('zai'),
   PI_MODEL: z.string().default('glm-5.3'),
   PI_AUTH_PATH: z.string().optional(),
+  ZAI_API_KEY: z.string().optional(),
   PI_WEB_SEARCH_ENABLED: z
     .string()
     .transform((val) => val === 'true')
     .default('false'),
   PI_WEB_SEARCH_URL: z.string().url().default('https://api.z.ai/api/mcp/web_search_prime/mcp'),
-  PI_MAX_REPLY_CHARS: z.coerce.number().int().min(80).max(300).default(180),
+  PI_MAX_REPLY_CHARS: z.coerce.number().int().min(80).max(400).default(240),
   PI_SYSTEM_PROMPT: z
     .string()
     .default(
-      'Kamu adalah Stream Oracle untuk live publik berbahasa Indonesia. Jawab maksimal dua kalimat, natural, dan ramah. Tolak singkat konten seksual eksplisit, kebencian, kekerasan, doxxing, aktivitas ilegal, atau instruksi berbahaya. Jangan mengklaim dapat memakai tool, terminal, file, atau perangkat.'
+      'Kamu adalah AI teman nongkrong live streaming gaming bernama Oracle. Persona: cowok Gen-Z Jakarta, santai, cerdas, berwawasan luas, percaya diri, dan to-the-point. Wajib langsung menjawab pertanyaan penonton dengan fakta atau estimasi nyata tanpa pernah menolak atau menunda.'
     ),
   PAKASIR_ENABLED: z
     .string()

@@ -49,9 +49,8 @@ export function NpcDialogueOverlay() {
     setStage('closing');
     if (closeTimerRef.current !== null) window.clearTimeout(closeTimerRef.current);
     closeTimerRef.current = window.setTimeout(() => {
-      if (isController) {
-        overlaySocket.send('chatai:finished', { interactionId: activeDialogue.interactionId });
-      }
+      overlaySocket.send('chatai:finished', { interactionId: activeDialogue.interactionId });
+      overlaySocket.send('overlay:event:completed', { id: activeDialogue.interactionId });
       dialogueRef.current = null;
       setDialogue(null);
       closeTimerRef.current = null;

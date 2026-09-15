@@ -58,6 +58,17 @@ export class StreamSocketClient {
 
   private resolveWsUrl(): string {
     try {
+      const isCustomHost =
+        typeof window !== 'undefined' &&
+        window.location.hostname !== 'localhost' &&
+        window.location.hostname !== '127.0.0.1';
+
+      if (isCustomHost) {
+        const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const mode = this.clientType === 'overlay' ? `&mode=${this.playbackMode}` : '';
+        return `${wsProtocol}//${window.location.hostname}:4001/ws?type=${this.clientType}${mode}`;
+      }
+
       if (env.VITE_WS_URL) {
         const url = new URL(env.VITE_WS_URL);
         url.searchParams.set('type', this.clientType);
@@ -233,6 +244,7 @@ export class StreamSocketClient {
   }
 }
 
-// Global Singleton Clients for Dashboard and Overlay
+// Global Singleton Clients for Dashboard, Overlay, and Viewer Portal
 export const dashboardSocket = new StreamSocketClient('dashboard');
 export const overlaySocket = new StreamSocketClient('overlay');
+export const viewerSocket = new StreamSocketClient('viewer');

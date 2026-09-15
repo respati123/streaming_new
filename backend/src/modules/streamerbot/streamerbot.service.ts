@@ -426,7 +426,9 @@ export class StreamerbotService extends EventEmitter {
       return { success: true, data: response };
     } catch (error) {
       const err = error as Error;
-      logger.error(`[StreamerbotService] Failed to execute action '${actionIdOrName}'`, {}, err);
+      logger.warn(
+        `[StreamerbotService] Action '${actionIdOrName}' could not be executed in Streamer.bot: ${err.message}. (Note: Make sure an action named '${actionIdOrName}' is created in your Streamer.bot app if hardware/OBS triggers are desired).`
+      );
       return { success: false, error: err.message };
     }
   }

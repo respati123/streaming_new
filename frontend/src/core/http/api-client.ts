@@ -8,8 +8,19 @@ interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
   _retry?: boolean;
 }
 
+function getApiBaseUrl(): string {
+  if (
+    typeof window !== 'undefined' &&
+    window.location.hostname !== 'localhost' &&
+    window.location.hostname !== '127.0.0.1'
+  ) {
+    return `http://${window.location.hostname}:4001/api/v1`;
+  }
+  return env.VITE_API_BASE_URL || 'http://localhost:4001/api/v1';
+}
+
 export const apiClient = axios.create({
-  baseURL: env.VITE_API_BASE_URL,
+  baseURL: getApiBaseUrl(),
   timeout: 15000,
   withCredentials: true,
   headers: {

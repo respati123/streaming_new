@@ -22,6 +22,26 @@ donationsController.post('/qris', zValidator('json', createDonationSchema), asyn
   return sendCreated(c, donation, 'Donation QRIS transaction created');
 });
 
+donationsController.post('/simulate', zValidator('json', createDonationSchema), async (c) => {
+  const body = c.req.valid('json');
+  const session = await auth.api.getSession({ headers: c.req.raw.headers });
+  const donation = await donationsService.createSimulatedDonation(
+    {
+      ...body,
+      donorName: session?.user.name || body.donorName,
+      donorEmail: session?.user.email || body.donorEmail,
+    },
+    session?.user.id
+  );
+  return sendCreated(c, donation, 'Simulated donation processed successfully');
+});
+
+donationsController.get('/recent', async (c) => {
+  const limit = Math.min(Number(c.req.query('limit')) || 20, 100);
+  const list = await donationsService.listRecent(limit);
+  return sendSuccess(c, list, 'Recent donations retrieved');
+});
+
 donationsController.get('/qris/:orderId', async (c) => {
   const orderId = c.req.param('orderId');
   const donation = await donationsService.getPaymentStatus(orderId);

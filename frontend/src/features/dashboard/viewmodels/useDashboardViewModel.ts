@@ -58,6 +58,12 @@ export function useDashboardViewModel() {
     staleTime: Number.POSITIVE_INFINITY,
   });
 
+  const { data: initialEventsQueue } = useQuery({
+    queryKey: ['events-queue'],
+    queryFn: dashboardService.getEventsQueue,
+    staleTime: 10000,
+  });
+
   useEffect(() => {
     if (!isLive) {
       if (state.liveMessages.length > 0) {
@@ -181,14 +187,24 @@ export function useDashboardViewModel() {
   const {
     isSocketConnected,
     botStatus: liveBotStatus,
+    activeLiveAlert,
+    isAlertPaused,
+    alertQueue,
+    eventsQueue,
     sendChatMessage,
     triggerAction,
     triggerTestAlert,
+    pauseOverlayAlerts,
+    resumeOverlayAlerts,
+    clearAlertQueue,
+    playQueueItem,
+    removeQueueItem,
   } = useDashboardRealtime(
     handleNewLiveChat,
     handleChatAiProgress,
     handleStreamStarted,
-    handleStreamEnded
+    handleStreamEnded,
+    initialEventsQueue?.events || []
   );
 
   const startStreamMutation = useMutation({
@@ -260,12 +276,17 @@ export function useDashboardViewModel() {
   const handleTriggerTestAlert = async (payload: {
     donorName: string;
     amount: number;
-    currency: string;
+    currency?: string;
     message?: string;
   }) => {
     const sent = triggerTestAlert(payload);
     if (!sent) {
-      await triggerAlertMutation.mutateAsync(payload);
+      await triggerAlertMutation.mutateAsync({
+        donorName: payload.donorName,
+        amount: payload.amount,
+        currency: payload.currency,
+        message: payload.message,
+      });
     }
   };
 
@@ -281,6 +302,10 @@ export function useDashboardViewModel() {
       isChatAiLoading,
       botStatus: (liveBotStatus as StreamerbotStatus) || null,
       isSocketConnected,
+      isAlertPaused,
+      alertQueue,
+      eventsQueue,
+      activeLiveAlert,
     },
     handlers: {
       handleStartStream,
@@ -289,6 +314,11 @@ export function useDashboardViewModel() {
       handleSendTestChat,
       handleTriggerAction,
       handleTriggerTestAlert,
+      handlePauseAlerts: pauseOverlayAlerts,
+      handleResumeAlerts: resumeOverlayAlerts,
+      handleClearAlertQueue: clearAlertQueue,
+      handlePlayQueueItem: playQueueItem,
+      handleRemoveQueueItem: removeQueueItem,
     },
   };
 }

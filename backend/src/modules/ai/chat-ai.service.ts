@@ -77,15 +77,32 @@ export class ChatAiService {
     const [completed] = await db
       .update(aiInteractions)
       .set({ status: 'completed', completedAt: new Date() })
-      .where(and(eq(aiInteractions.id, interactionId), eq(aiInteractions.status, 'playing')));
+      .where(and(eq(aiInteractions.id, interactionId), eq(aiInteractions.status, 'playing')))
+      .returning();
+
     if (completed) {
       await this.emitProgress(interactionId, 'completed');
       streamerbotService.emit('chatai:playback-completed', {
         interactionId,
       } satisfies ChatAiPlaybackCompletedEvent);
+    } else {
+      // Fallback: in case status was not 'playing' (e.g. ready or already updated)
+      const [fallbackCompleted] = await db
+        .update(aiInteractions)
+        .set({ status: 'completed', completedAt: new Date() })
+        .where(eq(aiInteractions.id, interactionId))
+        .returning();
+
+      if (fallbackCompleted) {
+        await this.emitProgress(interactionId, 'completed');
+        streamerbotService.emit('chatai:playback-completed', {
+          interactionId,
+        } satisfies ChatAiPlaybackCompletedEvent);
+      }
     }
+
     await this.dispatchNext();
-    return Boolean(completed);
+    return true;
   }
 
   public async releasePlayback(): Promise<void> {

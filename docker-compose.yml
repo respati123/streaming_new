@@ -30,6 +30,25 @@ services:
       - boilerplate-dev-net
 
   # ----------------------------------------------------------------------------
+  # 1.5. Redis In-Memory Cache & Queue (BullMQ / ChatAI)
+  # ----------------------------------------------------------------------------
+  redis:
+    image: redis:7-alpine
+    container_name: boilerplate-dev-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - dev_redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - boilerplate-dev-net
+
+  # ----------------------------------------------------------------------------
   # 2. Hono Backend API (Live Reloading via Bun --watch)
   # ----------------------------------------------------------------------------
   backend:
@@ -40,6 +59,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     volumes:
       - ./backend:/app
       - /app/node_modules
@@ -49,6 +70,7 @@ services:
       PORT: 4000
       NODE_ENV: development
       DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-boilerplate_db}
+      REDIS_URL: redis://redis:6379
       JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-your-super-secret-access-key-minimum-32-chars-length}
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-your-super-secret-refresh-key-minimum-32-chars-length}
       JWT_ACCESS_EXPIRES_IN: 15m
@@ -87,6 +109,8 @@ services:
 
 volumes:
   dev_postgres_data:
+    driver: local
+  dev_redis_data:
     driver: local
 
 networks:

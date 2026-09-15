@@ -17,16 +17,28 @@ export interface DonationPaymentStatus {
   completedAt: string | null;
 }
 
+export interface DonationPayload {
+  amount: number;
+  donorName: string;
+  donorEmail?: string;
+  message?: string;
+  template?: DonationTemplate;
+  isChatAi?: boolean;
+  aiPrompt?: string;
+}
+
 export const donationService = {
-  async createQrPayment(payload: {
-    amount: number;
-    donorName: string;
-    donorEmail?: string;
-    message?: string;
-    template?: DonationTemplate;
-  }): Promise<DonationPaymentStatus> {
+  async createQrPayment(payload: DonationPayload): Promise<DonationPaymentStatus> {
     const response = await apiClient.post<{ data: DonationPaymentStatus }>(
       '/donations/qris',
+      payload
+    );
+    return response.data.data;
+  },
+
+  async simulateDonation(payload: DonationPayload): Promise<DonationPaymentStatus> {
+    const response = await apiClient.post<{ data: DonationPaymentStatus }>(
+      '/donations/simulate',
       payload
     );
     return response.data.data;
