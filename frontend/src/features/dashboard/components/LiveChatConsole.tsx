@@ -54,10 +54,10 @@ export function LiveChatConsole({ messages, onSendTestChat, isLoading }: LiveCha
   };
 
   return (
-    <div className="flex flex-col h-full bg-[#131318] overflow-hidden border border-[#272733] shadow-xl rounded-2xl font-sans text-[#F4F4F6]">
-      <div className="p-3.5 border-b border-[#272733] bg-[#16161D] flex items-center justify-between">
+    <div className="flex flex-col h-full bg-[#FFFFFF] overflow-hidden border border-[#D4D4D8] shadow-xl rounded-2xl font-sans text-[#18181B]">
+      <div className="p-3.5 border-b border-[#D4D4D8] bg-[#F4F4F5] flex items-center justify-between">
         <div className="flex items-center gap-2.5">
-          <div className="p-1.5 rounded-lg bg-cyan-950/60 border border-cyan-800/50 text-cyan-400">
+          <div className="p-1.5 rounded-lg bg-zinc-950/60 border border-zinc-800/50 text-zinc-400">
             <RiChat1Line className="text-base" />
           </div>
           <div>
@@ -68,16 +68,16 @@ export function LiveChatConsole({ messages, onSendTestChat, isLoading }: LiveCha
         </div>
 
         <div className="flex items-center gap-3">
-          <label className="flex items-center gap-1.5 text-[11px] text-[#A0A0AC] font-mono cursor-pointer select-none">
+          <label className="flex items-center gap-1.5 text-[11px] text-[#52525B] font-mono cursor-pointer select-none">
             <input
               type="checkbox"
               checked={autoScroll}
               onChange={(e) => setAutoScroll(e.target.checked)}
-              className="rounded border-[#272733] bg-[#16161D] text-cyan-500 focus:ring-cyan-500 w-3.5 h-3.5 accent-cyan-500"
+              className="rounded border-[#D4D4D8] bg-[#F4F4F5] text-zinc-500 focus:ring-zinc-500 w-3.5 h-3.5 accent-zinc-500"
             />
             <span>Auto-scroll</span>
           </label>
-          <span className="text-[11px] font-mono font-bold px-2 py-0.5 rounded-md bg-[#16161D] border border-[#272733] text-cyan-300">
+          <span className="text-[11px] font-mono font-bold px-2 py-0.5 rounded-md bg-[#F4F4F5] border border-[#D4D4D8] text-zinc-300">
             {messages.length} Chats
           </span>
         </div>
@@ -85,20 +85,20 @@ export function LiveChatConsole({ messages, onSendTestChat, isLoading }: LiveCha
 
       <div
         ref={scrollRef}
-        className="flex-1 overflow-y-auto p-3 space-y-2 bg-[#0A0A0E] m-2 rounded-xl border border-[#1E1E28]"
+        className="flex-1 overflow-y-auto p-3 space-y-2 bg-[#FAFAFA] m-2 rounded-xl border border-[#E4E4E7]"
       >
         {isLoading ? (
-          <div className="p-8 text-center text-xs text-[#A0A0AC] font-mono flex flex-col items-center gap-2">
-            <div className="w-5 h-5 border-2 border-cyan-500/30 border-t-cyan-400 rounded-full animate-spin" />
+          <div className="p-8 text-center text-xs text-[#52525B] font-mono flex flex-col items-center gap-2">
+            <div className="w-5 h-5 border-2 border-zinc-500/30 border-t-zinc-400 rounded-full animate-spin" />
             <span>Memuat pesan live chat...</span>
           </div>
         ) : messages.length === 0 ? (
-          <div className="p-12 text-center text-xs text-[#A0A0AC] flex flex-col items-center justify-center h-full">
-            <div className="w-10 h-10 rounded-xl bg-[#16161D] flex items-center justify-center text-[#A0A0AC] mb-2 border border-[#272733]">
-              <RiChat1Line className="text-xl text-cyan-400" />
+          <div className="p-12 text-center text-xs text-[#52525B] flex flex-col items-center justify-center h-full">
+            <div className="w-10 h-10 rounded-xl bg-[#F4F4F5] flex items-center justify-center text-[#52525B] mb-2 border border-[#D4D4D8]">
+              <RiChat1Line className="text-xl text-zinc-400" />
             </div>
             <p className="font-semibold text-white">Belum ada obrolan dalam sesi siaran ini</p>
-            <p className="text-[11px] text-[#A0A0AC] mt-1 max-w-[240px]">
+            <p className="text-[11px] text-[#52525B] mt-1 max-w-[240px]">
               Chat YouTube live dan simulasi test akan tampil di sini secara real-time
             </p>
           </div>
@@ -106,16 +106,16 @@ export function LiveChatConsole({ messages, onSendTestChat, isLoading }: LiveCha
           messages.map((msg) => (
             <div
               key={msg.id}
-              className="p-3 bg-[#131318] rounded-xl border border-[#272733] shadow-xs flex items-start gap-2.5 hover:border-cyan-500/40 transition-colors"
+              className="p-3 bg-[#FFFFFF] rounded-xl border border-[#D4D4D8] shadow-xs flex items-start gap-2.5 hover:border-zinc-500/40 transition-colors"
             >
               {msg.userAvatarUrl ? (
                 <img
                   src={msg.userAvatarUrl}
                   alt={msg.username}
-                  className="w-7 h-7 rounded-full object-cover border border-[#272733] shrink-0 mt-0.5"
+                  className="w-7 h-7 rounded-full object-cover border border-[#D4D4D8] shrink-0 mt-0.5"
                 />
               ) : (
-                <div className="w-7 h-7 rounded-full bg-[#1A1A22] border border-[#272733] flex items-center justify-center shrink-0 mt-0.5 text-xs font-bold text-cyan-400">
+                <div className="w-7 h-7 rounded-full bg-[#E4E4E7] border border-[#D4D4D8] flex items-center justify-center shrink-0 mt-0.5 text-xs font-bold text-zinc-400">
                   {msg.username.charAt(0).toUpperCase()}
                 </div>
               )}
@@ -129,8 +129,8 @@ export function LiveChatConsole({ messages, onSendTestChat, isLoading }: LiveCha
                       </span>
                     )}
                     {msg.isModerator && (
-                      <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-indigo-950/80 text-indigo-300 border border-indigo-600/50 font-mono flex items-center gap-0.5">
-                        <RiShieldCheckFill className="text-[10px] text-indigo-400" /> MOD
+                      <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-zinc-950/80 text-zinc-300 border border-zinc-600/50 font-mono flex items-center gap-0.5">
+                        <RiShieldCheckFill className="text-[10px] text-zinc-400" /> MOD
                       </span>
                     )}
                     {msg.isSponsor && (
@@ -139,7 +139,7 @@ export function LiveChatConsole({ messages, onSendTestChat, isLoading }: LiveCha
                       </span>
                     )}
                     {msg.tier && msg.tier !== 'bronze' && !msg.isOwner && (
-                      <span className="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase font-mono bg-cyan-950/80 text-cyan-300 border border-cyan-600/50">
+                      <span className="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase font-mono bg-zinc-950/80 text-zinc-300 border border-zinc-600/50">
                         {msg.tier}
                       </span>
                     )}
@@ -167,7 +167,7 @@ export function LiveChatConsole({ messages, onSendTestChat, isLoading }: LiveCha
 
       <form
         onSubmit={handleTestSubmit}
-        className="p-2.5 border-t border-[#272733] bg-[#16161D] flex flex-wrap items-center gap-2"
+        className="p-2.5 border-t border-[#D4D4D8] bg-[#F4F4F5] flex flex-wrap items-center gap-2"
       >
         <div className="flex items-center gap-1.5">
           <input
@@ -175,13 +175,13 @@ export function LiveChatConsole({ messages, onSendTestChat, isLoading }: LiveCha
             placeholder="Username"
             value={testUsername}
             onChange={(e) => setTestUsername(e.target.value)}
-            className="w-28 px-2.5 py-1.5 text-xs bg-[#131318] border border-[#272733] rounded-lg font-mono text-white focus:outline-none focus:border-cyan-400"
+            className="w-28 px-2.5 py-1.5 text-xs bg-[#FFFFFF] border border-[#D4D4D8] rounded-lg font-mono text-white focus:outline-none focus:border-zinc-400"
           />
 
           <select
             value={testRole}
             onChange={(e) => setTestRole(e.target.value as 'viewer' | 'mod' | 'member')}
-            className="px-2 py-1.5 text-xs bg-[#131318] border border-[#272733] rounded-lg font-mono text-white focus:outline-none focus:border-cyan-400"
+            className="px-2 py-1.5 text-xs bg-[#FFFFFF] border border-[#D4D4D8] rounded-lg font-mono text-white focus:outline-none focus:border-zinc-400"
           >
             <option value="viewer">Viewer</option>
             <option value="member">Member</option>
@@ -194,13 +194,13 @@ export function LiveChatConsole({ messages, onSendTestChat, isLoading }: LiveCha
           placeholder="Ketik pesan obrolan test..."
           value={testText}
           onChange={(e) => setTestText(e.target.value)}
-          className="flex-1 min-w-[200px] px-3 py-1.5 text-xs bg-[#131318] border border-[#272733] rounded-lg focus:outline-none focus:border-cyan-400 font-sans text-white"
+          className="flex-1 min-w-[200px] px-3 py-1.5 text-xs bg-[#FFFFFF] border border-[#D4D4D8] rounded-lg focus:outline-none focus:border-zinc-400 font-sans text-white"
         />
 
         <button
           type="submit"
           disabled={isSending || !testText.trim()}
-          className="px-3.5 py-1.5 text-xs font-bold text-white bg-cyan-600 hover:bg-cyan-500 border border-cyan-400/40 rounded-lg shadow-md flex items-center gap-1.5 disabled:opacity-50 transition-colors"
+          className="px-3.5 py-1.5 text-xs font-bold text-white bg-zinc-600 hover:bg-zinc-500 border border-zinc-400/40 rounded-lg shadow-md flex items-center gap-1.5 disabled:opacity-50 transition-colors"
         >
           <RiSendPlaneFill className="text-xs" />
           <span>Kirim</span>

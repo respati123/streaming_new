@@ -267,7 +267,7 @@ export default function OverlayPage() {
   const streamerHandle = summary?.settings?.streamerHandle || '@respati_stream';
 
   return (
-    <div className="fixed inset-0 overflow-hidden bg-transparent font-sans select-none pointer-events-none">
+    <div className="overlay-shell fixed inset-0 overflow-hidden bg-transparent font-sans select-none pointer-events-none">
       {/* ─── 00. FULLSCREEN GAME WALLPAPER BACKGROUND ─────────────────────────── */}
       {showWallpaper && (
         <div className="fixed inset-0 w-full h-full z-0 overflow-hidden select-none pointer-events-none">

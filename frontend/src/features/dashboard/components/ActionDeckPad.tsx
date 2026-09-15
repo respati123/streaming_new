@@ -71,7 +71,7 @@ export function ActionDeckPad({
         return <RiVolumeUpLine className="text-amber-400 text-sm" />;
       case 'gamepad2':
       case 'game':
-        return <RiGamepadLine className="text-cyan-400 text-sm" />;
+        return <RiGamepadLine className="text-zinc-400 text-sm" />;
       case 'flame':
       case 'fire':
         return <RiFireLine className="text-rose-400 text-sm" />;
@@ -81,10 +81,10 @@ export function ActionDeckPad({
   };
 
   return (
-    <div className="flex flex-col h-full bg-[#131318] overflow-hidden border border-[#272733] shadow-xl rounded-2xl font-sans text-[#F4F4F6]">
-      <div className="p-3.5 border-b border-[#272733] bg-[#16161D] flex items-center justify-between">
+    <div className="flex flex-col h-full bg-[#FFFFFF] overflow-hidden border border-[#D4D4D8] shadow-xl rounded-2xl font-sans text-[#18181B]">
+      <div className="p-3.5 border-b border-[#D4D4D8] bg-[#F4F4F5] flex items-center justify-between">
         <div className="flex items-center gap-2.5">
-          <div className="p-1.5 rounded-lg bg-cyan-950/60 border border-cyan-800/50 text-cyan-400">
+          <div className="p-1.5 rounded-lg bg-zinc-950/60 border border-zinc-800/50 text-zinc-400">
             <RiFlashlightLine className="text-base" />
           </div>
           <div>
@@ -97,7 +97,7 @@ export function ActionDeckPad({
           className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-md uppercase tracking-wider ${
             isBotConnected
               ? 'bg-emerald-950/80 text-emerald-400 border border-emerald-500/40'
-              : 'bg-[#1A1A22] text-[#A0A0AC] border border-[#272733]'
+              : 'bg-[#E4E4E7] text-[#52525B] border border-[#D4D4D8]'
           }`}
         >
           {isBotConnected ? 'GATEWAY READY' : 'BOT OFFLINE'}
@@ -107,7 +107,7 @@ export function ActionDeckPad({
       <div className="p-3.5 flex-1 overflow-y-auto space-y-4">
         <div>
           <div className="flex items-center justify-between mb-2">
-            <h3 className="text-[11px] font-bold text-[#A0A0AC] uppercase font-mono tracking-wider">
+            <h3 className="text-[11px] font-bold text-[#52525B] uppercase font-mono tracking-wider">
               Streamer.bot Key Deck
             </h3>
             <span className="text-[10px] text-zinc-400 font-mono">{actions.length} Keys</span>
@@ -115,7 +115,7 @@ export function ActionDeckPad({
 
           <div className="grid grid-cols-2 gap-2">
             {actions.length === 0 ? (
-              <div className="col-span-2 p-6 text-center text-xs text-[#A0A0AC] font-mono bg-[#16161D] rounded-xl border border-[#272733]">
+              <div className="col-span-2 p-6 text-center text-xs text-[#52525B] font-mono bg-[#F4F4F5] rounded-xl border border-[#D4D4D8]">
                 Belum ada preset action termuat.
               </div>
             ) : (
@@ -128,24 +128,24 @@ export function ActionDeckPad({
                     onClick={() => handleActionClick(act)}
                     className={`p-3 text-left flex flex-col justify-between h-20 group relative rounded-xl transition-all border ${
                       isTriggered
-                        ? 'bg-cyan-950/60 border-cyan-400 shadow-md ring-1 ring-cyan-400/50'
-                        : 'bg-[#16161D] hover:bg-[#1A1A22] border-[#272733]'
+                        ? 'bg-zinc-950/60 border-zinc-400 shadow-md ring-1 ring-zinc-400/50'
+                        : 'bg-[#F4F4F5] hover:bg-[#E4E4E7] border-[#D4D4D8]'
                     }`}
                   >
                     <div className="flex items-center justify-between w-full">
-                      <div className="p-1 rounded-lg bg-[#1A1A22] border border-[#272733]">
+                      <div className="p-1 rounded-lg bg-[#E4E4E7] border border-[#D4D4D8]">
                         {getIcon(act.icon)}
                       </div>
-                      <span className="text-[9px] font-mono font-semibold text-[#A0A0AC] uppercase">
+                      <span className="text-[9px] font-mono font-semibold text-[#52525B] uppercase">
                         {act.category}
                       </span>
                     </div>
 
                     <div>
-                      <div className="text-xs font-bold text-white group-hover:text-cyan-300 transition-colors truncate">
+                      <div className="text-xs font-bold text-white group-hover:text-zinc-300 transition-colors truncate">
                         {act.name}
                       </div>
-                      <div className="text-[10px] text-[#A0A0AC] font-mono truncate">
+                      <div className="text-[10px] text-[#52525B] font-mono truncate">
                         ID: {act.actionId}
                       </div>
                     </div>
@@ -156,7 +156,7 @@ export function ActionDeckPad({
           </div>
         </div>
 
-        <div className="pt-3 border-t border-[#272733]">
+        <div className="pt-3 border-t border-[#D4D4D8]">
           <h3 className="text-[11px] font-bold text-white uppercase font-mono mb-2.5 flex items-center gap-1.5">
             <RiNotification3Line className="text-amber-400 text-sm" />
             <span>Simulasi Alert Saweria Cepat</span>
@@ -164,13 +164,13 @@ export function ActionDeckPad({
 
           <form
             onSubmit={handleAlertSubmit}
-            className="space-y-2.5 bg-[#16161D] p-3 rounded-xl border border-[#272733]"
+            className="space-y-2.5 bg-[#F4F4F5] p-3 rounded-xl border border-[#D4D4D8]"
           >
             <div className="grid grid-cols-2 gap-2">
               <div>
                 <label
                   htmlFor="deck-donor-input"
-                  className="block text-[10px] font-bold text-[#A0A0AC] mb-1 font-sans"
+                  className="block text-[10px] font-bold text-[#52525B] mb-1 font-sans"
                 >
                   Nama Donatur
                 </label>
@@ -179,14 +179,14 @@ export function ActionDeckPad({
                   type="text"
                   value={testDonor}
                   onChange={(e) => setTestDonor(e.target.value)}
-                  className="w-full px-2.5 py-1.5 text-xs bg-[#131318] border border-[#272733] rounded-lg font-mono focus:outline-none focus:border-cyan-400 font-medium text-white"
+                  className="w-full px-2.5 py-1.5 text-xs bg-[#FFFFFF] border border-[#D4D4D8] rounded-lg font-mono focus:outline-none focus:border-zinc-400 font-medium text-white"
                 />
               </div>
 
               <div>
                 <label
                   htmlFor="deck-amount-input"
-                  className="block text-[10px] font-bold text-[#A0A0AC] mb-1 font-sans"
+                  className="block text-[10px] font-bold text-[#52525B] mb-1 font-sans"
                 >
                   Nominal (Rp)
                 </label>
@@ -196,7 +196,7 @@ export function ActionDeckPad({
                   step="5000"
                   value={testAmount}
                   onChange={(e) => setTestAmount(e.target.value)}
-                  className="w-full px-2.5 py-1.5 text-xs bg-[#131318] border border-[#272733] rounded-lg font-mono font-bold text-amber-400 focus:outline-none focus:border-cyan-400"
+                  className="w-full px-2.5 py-1.5 text-xs bg-[#FFFFFF] border border-[#D4D4D8] rounded-lg font-mono font-bold text-amber-400 focus:outline-none focus:border-zinc-400"
                 />
               </div>
             </div>
@@ -204,7 +204,7 @@ export function ActionDeckPad({
             <div>
               <label
                 htmlFor="deck-message-input"
-                className="block text-[10px] font-bold text-[#A0A0AC] mb-1 font-sans"
+                className="block text-[10px] font-bold text-[#52525B] mb-1 font-sans"
               >
                 Pesan Donasi
               </label>
@@ -213,7 +213,7 @@ export function ActionDeckPad({
                 rows={2}
                 value={testMessage}
                 onChange={(e) => setTestMessage(e.target.value)}
-                className="w-full px-2.5 py-1.5 text-xs bg-[#131318] border border-[#272733] rounded-lg focus:outline-none focus:border-cyan-400 font-sans text-white"
+                className="w-full px-2.5 py-1.5 text-xs bg-[#FFFFFF] border border-[#D4D4D8] rounded-lg focus:outline-none focus:border-zinc-400 font-sans text-white"
               />
             </div>
 

@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 const envSchema = z.object({
-  PORT: z.coerce.number().default(4000),
+  PORT: z.coerce.number().default(4001),
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   APP_NAME: z.string().default('Enterprise-Hono-Backend'),
   API_PREFIX: z.string().default('/api/v1'),
@@ -73,15 +73,15 @@ const envSchema = z.object({
     .default('false'),
   CHATAI_COOLDOWN_SECONDS: z.coerce.number().int().min(0).max(300).default(0),
   CHATAI_AUDIO_DIR: z.string().default('./storage/chatai'),
-  CHATAI_MEDIA_BASE_URL: z.string().url().default('http://localhost:4000'),
+  CHATAI_MEDIA_BASE_URL: z.string().url().default('http://localhost:4001'),
 
   // Google OAuth & Better Auth Configuration
   BETTER_AUTH_API_KEY: z.string().optional().default('ba_mrgchyx7eet6z35es2h7f3ag8i2c9va3'),
   BETTER_AUTH_SECRET: z.string().default('ba_mrgchyx7eet6z35es2h7f3ag8i2c9va3'),
-  BETTER_AUTH_URL: z.string().default('http://localhost:4000'),
+  BETTER_AUTH_URL: z.string().default('http://localhost:4001'),
   GOOGLE_CLIENT_ID: z.string().optional().default(''),
   GOOGLE_CLIENT_SECRET: z.string().optional().default(''),
-  GOOGLE_REDIRECT_URI: z.string().default('http://localhost:4000/api/auth/callback/google'),
+  GOOGLE_REDIRECT_URI: z.string().default('http://localhost:4001/api/auth/callback/google'),
   FRONTEND_URL: z.string().default('http://localhost:5173'),
 });
 

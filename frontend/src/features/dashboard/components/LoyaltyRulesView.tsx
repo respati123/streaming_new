@@ -61,24 +61,24 @@ export function LoyaltyRulesView({
   };
 
   return (
-    <div className="space-y-6 font-sans text-[#F4F4F6]">
-      <div className="flex flex-wrap items-center justify-between gap-4 bg-[#131318] p-5 rounded-2xl border border-[#272733] shadow-lg">
+    <div className="space-y-6 font-sans text-[#18181B]">
+      <div className="flex flex-wrap items-center justify-between gap-4 bg-[#FFFFFF] p-5 rounded-2xl border border-[#D4D4D8] shadow-lg">
         <div className="space-y-1">
           <div className="flex items-center gap-3">
             <button
               type="button"
               onClick={onBack}
-              className="px-3 py-1.5 rounded-lg bg-[#16161D] hover:bg-[#1A1A22] border border-[#272733] text-xs font-semibold text-[#A0A0AC] hover:text-white flex items-center gap-1.5 transition-colors"
+              className="px-3 py-1.5 rounded-lg bg-[#F4F4F5] hover:bg-[#E4E4E7] border border-[#D4D4D8] text-xs font-semibold text-[#52525B] hover:text-white flex items-center gap-1.5 transition-colors"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               <span>Kembali ke Tabel</span>
             </button>
             <h1 className="text-base font-bold text-white tracking-tight flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-cyan-400" />
+              <Sparkles className="w-4 h-4 text-zinc-400" />
               <span>Loyalty Tiers, Points System & Auto-Moderation Rules</span>
             </h1>
           </div>
-          <p className="text-xs text-[#A0A0AC] font-mono">
+          <p className="text-xs text-[#52525B] font-mono">
             Konfigurasi otomatisasi reward penonton, multiplier Saweria, batas spam chat, dan
             blacklist kata terlarang.
           </p>
@@ -94,7 +94,7 @@ export function LoyaltyRulesView({
           <button
             type="button"
             onClick={handleSaveClick}
-            className="px-4 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold flex items-center gap-2 shadow-lg shadow-cyan-950/50 transition-colors"
+            className="px-4 py-2 rounded-xl bg-zinc-600 hover:bg-zinc-500 text-white text-xs font-bold flex items-center gap-2 shadow-lg shadow-zinc-950/50 transition-colors"
           >
             <Save className="w-4 h-4" />
             <span>Simpan Konfigurasi</span>
@@ -104,7 +104,7 @@ export function LoyaltyRulesView({
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         <div className="lg:col-span-6 space-y-6">
-          <div className="bg-[#131318] p-5 rounded-2xl border border-[#272733] space-y-4">
+          <div className="bg-[#FFFFFF] p-5 rounded-2xl border border-[#D4D4D8] space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2.5">
                 <div className="p-2 rounded-lg bg-amber-950/60 border border-amber-500/30 text-amber-400">
@@ -112,12 +112,12 @@ export function LoyaltyRulesView({
                 </div>
                 <div>
                   <h2 className="text-sm font-bold text-white">Hierarki Loyalty Tiers</h2>
-                  <p className="text-[11px] text-[#A0A0AC]">
+                  <p className="text-[11px] text-[#52525B]">
                     Multiplier points dan hak istimewa badge overlay
                   </p>
                 </div>
               </div>
-              <span className="text-[11px] font-mono font-bold text-cyan-400 bg-cyan-950/40 px-2.5 py-1 rounded-md border border-cyan-800/40">
+              <span className="text-[11px] font-mono font-bold text-zinc-400 bg-zinc-950/40 px-2.5 py-1 rounded-md border border-zinc-800/40">
                 4 Active Tiers
               </span>
             </div>
@@ -126,7 +126,7 @@ export function LoyaltyRulesView({
               {tiers.map((t) => (
                 <div
                   key={t.id}
-                  className={`p-4 rounded-xl bg-[#16161D] border transition-all ${t.borderColor}`}
+                  className={`p-4 rounded-xl bg-[#F4F4F5] border transition-all ${t.borderColor}`}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2.5">
@@ -137,7 +137,7 @@ export function LoyaltyRulesView({
                         <h3 className={`text-xs font-bold uppercase tracking-wider ${t.color}`}>
                           {t.name}
                         </h3>
-                        <p className="text-[11px] text-[#A0A0AC] font-mono">
+                        <p className="text-[11px] text-[#52525B] font-mono">
                           Minimal:{' '}
                           <span className="text-white font-bold">
                             {t.minPoints.toLocaleString('id-ID')} pts
@@ -146,7 +146,7 @@ export function LoyaltyRulesView({
                       </div>
                     </div>
                     <div className="text-right">
-                      <span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-[#1A1A22] border border-[#272733] text-white">
+                      <span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-[#E4E4E7] border border-[#D4D4D8] text-white">
                         {t.multiplier}x Multiplier
                       </span>
                     </div>
@@ -156,7 +156,7 @@ export function LoyaltyRulesView({
                     {t.perks.map((p) => (
                       <span
                         key={p}
-                        className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#1A1A22] text-[#A0A0AC] border border-[#272733]"
+                        className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#E4E4E7] text-[#52525B] border border-[#D4D4D8]"
                       >
                         ✓ {p}
                       </span>
@@ -167,14 +167,14 @@ export function LoyaltyRulesView({
             </div>
           </div>
 
-          <div className="bg-[#131318] p-5 rounded-2xl border border-[#272733] space-y-4">
+          <div className="bg-[#FFFFFF] p-5 rounded-2xl border border-[#D4D4D8] space-y-4">
             <div className="flex items-center gap-2.5">
               <div className="p-2 rounded-lg bg-emerald-950/60 border border-emerald-500/30 text-emerald-400">
                 <Sparkles className="w-4 h-4" />
               </div>
               <div>
                 <h2 className="text-sm font-bold text-white">Aturan Akumulasi Points</h2>
-                <p className="text-[11px] text-[#A0A0AC]">
+                <p className="text-[11px] text-[#52525B]">
                   Trigger penambahan points dari aktivitas interaksi
                 </p>
               </div>
@@ -184,11 +184,11 @@ export function LoyaltyRulesView({
               {pointsRules.map((r) => (
                 <div
                   key={r.id}
-                  className="p-3 rounded-xl bg-[#16161D] border border-[#272733] flex items-center justify-between"
+                  className="p-3 rounded-xl bg-[#F4F4F5] border border-[#D4D4D8] flex items-center justify-between"
                 >
                   <div>
                     <h4 className="text-xs font-bold text-white">{r.title}</h4>
-                    <p className="text-[11px] text-[#A0A0AC]">{r.description}</p>
+                    <p className="text-[11px] text-[#52525B]">{r.description}</p>
                     <span className="text-[10px] font-mono text-zinc-400 mt-1 inline-block">
                       Cooldown: {r.cooldownText}
                     </span>
@@ -205,15 +205,15 @@ export function LoyaltyRulesView({
         </div>
 
         <div className="lg:col-span-6 space-y-6">
-          <div className="bg-[#131318] p-5 rounded-2xl border border-[#272733] space-y-4">
+          <div className="bg-[#FFFFFF] p-5 rounded-2xl border border-[#D4D4D8] space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2.5">
-                <div className="p-2 rounded-lg bg-indigo-950/60 border border-indigo-500/30 text-indigo-400">
+                <div className="p-2 rounded-lg bg-zinc-950/60 border border-zinc-500/30 text-zinc-400">
                   <ShieldCheck className="w-4 h-4" />
                 </div>
                 <div>
                   <h2 className="text-sm font-bold text-white">Auto-Moderation Engine</h2>
-                  <p className="text-[11px] text-[#A0A0AC]">
+                  <p className="text-[11px] text-[#52525B]">
                     Filter otomatis spam, flood, dan caps berlebih
                   </p>
                 </div>
@@ -224,23 +224,23 @@ export function LoyaltyRulesView({
               {moderationRules.map((rule) => (
                 <div
                   key={rule.id}
-                  className="p-3.5 rounded-xl bg-[#16161D] border border-[#272733] flex items-center justify-between gap-3"
+                  className="p-3.5 rounded-xl bg-[#F4F4F5] border border-[#D4D4D8] flex items-center justify-between gap-3"
                 >
                   <div>
                     <div className="flex items-center gap-2">
                       <h4 className="text-xs font-bold text-white">{rule.name}</h4>
-                      <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#1A1A22] text-[#A0A0AC] border border-[#272733]">
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#E4E4E7] text-[#52525B] border border-[#D4D4D8]">
                         Batas: {rule.threshold} {rule.unit}
                       </span>
                     </div>
-                    <p className="text-[11px] text-[#A0A0AC] mt-1">{rule.description}</p>
+                    <p className="text-[11px] text-[#52525B] mt-1">{rule.description}</p>
                   </div>
 
                   <button
                     type="button"
                     onClick={() => onToggleRule(rule.id)}
                     className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                      rule.enabled ? 'bg-cyan-600' : 'bg-[#272733]'
+                      rule.enabled ? 'bg-zinc-600' : 'bg-[#D4D4D8]'
                     }`}
                   >
                     <span
@@ -254,7 +254,7 @@ export function LoyaltyRulesView({
             </div>
           </div>
 
-          <div className="bg-[#131318] p-5 rounded-2xl border border-[#272733] space-y-4">
+          <div className="bg-[#FFFFFF] p-5 rounded-2xl border border-[#D4D4D8] space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2.5">
                 <div className="p-2 rounded-lg bg-rose-950/60 border border-rose-500/30 text-rose-400">
@@ -262,7 +262,7 @@ export function LoyaltyRulesView({
                 </div>
                 <div>
                   <h2 className="text-sm font-bold text-white">Banned Words Blacklist</h2>
-                  <p className="text-[11px] text-[#A0A0AC]">
+                  <p className="text-[11px] text-[#52525B]">
                     Kata atau frasa yang otomatis disensor / di-block
                   </p>
                 </div>
@@ -275,7 +275,7 @@ export function LoyaltyRulesView({
                 placeholder="Tambahkan kata terlarang..."
                 value={newWord}
                 onChange={(e) => setNewWord(e.target.value)}
-                className="flex-1 px-3 py-1.5 text-xs bg-[#16161D] border border-[#272733] rounded-lg text-white font-mono focus:outline-none focus:border-cyan-400"
+                className="flex-1 px-3 py-1.5 text-xs bg-[#F4F4F5] border border-[#D4D4D8] rounded-lg text-white font-mono focus:outline-none focus:border-zinc-400"
               />
               <button
                 type="submit"
@@ -290,7 +290,7 @@ export function LoyaltyRulesView({
               {bannedWords.map((word) => (
                 <span
                   key={word}
-                  className="px-2.5 py-1 rounded-lg bg-[#16161D] border border-rose-900/40 text-rose-300 text-xs font-mono flex items-center gap-1.5"
+                  className="px-2.5 py-1 rounded-lg bg-[#F4F4F5] border border-rose-900/40 text-rose-300 text-xs font-mono flex items-center gap-1.5"
                 >
                   <span>{word}</span>
                   <button
@@ -305,7 +305,7 @@ export function LoyaltyRulesView({
             </div>
           </div>
 
-          <div className="bg-[#131318] p-5 rounded-2xl border border-[#272733] space-y-4">
+          <div className="bg-[#FFFFFF] p-5 rounded-2xl border border-[#D4D4D8] space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-xs font-bold uppercase tracking-wider text-rose-300 flex items-center gap-2">
                 <ShieldAlert className="w-4 h-4" />
@@ -315,23 +315,23 @@ export function LoyaltyRulesView({
 
             <div className="space-y-2 max-h-[160px] overflow-y-auto pr-1">
               {blacklistedUsers.length === 0 ? (
-                <div className="p-4 text-center text-xs text-[#A0A0AC] font-mono">
+                <div className="p-4 text-center text-xs text-[#52525B] font-mono">
                   Belum ada penonton di daftar blacklist.
                 </div>
               ) : (
                 blacklistedUsers.map((b) => (
                   <div
                     key={b.id}
-                    className="p-2.5 rounded-lg bg-[#16161D] border border-[#272733] flex items-center justify-between text-xs"
+                    className="p-2.5 rounded-lg bg-[#F4F4F5] border border-[#D4D4D8] flex items-center justify-between text-xs"
                   >
                     <div>
                       <span className="font-bold text-white">{b.username}</span>
-                      <p className="text-[11px] text-[#A0A0AC]">{b.reason}</p>
+                      <p className="text-[11px] text-[#52525B]">{b.reason}</p>
                     </div>
                     <button
                       type="button"
                       onClick={() => onUnbanUser(b.id)}
-                      className="px-2.5 py-1 rounded bg-[#1A1A22] hover:bg-emerald-950/60 border border-[#272733] hover:border-emerald-500/40 text-xs font-semibold text-[#A0A0AC] hover:text-emerald-300 transition-colors"
+                      className="px-2.5 py-1 rounded bg-[#E4E4E7] hover:bg-emerald-950/60 border border-[#D4D4D8] hover:border-emerald-500/40 text-xs font-semibold text-[#52525B] hover:text-emerald-300 transition-colors"
                     >
                       Cabut Ban
                     </button>

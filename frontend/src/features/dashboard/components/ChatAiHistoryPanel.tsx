@@ -86,7 +86,7 @@ export function ChatAiHistoryPanel({ interactions, isLoading }: ChatAiHistoryPan
     <section className="studio-card h-64 shrink-0 overflow-hidden rounded-xl border border-zinc-200/90 bg-white shadow-tactile">
       <div className="flex items-center justify-between border-b border-zinc-200 bg-zinc-50/70 p-3">
         <div className="flex items-center gap-2">
-          <RiRobot2Line className="text-violet-600" />
+          <RiRobot2Line className="text-zinc-600" />
           <h2 className="text-xs font-bold uppercase tracking-tight text-zinc-950">
             ChatAI history
           </h2>
@@ -161,7 +161,7 @@ export function ChatAiHistoryPanel({ interactions, isLoading }: ChatAiHistoryPan
                     onClick={() =>
                       playAudio([interaction.answerAudioUrl ?? ''], `${interaction.id}:a`)
                     }
-                    className="inline-flex items-center gap-1 rounded-md border border-violet-200 bg-violet-50 px-2 py-1 text-[10px] font-semibold text-violet-700 transition-colors hover:bg-violet-100"
+                    className="inline-flex items-center gap-1 rounded-md border border-zinc-200 bg-zinc-50 px-2 py-1 text-[10px] font-semibold text-zinc-700 transition-colors hover:bg-zinc-100"
                   >
                     {playingKey === `${interaction.id}:a` ? (
                       <RiPauseCircleLine />

@@ -50,7 +50,7 @@ services:
       CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost,http://localhost:80}
       LOG_LEVEL: ${LOG_LEVEL:-info}
     ports:
-      - "${BACKEND_PORT:-4000}:4000"
+      - "${BACKEND_PORT:-4001}:4000"
     networks:
       - boilerplate-prod-net
 
@@ -62,7 +62,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
       args:
-        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:4000/api/v1}
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:4001/api/v1}
     container_name: boilerplate-prod-frontend
     restart: always
     depends_on:

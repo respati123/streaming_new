@@ -117,11 +117,11 @@ export function ViewerProfileDrawer({
   const getTierColor = (tier: string) => {
     switch (tier) {
       case 'diamond':
-        return 'text-cyan-400 bg-cyan-950/50 border-cyan-500/40';
+        return 'text-zinc-400 bg-zinc-950/50 border-zinc-500/40';
       case 'gold':
         return 'text-amber-400 bg-amber-950/50 border-amber-500/40';
       case 'silver':
-        return 'text-slate-300 bg-slate-800/60 border-slate-600/40';
+        return 'text-zinc-300 bg-zinc-800/60 border-zinc-600/40';
       default:
         return 'text-amber-600 bg-amber-950/30 border-amber-700/40';
     }
@@ -137,8 +137,8 @@ export function ViewerProfileDrawer({
         );
       case 'moderator':
         return (
-          <span className="flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-bold bg-indigo-950/80 text-indigo-300 border border-indigo-600/50">
-            <Shield className="w-3 h-3 text-indigo-400" /> MOD
+          <span className="flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-bold bg-zinc-950/80 text-zinc-300 border border-zinc-600/50">
+            <Shield className="w-3 h-3 text-zinc-400" /> MOD
           </span>
         );
       case 'vip':
@@ -171,23 +171,23 @@ export function ViewerProfileDrawer({
         onClick={onClose}
       />
 
-      <aside className="fixed top-0 right-0 bottom-0 w-full max-w-[500px] z-50 bg-[#131318] border-l border-[#272733] shadow-2xl flex flex-col font-sans text-[#F4F4F6]">
-        <div className="px-6 py-4 border-b border-[#272733] flex items-center justify-between bg-[#16161D]">
+      <aside className="fixed top-0 right-0 bottom-0 w-full max-w-[500px] z-50 bg-[#FFFFFF] border-l border-[#D4D4D8] shadow-2xl flex flex-col font-sans text-[#18181B]">
+        <div className="px-6 py-4 border-b border-[#D4D4D8] flex items-center justify-between bg-[#F4F4F5]">
           <div className="flex items-center gap-2.5">
-            <div className="p-1.5 rounded-lg bg-cyan-950/60 border border-cyan-800/50 text-cyan-400">
+            <div className="p-1.5 rounded-lg bg-zinc-950/60 border border-zinc-800/50 text-zinc-400">
               <User className="w-4 h-4" />
             </div>
             <div>
-              <h2 className="text-sm font-bold text-[#F4F4F6] tracking-tight">
+              <h2 className="text-sm font-bold text-[#18181B] tracking-tight">
                 Detail Penonton & Moderasi
               </h2>
-              <p className="text-[11px] text-[#A0A0AC] font-mono">ID: {viewer.id.slice(0, 12)}</p>
+              <p className="text-[11px] text-[#52525B] font-mono">ID: {viewer.id.slice(0, 12)}</p>
             </div>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-lg bg-[#1A1A22] hover:bg-[#272733] text-[#A0A0AC] hover:text-white transition-colors"
+            className="p-1.5 rounded-lg bg-[#E4E4E7] hover:bg-[#D4D4D8] text-[#52525B] hover:text-white transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
@@ -201,9 +201,9 @@ export function ViewerProfileDrawer({
         )}
 
         <div className="flex-1 overflow-y-auto px-6 py-5 space-y-5">
-          <div className="p-4 rounded-xl bg-[#16161D] border border-[#272733] flex items-start justify-between gap-4">
+          <div className="p-4 rounded-xl bg-[#F4F4F5] border border-[#D4D4D8] flex items-start justify-between gap-4">
             <div className="flex items-center gap-3.5">
-              <div className="w-13 h-13 rounded-xl bg-[#1A1A22] border border-[#272733] flex items-center justify-center font-bold text-lg text-cyan-400 overflow-hidden">
+              <div className="w-13 h-13 rounded-xl bg-[#E4E4E7] border border-[#D4D4D8] flex items-center justify-center font-bold text-lg text-zinc-400 overflow-hidden">
                 {viewer.avatarUrl ? (
                   <img
                     src={viewer.avatarUrl}
@@ -221,7 +221,7 @@ export function ViewerProfileDrawer({
                 </div>
                 <div className="flex items-center gap-2 mt-1">
                   {getRoleBadge(viewer.role)}
-                  <span className="text-[11px] font-mono text-[#A0A0AC]">
+                  <span className="text-[11px] font-mono text-[#52525B]">
                     {viewer.youtubeHandle || '@viewer'}
                   </span>
                 </div>
@@ -237,9 +237,9 @@ export function ViewerProfileDrawer({
           </div>
 
           <div className="grid grid-cols-2 gap-2.5">
-            <div className="p-3 rounded-lg bg-[#16161D] border border-[#272733]">
-              <div className="text-[11px] text-[#A0A0AC] flex items-center gap-1.5">
-                <MessageSquare className="w-3.5 h-3.5 text-cyan-400" />
+            <div className="p-3 rounded-lg bg-[#F4F4F5] border border-[#D4D4D8]">
+              <div className="text-[11px] text-[#52525B] flex items-center gap-1.5">
+                <MessageSquare className="w-3.5 h-3.5 text-zinc-400" />
                 <span>Total Chats</span>
               </div>
               <div className="text-lg font-bold text-white mt-1 font-mono">
@@ -247,8 +247,8 @@ export function ViewerProfileDrawer({
               </div>
             </div>
 
-            <div className="p-3 rounded-lg bg-[#16161D] border border-[#272733]">
-              <div className="text-[11px] text-[#A0A0AC] flex items-center gap-1.5">
+            <div className="p-3 rounded-lg bg-[#F4F4F5] border border-[#D4D4D8]">
+              <div className="text-[11px] text-[#52525B] flex items-center gap-1.5">
                 <Gift className="w-3.5 h-3.5 text-amber-400" />
                 <span>Saweria Donasi</span>
               </div>
@@ -257,8 +257,8 @@ export function ViewerProfileDrawer({
               </div>
             </div>
 
-            <div className="p-3 rounded-lg bg-[#16161D] border border-[#272733]">
-              <div className="text-[11px] text-[#A0A0AC] flex items-center gap-1.5">
+            <div className="p-3 rounded-lg bg-[#F4F4F5] border border-[#D4D4D8]">
+              <div className="text-[11px] text-[#52525B] flex items-center gap-1.5">
                 <Zap className="w-3.5 h-3.5 text-emerald-400" />
                 <span>Loyalty Points</span>
               </div>
@@ -267,8 +267,8 @@ export function ViewerProfileDrawer({
               </div>
             </div>
 
-            <div className="p-3 rounded-lg bg-[#16161D] border border-[#272733]">
-              <div className="text-[11px] text-[#A0A0AC] flex items-center gap-1.5">
+            <div className="p-3 rounded-lg bg-[#F4F4F5] border border-[#D4D4D8]">
+              <div className="text-[11px] text-[#52525B] flex items-center gap-1.5">
                 <AlertTriangle className="w-3.5 h-3.5 text-rose-400" />
                 <span>Timeout / Warn</span>
               </div>
@@ -279,14 +279,14 @@ export function ViewerProfileDrawer({
           </div>
 
           <div>
-            <div className="flex border-b border-[#272733] gap-2">
+            <div className="flex border-b border-[#D4D4D8] gap-2">
               <button
                 type="button"
                 onClick={() => setActiveTab('chat')}
                 className={`pb-2 text-xs font-semibold px-2 flex items-center gap-1.5 border-b-2 transition-colors ${
                   activeTab === 'chat'
-                    ? 'border-cyan-400 text-cyan-400'
-                    : 'border-transparent text-[#A0A0AC] hover:text-white'
+                    ? 'border-zinc-400 text-zinc-400'
+                    : 'border-transparent text-[#52525B] hover:text-white'
                 }`}
               >
                 <MessageSquare className="w-3.5 h-3.5" />
@@ -298,7 +298,7 @@ export function ViewerProfileDrawer({
                 className={`pb-2 text-xs font-semibold px-2 flex items-center gap-1.5 border-b-2 transition-colors ${
                   activeTab === 'donation'
                     ? 'border-amber-400 text-amber-400'
-                    : 'border-transparent text-[#A0A0AC] hover:text-white'
+                    : 'border-transparent text-[#52525B] hover:text-white'
                 }`}
               >
                 <Gift className="w-3.5 h-3.5" />
@@ -310,7 +310,7 @@ export function ViewerProfileDrawer({
                 className={`pb-2 text-xs font-semibold px-2 flex items-center gap-1.5 border-b-2 transition-colors ${
                   activeTab === 'points'
                     ? 'border-emerald-400 text-emerald-400'
-                    : 'border-transparent text-[#A0A0AC] hover:text-white'
+                    : 'border-transparent text-[#52525B] hover:text-white'
                 }`}
               >
                 <Zap className="w-3.5 h-3.5" />
@@ -325,10 +325,10 @@ export function ViewerProfileDrawer({
                   .map((log) => (
                     <div
                       key={log.id}
-                      className="p-2.5 rounded-lg bg-[#16161D] border border-[#272733] text-xs"
+                      className="p-2.5 rounded-lg bg-[#F4F4F5] border border-[#D4D4D8] text-xs"
                     >
-                      <div className="flex items-center justify-between text-[11px] text-[#A0A0AC]">
-                        <span className="font-medium text-cyan-400">{log.platform}</span>
+                      <div className="flex items-center justify-between text-[11px] text-[#52525B]">
+                        <span className="font-medium text-zinc-400">{log.platform}</span>
                         <span className="font-mono">{log.timestamp}</span>
                       </div>
                       <p className="mt-1 text-white">{log.content}</p>
@@ -341,13 +341,13 @@ export function ViewerProfileDrawer({
                   .map((log) => (
                     <div
                       key={log.id}
-                      className="p-2.5 rounded-lg bg-[#16161D] border border-amber-500/30 text-xs"
+                      className="p-2.5 rounded-lg bg-[#F4F4F5] border border-amber-500/30 text-xs"
                     >
                       <div className="flex items-center justify-between text-[11px]">
                         <span className="font-bold text-amber-400 font-mono">
                           Rp {log.amount?.toLocaleString('id-ID')}
                         </span>
-                        <span className="text-[#A0A0AC] font-mono">{log.timestamp}</span>
+                        <span className="text-[#52525B] font-mono">{log.timestamp}</span>
                       </div>
                       <p className="mt-1 text-zinc-200">{log.content}</p>
                     </div>
@@ -359,7 +359,7 @@ export function ViewerProfileDrawer({
                   .map((log) => (
                     <div
                       key={log.id}
-                      className="p-2.5 rounded-lg bg-[#16161D] border border-[#272733] text-xs flex items-center justify-between"
+                      className="p-2.5 rounded-lg bg-[#F4F4F5] border border-[#D4D4D8] text-xs flex items-center justify-between"
                     >
                       <span className="text-zinc-200">{log.content}</span>
                       <span className="font-mono font-bold text-emerald-400">
@@ -370,24 +370,24 @@ export function ViewerProfileDrawer({
             </div>
           </div>
 
-          <div className="space-y-3 pt-3 border-t border-[#272733]">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-[#A0A0AC]">
+          <div className="space-y-3 pt-3 border-t border-[#D4D4D8]">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-[#52525B]">
               Panel Aksi & Moderasi
             </h4>
 
-            <div className="p-3 rounded-lg bg-[#16161D] border border-[#272733] space-y-2">
-              <label htmlFor="pts-input" className="text-[11px] text-[#A0A0AC] font-medium block">
+            <div className="p-3 rounded-lg bg-[#F4F4F5] border border-[#D4D4D8] space-y-2">
+              <label htmlFor="pts-input" className="text-[11px] text-[#52525B] font-medium block">
                 Atur Points Penonton
               </label>
               <div className="flex items-center gap-2">
-                <div className="flex rounded-md border border-[#272733] overflow-hidden">
+                <div className="flex rounded-md border border-[#D4D4D8] overflow-hidden">
                   <button
                     type="button"
                     onClick={() => setPointsSign('+')}
                     className={`px-3 py-1.5 text-xs font-bold transition-colors ${
                       pointsSign === '+'
                         ? 'bg-emerald-600 text-white'
-                        : 'bg-[#1A1A22] text-[#A0A0AC]'
+                        : 'bg-[#E4E4E7] text-[#52525B]'
                     }`}
                   >
                     +
@@ -396,7 +396,7 @@ export function ViewerProfileDrawer({
                     type="button"
                     onClick={() => setPointsSign('-')}
                     className={`px-3 py-1.5 text-xs font-bold transition-colors ${
-                      pointsSign === '-' ? 'bg-rose-600 text-white' : 'bg-[#1A1A22] text-[#A0A0AC]'
+                      pointsSign === '-' ? 'bg-rose-600 text-white' : 'bg-[#E4E4E7] text-[#52525B]'
                     }`}
                   >
                     -
@@ -407,22 +407,22 @@ export function ViewerProfileDrawer({
                   type="number"
                   value={pointsInput}
                   onChange={(e) => setPointsInput(e.target.value)}
-                  className="w-24 px-2.5 py-1.5 text-xs bg-[#1A1A22] border border-[#272733] rounded-md font-mono text-white focus:outline-none focus:border-cyan-400"
+                  className="w-24 px-2.5 py-1.5 text-xs bg-[#E4E4E7] border border-[#D4D4D8] rounded-md font-mono text-white focus:outline-none focus:border-zinc-400"
                 />
                 <button
                   type="button"
                   onClick={handlePointsSubmit}
-                  className="flex-1 py-1.5 px-3 bg-cyan-600 hover:bg-cyan-500 text-white rounded-md text-xs font-bold transition-colors"
+                  className="flex-1 py-1.5 px-3 bg-zinc-600 hover:bg-zinc-500 text-white rounded-md text-xs font-bold transition-colors"
                 >
                   Terapkan Points
                 </button>
               </div>
             </div>
 
-            <div className="p-3 rounded-lg bg-[#16161D] border border-[#272733] space-y-2">
+            <div className="p-3 rounded-lg bg-[#F4F4F5] border border-[#D4D4D8] space-y-2">
               <label
                 htmlFor="role-viewer-select-btn"
-                className="text-[11px] text-[#A0A0AC] font-medium block"
+                className="text-[11px] text-[#52525B] font-medium block"
               >
                 Ubah Role Penonton
               </label>
@@ -438,8 +438,8 @@ export function ViewerProfileDrawer({
                     }}
                     className={`py-1.5 rounded text-[11px] font-bold uppercase transition-colors border ${
                       viewer.role === r
-                        ? 'bg-cyan-950 border-cyan-500 text-cyan-300'
-                        : 'bg-[#1A1A22] border-[#272733] text-[#A0A0AC] hover:text-white'
+                        ? 'bg-zinc-950 border-zinc-500 text-zinc-300'
+                        : 'bg-[#E4E4E7] border-[#D4D4D8] text-[#52525B] hover:text-white'
                     }`}
                   >
                     {r}
@@ -457,21 +457,21 @@ export function ViewerProfileDrawer({
                   id="timeout-5m-btn"
                   type="button"
                   onClick={() => handleTimeoutClick(5)}
-                  className="py-1.5 px-2 rounded bg-[#1A1A22] hover:bg-rose-900/30 border border-rose-800/40 text-rose-300 text-xs font-medium transition-colors"
+                  className="py-1.5 px-2 rounded bg-[#E4E4E7] hover:bg-rose-900/30 border border-rose-800/40 text-rose-300 text-xs font-medium transition-colors"
                 >
                   Timeout 5m
                 </button>
                 <button
                   type="button"
                   onClick={() => handleTimeoutClick(60)}
-                  className="py-1.5 px-2 rounded bg-[#1A1A22] hover:bg-rose-900/30 border border-rose-800/40 text-rose-300 text-xs font-medium transition-colors"
+                  className="py-1.5 px-2 rounded bg-[#E4E4E7] hover:bg-rose-900/30 border border-rose-800/40 text-rose-300 text-xs font-medium transition-colors"
                 >
                   Timeout 1 Jam
                 </button>
                 <button
                   type="button"
                   onClick={() => handleTimeoutClick(1440)}
-                  className="py-1.5 px-2 rounded bg-[#1A1A22] hover:bg-rose-900/30 border border-rose-800/40 text-rose-300 text-xs font-medium transition-colors"
+                  className="py-1.5 px-2 rounded bg-[#E4E4E7] hover:bg-rose-900/30 border border-rose-800/40 text-rose-300 text-xs font-medium transition-colors"
                 >
                   Timeout 24 Jam
                 </button>

@@ -14,7 +14,7 @@ COPY tsconfig.json tsconfig.node.json vite.config.ts postcss.config.js tailwind.
 COPY src ./src
 
 # Build production bundle
-ARG VITE_API_BASE_URL=http://localhost:4000/api/v1
+ARG VITE_API_BASE_URL=http://localhost:4001/api/v1
 ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 
 RUN bun run build

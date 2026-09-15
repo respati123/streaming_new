@@ -65,14 +65,14 @@ export class StreamSocketClient {
         return url.toString();
       }
 
-      const httpUrl = env.VITE_API_BASE_URL || 'http://localhost:4000/api/v1';
+      const httpUrl = env.VITE_API_BASE_URL || 'http://localhost:4001/api/v1';
       const parsed = new URL(httpUrl);
       const wsProtocol = parsed.protocol === 'https:' ? 'wss:' : 'ws:';
       const mode = this.clientType === 'overlay' ? `&mode=${this.playbackMode}` : '';
       return `${wsProtocol}//${parsed.host}/ws?type=${this.clientType}${mode}`;
     } catch {
       const mode = this.clientType === 'overlay' ? `&mode=${this.playbackMode}` : '';
-      return `ws://localhost:4000/ws?type=${this.clientType}${mode}`;
+      return `ws://localhost:4001/ws?type=${this.clientType}${mode}`;
     }
   }
 

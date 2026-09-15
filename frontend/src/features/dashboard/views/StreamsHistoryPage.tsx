@@ -407,7 +407,7 @@ export default function StreamsHistoryPage() {
                     onClick={() => setRoleFilter('moderator')}
                     className={`px-2 py-0.5 rounded ${
                       roleFilter === 'moderator'
-                        ? 'bg-blue-600 text-white font-bold'
+                        ? 'bg-zinc-600 text-white font-bold'
                         : 'text-zinc-600 hover:bg-zinc-100'
                     }`}
                   >
@@ -466,7 +466,7 @@ export default function StreamsHistoryPage() {
                         isHost
                           ? 'border-amber-200 bg-amber-50/20 shadow-xs'
                           : isMod
-                            ? 'border-blue-200 bg-blue-50/20'
+                            ? 'border-zinc-200 bg-zinc-50/20'
                             : isMember
                               ? 'border-emerald-200 bg-emerald-50/20'
                               : 'border-zinc-200/90 shadow-2xs hover:border-zinc-300'
@@ -486,7 +486,7 @@ export default function StreamsHistoryPage() {
                               isHost
                                 ? 'bg-amber-500 text-white'
                                 : isMod
-                                  ? 'bg-blue-600 text-white'
+                                  ? 'bg-zinc-600 text-white'
                                   : isMember
                                     ? 'bg-emerald-600 text-white'
                                     : 'bg-zinc-200 text-zinc-700'
@@ -510,7 +510,7 @@ export default function StreamsHistoryPage() {
                               </span>
                             )}
                             {isMod && (
-                              <span className="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-blue-100 text-blue-800 border border-blue-300 flex items-center gap-0.5">
+                              <span className="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-zinc-100 text-zinc-800 border border-zinc-300 flex items-center gap-0.5">
                                 <RiShieldUserLine className="text-[10px]" />
                                 MOD
                               </span>

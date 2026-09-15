@@ -43,8 +43,8 @@ export default function UsersDirectoryPage() {
     switch (tier) {
       case 'diamond':
         return (
-          <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-bold font-mono uppercase bg-cyan-950/60 text-cyan-300 border border-cyan-500/40">
-            <Crown className="w-3.5 h-3.5 text-cyan-400" />
+          <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-bold font-mono uppercase bg-zinc-950/60 text-zinc-300 border border-zinc-500/40">
+            <Crown className="w-3.5 h-3.5 text-zinc-400" />
             <span>Diamond</span>
           </span>
         );
@@ -57,14 +57,14 @@ export default function UsersDirectoryPage() {
         );
       case 'silver':
         return (
-          <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-bold font-mono uppercase bg-slate-800/60 text-slate-300 border border-slate-600/40">
-            <Crown className="w-3.5 h-3.5 text-slate-400" />
+          <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-bold font-mono uppercase bg-zinc-800/60 text-zinc-300 border border-zinc-600/40">
+            <Crown className="w-3.5 h-3.5 text-zinc-400" />
             <span>Silver</span>
           </span>
         );
       default:
         return (
-          <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold font-mono uppercase bg-[#1A1A22] text-[#A0A0AC] border border-[#272733]">
+          <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold font-mono uppercase bg-[#E4E4E7] text-[#52525B] border border-[#D4D4D8]">
             <Crown className="w-3.5 h-3.5 text-zinc-500" />
             <span>Bronze</span>
           </span>
@@ -82,8 +82,8 @@ export default function UsersDirectoryPage() {
         );
       case 'moderator':
         return (
-          <span className="flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-bold bg-indigo-950/80 text-indigo-300 border border-indigo-600/50">
-            <Shield className="w-3 h-3 text-indigo-400" /> MOD
+          <span className="flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-bold bg-zinc-950/80 text-zinc-300 border border-zinc-600/50">
+            <Shield className="w-3 h-3 text-zinc-400" /> MOD
           </span>
         );
       case 'vip':
@@ -100,7 +100,7 @@ export default function UsersDirectoryPage() {
         );
       default:
         return (
-          <span className="flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium bg-[#1A1A22] text-[#A0A0AC] border border-[#272733]">
+          <span className="flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium bg-[#E4E4E7] text-[#52525B] border border-[#D4D4D8]">
             <User className="w-3 h-3 text-zinc-400" /> Viewer
           </span>
         );
@@ -108,16 +108,16 @@ export default function UsersDirectoryPage() {
   };
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 max-w-[1600px] w-full mx-auto space-y-6 font-sans text-[#F4F4F6]">
-      <div className="flex flex-wrap items-center justify-between gap-4 bg-[#131318] p-5 rounded-2xl border border-[#272733] shadow-lg">
+    <div className="p-4 sm:p-6 lg:p-8 max-w-[1600px] w-full mx-auto space-y-6 font-sans text-[#18181B]">
+      <div className="flex flex-wrap items-center justify-between gap-4 bg-[#FFFFFF] p-5 rounded-2xl border border-[#D4D4D8] shadow-lg">
         <div className="space-y-1">
           <h1 className="text-lg font-bold text-white tracking-tight flex items-center gap-2.5">
-            <div className="p-2 rounded-xl bg-cyan-950/60 border border-cyan-800/50 text-cyan-400">
+            <div className="p-2 rounded-xl bg-zinc-950/60 border border-zinc-800/50 text-zinc-400">
               <Users className="w-5 h-5" />
             </div>
             <span>Database Penonton & Chatters Hub</span>
           </h1>
-          <p className="text-xs text-[#A0A0AC] font-mono">
+          <p className="text-xs text-[#52525B] font-mono">
             Direktori profil pemirsa aktif, ranking loyalty points, donasi Saweria, dan kontrol
             moderasi stream.
           </p>
@@ -127,15 +127,15 @@ export default function UsersDirectoryPage() {
           <button
             type="button"
             onClick={() => handlers.handleTabChange('rules')}
-            className="px-3.5 py-2 rounded-xl bg-[#16161D] hover:bg-[#1A1A22] border border-[#272733] text-xs font-bold text-white flex items-center gap-2 transition-colors"
+            className="px-3.5 py-2 rounded-xl bg-[#F4F4F5] hover:bg-[#E4E4E7] border border-[#D4D4D8] text-xs font-bold text-white flex items-center gap-2 transition-colors"
           >
-            <Settings className="w-4 h-4 text-cyan-400" />
+            <Settings className="w-4 h-4 text-zinc-400" />
             <span>Rules & Tier Config</span>
           </button>
           <button
             type="button"
             onClick={() => window.location.reload()}
-            className="px-3.5 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold flex items-center gap-2 shadow-lg shadow-cyan-950/50 transition-colors"
+            className="px-3.5 py-2 rounded-xl bg-zinc-600 hover:bg-zinc-500 text-white text-xs font-bold flex items-center gap-2 shadow-lg shadow-zinc-950/50 transition-colors"
           >
             <RefreshCw className="w-4 h-4" />
             <span>Sync Streamer.bot</span>
@@ -144,8 +144,8 @@ export default function UsersDirectoryPage() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="p-4 rounded-xl bg-[#131318] border border-[#272733] space-y-2">
-          <div className="text-xs text-[#A0A0AC] font-mono flex items-center justify-between">
+        <div className="p-4 rounded-xl bg-[#FFFFFF] border border-[#D4D4D8] space-y-2">
+          <div className="text-xs text-[#52525B] font-mono flex items-center justify-between">
             <span>TOTAL VIEWERS RECORDED</span>
             <span className="text-emerald-400 font-bold">+12%</span>
           </div>
@@ -155,19 +155,19 @@ export default function UsersDirectoryPage() {
           <div className="text-[11px] text-zinc-400 font-mono">Terekam di seluruh stream live</div>
         </div>
 
-        <div className="p-4 rounded-xl bg-[#131318] border border-[#272733] space-y-2">
-          <div className="text-xs text-[#A0A0AC] font-mono flex items-center justify-between">
+        <div className="p-4 rounded-xl bg-[#FFFFFF] border border-[#D4D4D8] space-y-2">
+          <div className="text-xs text-[#52525B] font-mono flex items-center justify-between">
             <span>ACTIVE CHATTERS (RECENT)</span>
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
           </div>
-          <div className="text-2xl font-bold text-cyan-400 font-mono">
+          <div className="text-2xl font-bold text-zinc-400 font-mono">
             {states.summaryStats.activeRecent} Penonton
           </div>
           <div className="text-[11px] text-zinc-400 font-mono">Aktif berinteraksi di room</div>
         </div>
 
-        <div className="p-4 rounded-xl bg-[#131318] border border-[#272733] space-y-2">
-          <div className="text-xs text-[#A0A0AC] font-mono flex items-center justify-between">
+        <div className="p-4 rounded-xl bg-[#FFFFFF] border border-[#D4D4D8] space-y-2">
+          <div className="text-xs text-[#52525B] font-mono flex items-center justify-between">
             <span>LOYAL MEMBERS & VIPS</span>
             <Crown className="w-3.5 h-3.5 text-amber-400" />
           </div>
@@ -179,8 +179,8 @@ export default function UsersDirectoryPage() {
           </div>
         </div>
 
-        <div className="p-4 rounded-xl bg-[#131318] border border-[#272733] space-y-2">
-          <div className="text-xs text-[#A0A0AC] font-mono flex items-center justify-between">
+        <div className="p-4 rounded-xl bg-[#FFFFFF] border border-[#D4D4D8] space-y-2">
+          <div className="text-xs text-[#52525B] font-mono flex items-center justify-between">
             <span>CIRCULATING LOYALTY POINTS</span>
             <Zap className="w-3.5 h-3.5 text-emerald-400" />
           </div>
@@ -191,22 +191,22 @@ export default function UsersDirectoryPage() {
         </div>
       </div>
 
-      <div className="bg-[#131318] p-4 rounded-xl border border-[#272733] flex flex-wrap items-center justify-between gap-3">
+      <div className="bg-[#FFFFFF] p-4 rounded-xl border border-[#D4D4D8] flex flex-wrap items-center justify-between gap-3">
         <div className="relative flex-1 min-w-[260px]">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#A0A0AC] w-4 h-4" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#52525B] w-4 h-4" />
           <input
             type="text"
             placeholder="Cari penonton via nama, @handle, channel ID..."
             value={states.search}
             onChange={(e) => handlers.handleSearchChange(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 text-xs bg-[#16161D] border border-[#272733] rounded-lg focus:outline-none focus:border-cyan-400 font-mono text-white"
+            className="w-full pl-9 pr-3 py-2 text-xs bg-[#F4F4F5] border border-[#D4D4D8] rounded-lg focus:outline-none focus:border-zinc-400 font-mono text-white"
           />
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          <div className="flex items-center gap-1.5 px-2 py-1 bg-[#16161D] border border-[#272733] rounded-lg">
-            <Filter className="w-3.5 h-3.5 text-[#A0A0AC]" />
-            <span className="text-[11px] text-[#A0A0AC] font-semibold">Role:</span>
+          <div className="flex items-center gap-1.5 px-2 py-1 bg-[#F4F4F5] border border-[#D4D4D8] rounded-lg">
+            <Filter className="w-3.5 h-3.5 text-[#52525B]" />
+            <span className="text-[11px] text-[#52525B] font-semibold">Role:</span>
             {(['all', 'admin', 'moderator', 'vip', 'member', 'viewer'] as const).map((r) => (
               <button
                 key={r}
@@ -214,8 +214,8 @@ export default function UsersDirectoryPage() {
                 onClick={() => handlers.handleRoleFilterChange(r)}
                 className={`px-2 py-0.5 rounded text-[11px] font-mono uppercase transition-colors ${
                   states.roleFilter === r
-                    ? 'bg-cyan-600 text-white font-bold'
-                    : 'text-[#A0A0AC] hover:text-white'
+                    ? 'bg-zinc-600 text-white font-bold'
+                    : 'text-[#52525B] hover:text-white'
                 }`}
               >
                 {r}
@@ -226,7 +226,7 @@ export default function UsersDirectoryPage() {
           <select
             value={states.tierFilter}
             onChange={(e) => handlers.handleTierFilterChange(e.target.value)}
-            className="px-3 py-2 text-xs bg-[#16161D] border border-[#272733] rounded-lg font-mono text-white focus:outline-none focus:border-cyan-400"
+            className="px-3 py-2 text-xs bg-[#F4F4F5] border border-[#D4D4D8] rounded-lg font-mono text-white focus:outline-none focus:border-zinc-400"
           >
             <option value="all">Semua Tier</option>
             <option value="diamond">Diamond Tier</option>
@@ -237,11 +237,11 @@ export default function UsersDirectoryPage() {
         </div>
       </div>
 
-      <div className="bg-[#131318] rounded-2xl border border-[#272733] overflow-hidden shadow-lg">
+      <div className="bg-[#FFFFFF] rounded-2xl border border-[#D4D4D8] overflow-hidden shadow-lg">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse font-sans">
             <thead>
-              <tr className="border-b border-[#272733] bg-[#16161D] text-[11px] font-mono font-bold text-[#A0A0AC] uppercase tracking-wider">
+              <tr className="border-b border-[#D4D4D8] bg-[#F4F4F5] text-[11px] font-mono font-bold text-[#52525B] uppercase tracking-wider">
                 <th className="py-3 px-4">PENONTON</th>
                 <th className="py-3 px-4">ROLE</th>
                 <th className="py-3 px-4">LOYALTY TIER</th>
@@ -252,10 +252,10 @@ export default function UsersDirectoryPage() {
                 <th className="py-3 px-4 text-center">AKSI</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#272733] text-xs">
+            <tbody className="divide-y divide-[#D4D4D8] text-xs">
               {states.viewers.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="py-8 text-center text-[#A0A0AC] font-mono">
+                  <td colSpan={8} className="py-8 text-center text-[#52525B] font-mono">
                     Tidak ada penonton yang cocok dengan filter pencarian.
                   </td>
                 </tr>
@@ -263,12 +263,12 @@ export default function UsersDirectoryPage() {
                 states.viewers.map((viewer) => (
                   <tr
                     key={viewer.id}
-                    className="hover:bg-[#16161D]/70 transition-colors group cursor-pointer"
+                    className="hover:bg-[#F4F4F5]/70 transition-colors group cursor-pointer"
                     onClick={() => handlers.handleSelectViewer(viewer.id)}
                   >
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-[#1A1A22] border border-[#272733] flex items-center justify-center font-bold text-xs text-cyan-400">
+                        <div className="w-8 h-8 rounded-lg bg-[#E4E4E7] border border-[#D4D4D8] flex items-center justify-center font-bold text-xs text-zinc-400">
                           {viewer.name.charAt(0).toUpperCase()}
                         </div>
                         <div>
@@ -278,7 +278,7 @@ export default function UsersDirectoryPage() {
                               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
                             )}
                           </div>
-                          <span className="text-[11px] text-[#A0A0AC] font-mono">
+                          <span className="text-[11px] text-[#52525B] font-mono">
                             {viewer.youtubeHandle || '@viewer'}
                           </span>
                         </div>
@@ -306,7 +306,7 @@ export default function UsersDirectoryPage() {
                           e.stopPropagation();
                           handlers.handleSelectViewer(viewer.id);
                         }}
-                        className="px-3 py-1.5 rounded-lg bg-[#16161D] group-hover:bg-cyan-600 group-hover:text-white border border-[#272733] text-xs font-semibold text-[#A0A0AC] flex items-center gap-1.5 mx-auto transition-colors"
+                        className="px-3 py-1.5 rounded-lg bg-[#F4F4F5] group-hover:bg-zinc-600 group-hover:text-white border border-[#D4D4D8] text-xs font-semibold text-[#52525B] flex items-center gap-1.5 mx-auto transition-colors"
                       >
                         <Eye className="w-3.5 h-3.5" />
                         <span>Profil</span>
@@ -319,7 +319,7 @@ export default function UsersDirectoryPage() {
           </table>
         </div>
 
-        <div className="p-3.5 border-t border-[#272733] bg-[#16161D] flex items-center justify-between text-xs font-mono text-[#A0A0AC]">
+        <div className="p-3.5 border-t border-[#D4D4D8] bg-[#F4F4F5] flex items-center justify-between text-xs font-mono text-[#52525B]">
           <div>
             Menampilkan <span className="text-white font-bold">{states.viewers.length}</span> dari{' '}
             <span className="text-white font-bold">{states.allViewersCount}</span> penonton
@@ -328,15 +328,15 @@ export default function UsersDirectoryPage() {
             <button
               type="button"
               disabled
-              className="px-3 py-1 rounded bg-[#1A1A22] border border-[#272733] text-zinc-500 cursor-not-allowed"
+              className="px-3 py-1 rounded bg-[#E4E4E7] border border-[#D4D4D8] text-zinc-500 cursor-not-allowed"
             >
               Sebelumnya
             </button>
-            <span className="px-2 font-bold text-cyan-400">1</span>
+            <span className="px-2 font-bold text-zinc-400">1</span>
             <button
               type="button"
               disabled
-              className="px-3 py-1 rounded bg-[#1A1A22] border border-[#272733] text-zinc-500 cursor-not-allowed"
+              className="px-3 py-1 rounded bg-[#E4E4E7] border border-[#D4D4D8] text-zinc-500 cursor-not-allowed"
             >
               Selanjutnya
             </button>

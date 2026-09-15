@@ -60,14 +60,14 @@ export function StreamControlHeader({
   };
 
   return (
-    <header className="px-5 py-3 border-b border-[#272733] bg-[#131318]/95 backdrop-blur-md sticky top-0 z-30 font-sans text-[#F4F4F6]">
+    <header className="px-5 py-3 border-b border-[#D4D4D8] bg-[#FFFFFF]/95 backdrop-blur-md sticky top-0 z-30 font-sans text-[#18181B]">
       <div className="flex flex-wrap items-center justify-between gap-4 max-w-[1920px] mx-auto">
         <div className="flex items-center gap-3.5">
           <div
             className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-mono font-bold tracking-wider uppercase transition-colors ${
               isLive
                 ? 'bg-rose-950/80 border-rose-600/50 text-rose-300 shadow-sm'
-                : 'bg-[#16161D] border-[#272733] text-[#A0A0AC]'
+                : 'bg-[#F4F4F5] border-[#D4D4D8] text-[#52525B]'
             }`}
           >
             <span
@@ -86,12 +86,12 @@ export function StreamControlHeader({
                 {activeStream ? activeStream.title : 'Tidak Ada Sesi Live Aktif'}
               </h1>
               {activeStream && (
-                <span className="text-[11px] font-mono font-semibold text-cyan-400 bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-800/40">
+                <span className="text-[11px] font-mono font-semibold text-zinc-400 bg-zinc-950/60 px-2 py-0.5 rounded border border-zinc-800/40">
                   ID: {activeStream.id.slice(0, 8)}
                 </span>
               )}
             </div>
-            <p className="text-[11px] text-[#A0A0AC] font-mono mt-0.5">
+            <p className="text-[11px] text-[#52525B] font-mono mt-0.5">
               {activeStream
                 ? `Dimulai pukul ${new Date(activeStream.startedAt).toLocaleTimeString('id-ID')} • Live YouTube Gateway Terhubung`
                 : 'Inisialisasi sesi siaran untuk mengaktifkan perekaman chat & engagement realtime'}
@@ -99,7 +99,7 @@ export function StreamControlHeader({
           </div>
         </div>
 
-        <div className="flex items-center gap-3 bg-[#16161D] px-3.5 py-1.5 rounded-xl border border-[#272733]">
+        <div className="flex items-center gap-3 bg-[#F4F4F5] px-3.5 py-1.5 rounded-xl border border-[#D4D4D8]">
           <div className="flex items-center gap-2.5">
             <div
               className={`p-1.5 rounded-lg border ${
@@ -125,7 +125,7 @@ export function StreamControlHeader({
                   {botStatus?.status || 'DISCONNECTED'}
                 </span>
               </div>
-              <div className="text-[10px] text-[#A0A0AC] font-mono">
+              <div className="text-[10px] text-[#52525B] font-mono">
                 {botStatus?.host || '127.0.0.1'}:{botStatus?.port || 8080} • WS Telemetry:{' '}
                 <span className={isSSEActive ? 'text-emerald-400 font-bold' : 'text-zinc-500'}>
                   {isSSEActive ? 'CONNECTED' : 'CONNECTING'}
@@ -138,7 +138,7 @@ export function StreamControlHeader({
             type="button"
             onClick={onReconnectBot}
             title="Reconnect to Streamer.bot"
-            className="p-1.5 text-[#A0A0AC] hover:text-white bg-[#1A1A22] hover:bg-[#272733] rounded-lg border border-[#272733] transition-all"
+            className="p-1.5 text-[#52525B] hover:text-white bg-[#E4E4E7] hover:bg-[#D4D4D8] rounded-lg border border-[#D4D4D8] transition-all"
             aria-label="Reconnect to Streamer.bot"
           >
             <RiRefreshLine className="text-sm" />
@@ -160,7 +160,7 @@ export function StreamControlHeader({
             <button
               type="button"
               onClick={() => setShowStartModal(true)}
-              className="flex items-center gap-2 px-4 py-2 text-xs font-bold text-white bg-cyan-600 hover:bg-cyan-500 border border-cyan-400/40 rounded-xl shadow-lg shadow-cyan-950/50 transition-all"
+              className="flex items-center gap-2 px-4 py-2 text-xs font-bold text-white bg-zinc-600 hover:bg-zinc-500 border border-zinc-400/40 rounded-xl shadow-lg shadow-zinc-950/50 transition-all"
             >
               <RiVideoAddFill className="text-base" />
               <span>Mulai Sesi Stream Baru</span>
@@ -177,17 +177,17 @@ export function StreamControlHeader({
             className="fixed inset-0 bg-black/70 backdrop-blur-xs transition-opacity cursor-default w-full h-full border-none"
             onClick={() => setShowStartModal(false)}
           />
-          <div className="relative w-full max-w-md bg-[#131318] rounded-2xl p-6 border border-[#272733] shadow-2xl z-10 animate-in fade-in zoom-in-95 duration-150 text-[#F4F4F6]">
-            <div className="flex items-center justify-between pb-3 border-b border-[#272733]">
+          <div className="relative w-full max-w-md bg-[#FFFFFF] rounded-2xl p-6 border border-[#D4D4D8] shadow-2xl z-10 animate-in fade-in zoom-in-95 duration-150 text-[#18181B]">
+            <div className="flex items-center justify-between pb-3 border-b border-[#D4D4D8]">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-cyan-950 border border-cyan-800 flex items-center justify-center text-cyan-400">
+                <div className="w-8 h-8 rounded-xl bg-zinc-950 border border-zinc-800 flex items-center justify-center text-zinc-400">
                   <RiBroadcastFill className="text-base" />
                 </div>
                 <div>
                   <h2 className="text-sm font-bold text-white tracking-tight">
                     Mulai Sesi Siaran Baru
                   </h2>
-                  <p className="text-[11px] text-[#A0A0AC] font-mono">
+                  <p className="text-[11px] text-[#52525B] font-mono">
                     Catat riwayat penonton dan trigger aksi live
                   </p>
                 </div>
@@ -195,7 +195,7 @@ export function StreamControlHeader({
               <button
                 type="button"
                 onClick={() => setShowStartModal(false)}
-                className="p-1.5 text-[#A0A0AC] hover:text-white rounded-lg hover:bg-[#1A1A22]"
+                className="p-1.5 text-[#52525B] hover:text-white rounded-lg hover:bg-[#E4E4E7]"
                 aria-label="Tutup dialog"
               >
                 <RiCloseLine className="text-lg" />
@@ -217,7 +217,7 @@ export function StreamControlHeader({
                   placeholder="Contoh: Ranked Mythic Push + Diskusi Live"
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
-                  className="w-full px-3.5 py-2.5 text-xs bg-[#16161D] border border-[#272733] rounded-xl focus:outline-none focus:border-cyan-400 font-sans text-white"
+                  className="w-full px-3.5 py-2.5 text-xs bg-[#F4F4F5] border border-[#D4D4D8] rounded-xl focus:outline-none focus:border-zinc-400 font-sans text-white"
                 />
               </div>
 
@@ -225,14 +225,14 @@ export function StreamControlHeader({
                 <button
                   type="button"
                   onClick={() => setShowStartModal(false)}
-                  className="px-4 py-2 text-xs font-semibold text-[#A0A0AC] hover:text-white bg-[#1A1A22] hover:bg-[#272733] border border-[#272733] rounded-xl"
+                  className="px-4 py-2 text-xs font-semibold text-[#52525B] hover:text-white bg-[#E4E4E7] hover:bg-[#D4D4D8] border border-[#D4D4D8] rounded-xl"
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
                   disabled={isActionLoading || !newTitle.trim()}
-                  className="px-5 py-2 text-xs font-bold text-white bg-cyan-600 hover:bg-cyan-500 border border-cyan-400/40 rounded-xl shadow-lg shadow-cyan-950/50 disabled:opacity-50"
+                  className="px-5 py-2 text-xs font-bold text-white bg-zinc-600 hover:bg-zinc-500 border border-zinc-400/40 rounded-xl shadow-lg shadow-zinc-950/50 disabled:opacity-50"
                 >
                   {isActionLoading ? 'Memulai Sesi...' : 'Mulai Siaran Sekarang'}
                 </button>

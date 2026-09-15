@@ -69,7 +69,7 @@ bun run db:seed
 ```bash
 bun dev
 ```
-Server will start listening at `http://localhost:4000`.
+Server will start listening at `http://localhost:4001`.
 
 ---
 

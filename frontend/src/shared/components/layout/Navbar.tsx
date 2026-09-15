@@ -1,6 +1,5 @@
 import { Button } from '@shared/components/ui/Button';
 import { LanguageSwitcher } from '@shared/components/ui/LanguageSwitcher';
-import { ThemeToggle } from '@shared/components/ui/ThemeToggle';
 import { useTranslation } from '@shared/hooks/useTranslation';
 import { useAuthStore } from '@shared/stores/auth.store';
 import type { NavLinkItem } from '@shared/types/layout.types';
@@ -64,7 +63,6 @@ export function Navbar() {
 
         {/* Tools & User Profile */}
         <div className="flex items-center gap-2.5">
-          <ThemeToggle />
           <LanguageSwitcher />
 
           {isAuthenticated && user ? (
